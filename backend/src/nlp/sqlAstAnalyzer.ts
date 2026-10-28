@@ -18,6 +18,8 @@ export interface DetailedSqlAnalysis {
     hasSubquery: boolean;
     isDestructive: boolean;
     concerns: string[];
+    syntaxValid: boolean;
+    parseError?: string;
 }
 
 const parser = new Parser();
@@ -27,7 +29,7 @@ export function parseAndExplainSql(sql: string, databaseDialect: string = 'MySQL
     const clauses: ClauseExplanation[] = [];
     let ast: any = null;
 
-    const trimmed = sql.trim();
+    const trimmed = (sql || '').trim();
     const upper = trimmed.toUpperCase();
 
     // Check destructive query flags
@@ -40,11 +42,26 @@ export function parseAndExplainSql(sql: string, databaseDialect: string = 'MySQL
         }
     }
 
-    try {
-        ast = parser.astify(sql, { database: databaseDialect === 'PostgreSQL' ? 'PostgreSQL' : 'MySQL' });
-    } catch (e: any) {
-        // Fallback for non-standard queries or parser quirks
-        concerns.push(`AST Parser Notice: ${e.message}`);
+    let syntaxValid = true;
+    let parseError: string | undefined = undefined;
+
+    if (!trimmed) {
+        syntaxValid = false;
+        parseError = 'SQL query is empty.';
+        concerns.push(parseError);
+    } else {
+        try {
+            ast = parser.astify(trimmed, { database: databaseDialect === 'PostgreSQL' ? 'PostgreSQL' : 'MySQL' });
+            if (!ast) {
+                syntaxValid = false;
+                parseError = 'Parser produced empty AST for input.';
+                concerns.push(parseError);
+            }
+        } catch (e: any) {
+            syntaxValid = false;
+            parseError = e.message || 'Syntax error while generating SQL AST';
+            concerns.push(`AST Parser Notice: ${parseError}`);
+        }
     }
 
     const astObj = Array.isArray(ast) ? ast[0] : ast;
@@ -162,7 +179,9 @@ export function parseAndExplainSql(sql: string, databaseDialect: string = 'MySQL
     }
 
     const summaryParts: string[] = [];
-    if (upper.startsWith('SELECT')) {
+    if (!syntaxValid) {
+        summaryParts.push(`SQL Syntax Error: ${parseError || 'Invalid SQL syntax'}`);
+    } else if (upper.startsWith('SELECT')) {
         summaryParts.push(`Retrieves records from ${tablesAccessed.length > 0 ? tablesAccessed.join(', ') : 'the database'}`);
         if (hasAggregate) summaryParts.push('computing aggregated metrics');
         if (joins.length > 0) summaryParts.push(`joining related entities`);
@@ -186,6 +205,8 @@ export function parseAndExplainSql(sql: string, databaseDialect: string = 'MySQL
         hasAggregate,
         hasSubquery,
         isDestructive,
-        concerns
+        concerns,
+        syntaxValid,
+        parseError
     };
 }

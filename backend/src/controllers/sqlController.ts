@@ -117,13 +117,33 @@ export const explainSql = async (req: Request, res: Response): Promise<void> => 
 
 export const validateSql = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { sql, schema } = req.body;
-        if (!sql) {
-            res.status(400).json({ error: 'SQL query is required' });
+        const { sql } = req.body;
+        if (!sql || typeof sql !== 'string' || !sql.trim()) {
+            res.status(400).json({
+                isValid: false,
+                isDestructive: false,
+                errors: [{ type: 'EMPTY_INPUT', location: 'Root', message: 'SQL query is required and cannot be empty', suggestion: 'Provide a valid SQL query' }]
+            });
             return;
         }
 
         const astAnalysis = parseAndExplainSql(sql);
+
+        if (!astAnalysis.syntaxValid) {
+            res.status(400).json({
+                isValid: false,
+                isDestructive: astAnalysis.isDestructive,
+                errors: [{
+                    type: 'SYNTAX_ERROR',
+                    location: 'Query body',
+                    message: astAnalysis.parseError || 'Syntax error in SQL statement',
+                    suggestion: 'Verify statement syntax, table/column identifiers, and dialect keywords'
+                }],
+                astAnalysis
+            });
+            return;
+        }
+
         const errors = astAnalysis.concerns.map(c => ({
             type: 'SAFETY_OR_PERFORMANCE',
             location: 'Query body',
@@ -151,19 +171,39 @@ export const executeSql = async (req: Request, res: Response): Promise<void> => 
     try {
         const { sql } = req.body;
         
-        if (!sql) {
+        if (!sql || typeof sql !== 'string' || !sql.trim()) {
             res.status(400).json({ error: 'SQL query is required' });
             return;
         }
 
-        const upperSql = sql.trim().toUpperCase();
+        const trimmedSql = sql.trim();
+
+        // Disallow multiple semicolon-delimited statements in sandbox
+        const statements = trimmedSql
+            .split(';')
+            .map((s: string) => s.trim())
+            .filter((s: string) => s.length > 0);
+
+        if (statements.length > 1) {
+            res.status(403).json({ error: 'Security Exception: Multiple semicolon-separated SQL statements are disallowed in the execution sandbox.' });
+            return;
+        }
+
+        const upperSql = trimmedSql.toUpperCase();
         if (!upperSql.startsWith('SELECT') && !upperSql.startsWith('SHOW') && !upperSql.startsWith('DESCRIBE') && !upperSql.startsWith('EXPLAIN')) {
             res.status(403).json({ error: 'Security Exception: Only read-only queries (SELECT, SHOW, DESCRIBE, EXPLAIN) are permitted.' });
             return;
         }
 
+        // Validate AST syntax before sending to database engine
+        const astAnalysis = parseAndExplainSql(trimmedSql);
+        if (!astAnalysis.syntaxValid) {
+            res.status(400).json({ error: `Syntax error: ${astAnalysis.parseError || 'Invalid SQL syntax'}` });
+            return;
+        }
+
         const start = performance.now();
-        const results = await query(sql);
+        const results = await query(trimmedSql);
         const end = performance.now();
 
         res.json({

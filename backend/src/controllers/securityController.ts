@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { scanSourceDirectory, scanCodeSnippet, scanGithubRepository } from '../security/sourceAuditor';
-import { auditDatabaseSecurity } from '../security/databaseAuditor';
+import { auditDatabaseSecurity, isAllowedAuditHost, isAllowedAuditPort } from '../security/databaseAuditor';
 import path from 'path';
 
 export const scanSourceCode = async (req: Request, res: Response): Promise<void> => {
@@ -8,7 +8,7 @@ export const scanSourceCode = async (req: Request, res: Response): Promise<void>
         const { githubUrl } = req.query;
 
         if (githubUrl && typeof githubUrl === 'string') {
-            const report = scanGithubRepository(githubUrl);
+            const report = await scanGithubRepository(githubUrl);
             res.json(report);
             return;
         }
@@ -25,8 +25,8 @@ export const scanSourceCode = async (req: Request, res: Response): Promise<void>
 export const scanSnippet = async (req: Request, res: Response): Promise<void> => {
     try {
         const { code } = req.body;
-        if (!code) {
-            res.status(400).json({ error: 'Code is required' });
+        if (!code || typeof code !== 'string') {
+            res.status(400).json({ error: 'Code string is required' });
             return;
         }
         const findings = scanCodeSnippet(code);
@@ -42,7 +42,27 @@ export const scanSnippet = async (req: Request, res: Response): Promise<void> =>
 
 export const auditDatabase = async (req: Request, res: Response): Promise<void> => {
     try {
-        const config = req.method === 'POST' ? req.body : req.query;
+        if (req.method !== 'POST') {
+            res.status(405).json({ error: 'Method Not Allowed. Database audits must use POST.' });
+            return;
+        }
+
+        const config = req.body || {};
+
+        if (config.host && !isAllowedAuditHost(config.host)) {
+            res.status(403).json({
+                error: `Connection to host '${config.host}' is not permitted by database auditing security policy.`
+            });
+            return;
+        }
+
+        if (config.port && !isAllowedAuditPort(Number(config.port))) {
+            res.status(403).json({
+                error: `Port ${config.port} is not permitted for database auditing.`
+            });
+            return;
+        }
+
         const result = await auditDatabaseSecurity(config);
         res.json(result);
     } catch (e: any) {

@@ -27,6 +27,55 @@ export interface ConnectionConfig {
     database?: string;
 }
 
+/**
+ * Validates whether a target host is permissible under the safe database auditing policy.
+ * Disallows arbitrary internal network probing, loopback port traversal, and cloud metadata access.
+ */
+export function isAllowedAuditHost(host: string): boolean {
+    if (!host || typeof host !== 'string') return false;
+    const normalized = host.trim().toLowerCase();
+
+    // Block cloud metadata and link-local addresses
+    if (
+        normalized === '169.254.169.254' ||
+        normalized.startsWith('169.254.') ||
+        normalized === 'metadata.google.internal' ||
+        normalized === '0.0.0.0'
+    ) {
+        return false;
+    }
+
+    const defaultAllowed = new Set([
+        'localhost',
+        '127.0.0.1',
+        '::1',
+        (process.env.DB_HOST || 'localhost').toLowerCase()
+    ]);
+
+    if (defaultAllowed.has(normalized)) {
+        return true;
+    }
+
+    // Check optional explicitly configured allowed hosts
+    if (process.env.ALLOWED_AUDIT_HOSTS) {
+        const customAllowed = process.env.ALLOWED_AUDIT_HOSTS.split(',')
+            .map(h => h.trim().toLowerCase())
+            .filter(Boolean);
+        if (customAllowed.includes(normalized)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+export function isAllowedAuditPort(port: number): boolean {
+    if (!Number.isInteger(port) || port < 1 || port > 65535) return false;
+    // Block common non-MySQL service ports to prevent cross-protocol SSRF scanning
+    const blockedPorts = new Set([21, 22, 23, 25, 53, 80, 443, 6379, 11211, 27017, 8080]);
+    return !blockedPorts.has(port);
+}
+
 export async function auditDatabaseSecurity(customConfig?: ConnectionConfig): Promise<SecurityAuditResult> {
     const issues: string[] = [];
     const hardeningRecommendations: string[] = [];
@@ -35,20 +84,31 @@ export async function auditDatabaseSecurity(customConfig?: ConnectionConfig): Pr
     let currentUser = 'unknown';
     let version = 'unknown';
     let sslActive = false;
-    let targetHost = customConfig?.host || process.env.DB_HOST || 'localhost';
+    let targetHost = customConfig?.host ? customConfig.host.trim() : (process.env.DB_HOST || 'localhost');
 
     let connection: mysql.Connection | null = null;
 
     try {
         if (customConfig && customConfig.host && customConfig.user) {
-            // Connect to user-specified target database
+            const requestedHost = customConfig.host.trim();
+            const requestedPort = Number(customConfig.port) || 3306;
+
+            if (!isAllowedAuditHost(requestedHost)) {
+                throw new Error(`Connection to host '${requestedHost}' is restricted by database auditing security policy. Permitted hosts: localhost, 127.0.0.1, or ALLOWED_AUDIT_HOSTS.`);
+            }
+
+            if (!isAllowedAuditPort(requestedPort)) {
+                throw new Error(`Port ${requestedPort} is not permitted for database auditing.`);
+            }
+
+            // Connect to validated target database with a bounded timeout
             connection = await mysql.createConnection({
-                host: customConfig.host,
-                port: Number(customConfig.port) || 3306,
+                host: requestedHost,
+                port: requestedPort,
                 user: customConfig.user,
                 password: customConfig.password || '',
                 database: customConfig.database || undefined,
-                connectTimeout: 8000
+                connectTimeout: 5000
             });
         }
 

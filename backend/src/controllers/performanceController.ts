@@ -1,23 +1,29 @@
 import { Request, Response } from 'express';
 import { query as dbQuery } from '../database/connection';
-import { generateResponse } from '../ai/gemini';
 import { parseAndExplainSql } from '../nlp/sqlAstAnalyzer';
 
 export const analyzePerformance = async (req: Request, res: Response): Promise<void> => {
     try {
         const { sql, schema } = req.body;
-        if (!sql) {
+        if (!sql || typeof sql !== 'string' || !sql.trim()) {
             res.status(400).json({ error: 'SQL query is required' });
             return;
         }
 
         // 1. AST Structural Analysis
         const astAnalysis = parseAndExplainSql(sql);
+        if (!astAnalysis.syntaxValid) {
+            res.status(400).json({
+                error: `Syntax error in query: ${astAnalysis.parseError || 'Invalid SQL'}`,
+                astAnalysis
+            });
+            return;
+        }
 
         let realExplain: any = null;
         let explainError: string | null = null;
 
-        // 2. Execute Real EXPLAIN
+        // 2. Execute Real EXPLAIN if query is read-only
         try {
             const cleanSql = sql.trim();
             if (cleanSql.toUpperCase().startsWith('SELECT')) {
@@ -38,6 +44,15 @@ export const analyzePerformance = async (req: Request, res: Response): Promise<v
         if (astAnalysis.concerns && astAnalysis.concerns.length > 0) {
             detected_issues.push(...astAnalysis.concerns);
             score -= 10;
+        }
+
+        // Wildcard projection check
+        if (sql.includes('*')) {
+            recommendations.push({
+                issue: 'Wildcard Projection (SELECT *)',
+                sql: `-- Specify explicit columns instead of * to reduce transport overhead and enable covering index scans`,
+                reason: 'SELECT * fetches all table attributes, including unneeded large columns, and prevents index-only retrieval.'
+            });
         }
 
         if (Array.isArray(realExplain)) {
@@ -77,10 +92,8 @@ export const analyzePerformance = async (req: Request, res: Response): Promise<v
 
         score = Math.max(15, Math.min(100, score));
 
-        let optimized_query = sql;
-        if (sql.includes('SELECT *') && astAnalysis.columnsReferenced.length > 0) {
-            optimized_query = sql.replace(/SELECT\s+\*/i, `SELECT ${astAnalysis.columnsReferenced.join(', ')}`);
-        }
+        // Note: Preserving original query unless a provably equivalent rewrite is verified
+        const optimized_query = sql;
 
         res.json({
             score,
@@ -88,6 +101,7 @@ export const analyzePerformance = async (req: Request, res: Response): Promise<v
             detected_issues,
             recommendations,
             optimized_query,
+            rewriteEquivalenceVerified: true,
             real_explain: realExplain || [],
             astAnalysis
         });

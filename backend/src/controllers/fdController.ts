@@ -1,38 +1,40 @@
 import { Request, Response } from 'express';
 
-interface FD {
+export interface FD {
     left: string[];
     right: string[];
 }
 
 // Utility: Check if set A is a subset of set B
-const isSubset = (subset: Set<string>, superset: Set<string>) => {
-    for (let elem of subset) {
+export const isSubset = (subset: Set<string>, superset: Set<string>): boolean => {
+    for (const elem of subset) {
         if (!superset.has(elem)) return false;
     }
     return true;
 };
 
 // Utility: Check if two sets are equal
-const areSetsEqual = (a: Set<string>, b: Set<string>) => {
+export const areSetsEqual = (a: Set<string>, b: Set<string>): boolean => {
     return a.size === b.size && isSubset(a, b);
 };
 
 // 1. Attribute Closure Calculator
 export const calculateClosure = (attributes: Set<string>, fds: FD[], target: Set<string>): { closure: Set<string>, steps: string[] } => {
-    let closure = new Set(target);
-    let steps: string[] = [`Initial closure = {${Array.from(closure).join(', ')}}`];
+    const closure = new Set(target);
+    const steps: string[] = [`Initial closure = {${Array.from(closure).join(', ')}}`];
     let changed = true;
 
     while (changed) {
         changed = false;
-        for (let fd of fds) {
+        for (const fd of fds) {
             const leftSet = new Set(fd.left);
-            const rightSet = new Set(fd.right);
-            if (isSubset(leftSet, closure) && !isSubset(rightSet, closure)) {
-                fd.right.forEach(attr => closure.add(attr));
-                steps.push(`Using ${fd.left.join('')} \u2192 ${fd.right.join('')}, added {${fd.right.filter(x => !closure.has(x)).join(', ')}... wait}. Closure is now {${Array.from(closure).join(', ')}}`);
-                changed = true;
+            if (isSubset(leftSet, closure)) {
+                const newlyAdded = fd.right.filter(attr => !closure.has(attr));
+                if (newlyAdded.length > 0) {
+                    newlyAdded.forEach(attr => closure.add(attr));
+                    steps.push(`Using ${fd.left.join('')} \u2192 ${fd.right.join('')}, added {${newlyAdded.join(', ')}}. Closure is now {${Array.from(closure).join(', ')}}`);
+                    changed = true;
+                }
             }
         }
     }
@@ -55,8 +57,8 @@ export const findCandidateKeys = (attributes: string[], fds: FD[]): { candidateK
     const rightSideAttrs = new Set(fds.flatMap(fd => fd.right));
     const leftSideAttrs = new Set(fds.flatMap(fd => fd.left));
     
-    let essential = attributes.filter(a => !rightSideAttrs.has(a));
-    let others = attributes.filter(a => rightSideAttrs.has(a) && leftSideAttrs.has(a)); // Middle attributes
+    const essential = attributes.filter(a => !rightSideAttrs.has(a));
+    const others = attributes.filter(a => rightSideAttrs.has(a) && leftSideAttrs.has(a)); // Middle attributes
     
     // If essential attributes determine everything, it's the only candidate key
     const essentialClosure = calculateClosure(attrSet, fds, new Set(essential)).closure;
@@ -66,9 +68,9 @@ export const findCandidateKeys = (attributes: string[], fds: FD[]): { candidateK
 
     // Otherwise, generate combinations of 'others' with 'essential'
     const combinations = getSubsets(others).sort((a, b) => a.length - b.length); // Smallest first
-    let candidateKeys: string[][] = [];
+    const candidateKeys: string[][] = [];
 
-    for (let combo of combinations) {
+    for (const combo of combinations) {
         const potentialKey = [...essential, ...combo];
         const closure = calculateClosure(attrSet, fds, new Set(potentialKey)).closure;
         
@@ -101,14 +103,14 @@ export const analyzeNormalization = (attributes: string[], fds: FD[]) => {
     let is3NF = true;
     let isBCNF = true;
     
-    let analysis = [];
+    const analysis: Array<{ fd: string; violation: '2NF' | '3NF' | 'BCNF'; reason: string }> = [];
 
-    for (let fd of fds) {
+    for (const fd of fds) {
         const leftSet = new Set(fd.left);
-        const rightSet = new Set(fd.right);
+        const nonTrivialRight = fd.right.filter(attr => !leftSet.has(attr));
         
         // Trivial FD check: Y is subset of X
-        if (isSubset(rightSet, leftSet)) continue;
+        if (nonTrivialRight.length === 0) continue;
 
         // Check if X is a superkey
         const leftClosure = calculateClosure(attrSet, fds, leftSet).closure;
@@ -117,22 +119,16 @@ export const analyzeNormalization = (attributes: string[], fds: FD[]) => {
         if (!isSuperKey) {
             isBCNF = false; // BCNF violation
             
-            // Check 3NF: Is Y a prime attribute? (for every attribute in Y)
-            let yIsPrime = true;
-            for (let attr of fd.right) {
-                if (!primeSet.has(attr)) {
-                    yIsPrime = false;
-                    break;
-                }
-            }
+            // Check 3NF: Is every non-trivial attribute in Y prime?
+            const nonPrimeInRight = nonTrivialRight.filter(attr => !primeSet.has(attr));
             
-            if (!yIsPrime) {
+            if (nonPrimeInRight.length > 0) {
                 is3NF = false; // 3NF violation
                 
                 // Check 2NF: Partial dependency check
-                // A partial dependency exists if a non-prime attribute depends on a PROPER SUBSET of a candidate key
+                // A partial dependency exists if a non-prime attribute depends on a PROPER SUBSET of any candidate key
                 let isProperSubsetOfAnyCK = false;
-                for (let ck of candidateKeys) {
+                for (const ck of candidateKeys) {
                     const ckSet = new Set(ck);
                     if (isSubset(leftSet, ckSet) && !areSetsEqual(leftSet, ckSet)) {
                         isProperSubsetOfAnyCK = true;
@@ -145,26 +141,26 @@ export const analyzeNormalization = (attributes: string[], fds: FD[]) => {
                     analysis.push({
                         fd: `${fd.left.join('')} \u2192 ${fd.right.join('')}`,
                         violation: '2NF',
-                        reason: `Partial Dependency: '${fd.left.join('')}' is a proper subset of a candidate key, determining non-prime attribute(s) '${fd.right.filter(x => !primeSet.has(x)).join(', ')}'`
+                        reason: `Partial Dependency: '${fd.left.join('')}' is a proper subset of a candidate key, determining non-prime attribute(s) '${nonPrimeInRight.join(', ')}'`
                     });
                 } else {
-                     analysis.push({
+                    analysis.push({
                         fd: `${fd.left.join('')} \u2192 ${fd.right.join('')}`,
                         violation: '3NF',
-                        reason: `Transitive Dependency: '${fd.left.join('')}' is not a superkey, and '${fd.right.join('')}' is not completely prime.`
+                        reason: `Transitive Dependency: '${fd.left.join('')}' is not a superkey, and determines non-prime attribute(s) '${nonPrimeInRight.join(', ')}'.`
                     });
                 }
             } else {
-                 analysis.push({
+                analysis.push({
                     fd: `${fd.left.join('')} \u2192 ${fd.right.join('')}`,
                     violation: 'BCNF',
-                    reason: `BCNF Violation: '${fd.left.join('')}' is not a superkey, but determines prime attribute(s).`
+                    reason: `BCNF Violation: '${fd.left.join('')}' is not a superkey, but determines prime attribute(s) '${nonTrivialRight.join(', ')}'.`
                 });
             }
         }
     }
 
-    let highestForm = isBCNF ? 'BCNF' : (is3NF ? '3NF' : (is2NF ? '2NF' : '1NF'));
+    const highestForm = isBCNF ? 'BCNF' : (is3NF ? '3NF' : (is2NF ? '2NF' : '1NF'));
 
     return { candidateKeys, primeAttributes, nonPrimeAttributes, highestForm, analysis };
 };
@@ -172,18 +168,30 @@ export const analyzeNormalization = (attributes: string[], fds: FD[]) => {
 // Express Endpoints
 export const handleClosure = (req: Request, res: Response) => {
     const { attributes, fds, target } = req.body;
+    if (!attributes || !fds || !target) {
+        res.status(400).json({ error: 'attributes, fds, and target are required' });
+        return;
+    }
     const result = calculateClosure(new Set(attributes), fds, new Set(target));
     res.json({ closure: Array.from(result.closure), steps: result.steps });
 };
 
 export const handleCandidateKeys = (req: Request, res: Response) => {
     const { attributes, fds } = req.body;
+    if (!attributes || !fds) {
+        res.status(400).json({ error: 'attributes and fds are required' });
+        return;
+    }
     const result = findCandidateKeys(attributes, fds);
     res.json(result);
 };
 
 export const handleNormalization = (req: Request, res: Response) => {
     const { attributes, fds } = req.body;
+    if (!attributes || !fds) {
+        res.status(400).json({ error: 'attributes and fds are required' });
+        return;
+    }
     const result = analyzeNormalization(attributes, fds);
     res.json(result);
 };

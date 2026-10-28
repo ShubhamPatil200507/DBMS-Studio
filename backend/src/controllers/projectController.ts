@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import { query } from '../database/connection';
 
-// Assuming user ID 1 for now (mock user)
-const USER_ID = 1;
+// User context resolver (defaults to authenticated session/token user, fallback 1)
+export const getRequestUserId = (req: Request): number => {
+    return (req as any).user?.id || 1;
+};
 
 export const logActivity = async (projectId: number, activityType: string, description: string) => {
     try {
@@ -14,7 +16,8 @@ export const logActivity = async (projectId: number, activityType: string, descr
 
 export const getProjects = async (req: Request, res: Response): Promise<void> => {
     try {
-        const projects = await query('SELECT * FROM projects WHERE user_id = ? ORDER BY updated_at DESC', [USER_ID]);
+        const userId = getRequestUserId(req);
+        const projects = await query('SELECT * FROM projects WHERE user_id = ? ORDER BY updated_at DESC', [userId]);
         res.json(projects);
     } catch (error) {
         console.error(error);
@@ -25,7 +28,8 @@ export const getProjects = async (req: Request, res: Response): Promise<void> =>
 export const getProjectById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const [project]: any = await query('SELECT * FROM projects WHERE id = ? AND user_id = ?', [id, USER_ID]);
+        const userId = getRequestUserId(req);
+        const [project]: any = await query('SELECT * FROM projects WHERE id = ? AND user_id = ?', [id, userId]);
         
         if (!project) {
             res.status(404).json({ error: 'Project not found' });
@@ -58,16 +62,22 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
 export const createProject = async (req: Request, res: Response): Promise<void> => {
     try {
         const { project_name, description, original_requirement, database_platform } = req.body;
+        if (!project_name || typeof project_name !== 'string' || !project_name.trim()) {
+            res.status(400).json({ error: 'Project name is required' });
+            return;
+        }
+
+        const userId = getRequestUserId(req);
         const platform = database_platform || 'MySQL';
         
         const result: any = await query(
             'INSERT INTO projects (user_id, project_name, description, original_requirement, database_platform) VALUES (?, ?, ?, ?, ?)',
-            [USER_ID, project_name, description || '', original_requirement || '', platform]
+            [userId, project_name.trim(), description || '', original_requirement || '', platform]
         );
         
         await logActivity(result.insertId, 'PROJECT_CREATED', `Project created with ${platform} platform.`);
         
-        res.status(201).json({ id: result.insertId, project_name, description, database_platform: platform });
+        res.status(201).json({ id: result.insertId, project_name: project_name.trim(), description, database_platform: platform });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to create project' });
@@ -77,11 +87,19 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
 export const updateProject = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
+        const userId = getRequestUserId(req);
         const { project_name, description } = req.body;
-        await query(
+        
+        const result: any = await query(
             'UPDATE projects SET project_name = ?, description = ? WHERE id = ? AND user_id = ?',
-            [project_name, description, id, USER_ID]
+            [project_name, description, id, userId]
         );
+
+        if (result.affectedRows === 0) {
+            res.status(404).json({ error: 'Project not found or unauthorized' });
+            return;
+        }
+
         res.json({ success: true });
     } catch (error) {
         console.error(error);
@@ -92,7 +110,14 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
 export const deleteProject = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        await query('DELETE FROM projects WHERE id = ? AND user_id = ?', [id, USER_ID]);
+        const userId = getRequestUserId(req);
+        const result: any = await query('DELETE FROM projects WHERE id = ? AND user_id = ?', [id, userId]);
+
+        if (result.affectedRows === 0) {
+            res.status(404).json({ error: 'Project not found or unauthorized' });
+            return;
+        }
+
         res.json({ success: true });
     } catch (error) {
         console.error(error);
@@ -105,7 +130,15 @@ export const deleteProject = async (req: Request, res: Response): Promise<void> 
 export const saveSchema = async (req: Request, res: Response): Promise<void> => {
      try {
          const { id } = req.params;
+         const userId = getRequestUserId(req);
          const { schema_json, mysql_schema } = req.body;
+
+         // Verify project exists and belongs to requesting user
+         const [project]: any = await query('SELECT id FROM projects WHERE id = ? AND user_id = ?', [id, userId]);
+         if (!project) {
+             res.status(404).json({ error: 'Project not found or unauthorized' });
+             return;
+         }
          
          // Insert into database_schemas (latest view)
          await query(
@@ -134,12 +167,20 @@ export const saveSchema = async (req: Request, res: Response): Promise<void> => 
          console.error('Save schema error', e);
          res.status(500).json({error: 'Failed to save schema'});
      }
-}
+};
 
 export const saveQuery = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
+        const userId = getRequestUserId(req);
         const { natural_language_request, generated_sql, explanation, execution_time, execution_status } = req.body;
+
+        // Verify project exists and belongs to requesting user
+        const [project]: any = await query('SELECT id FROM projects WHERE id = ? AND user_id = ?', [id, userId]);
+        if (!project) {
+            res.status(404).json({ error: 'Project not found or unauthorized' });
+            return;
+        }
         
         await query(
             'INSERT INTO sql_queries (project_id, natural_language_request, generated_sql, explanation, execution_time, execution_status) VALUES (?, ?, ?, ?, ?, ?)',
@@ -156,4 +197,4 @@ export const saveQuery = async (req: Request, res: Response): Promise<void> => {
         console.error('Save query error', e);
         res.status(500).json({error: 'Failed to save query'});
     }
-}
+};

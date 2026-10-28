@@ -1,7 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import { execSync } from 'child_process';
+import { execFile } from 'child_process';
+import { promisify } from 'util';
+
+const execFileAsync = promisify(execFile);
 
 export interface SecurityFinding {
     ruleId: string;
@@ -23,6 +26,7 @@ export interface SecurityAuditReport {
     findingsCount: number;
     findings: SecurityFinding[];
     summary: string;
+    auditMethodology?: string;
 }
 
 const EXTENSIONS = new Set(['.ts', '.js', '.tsx', '.jsx', '.py', '.php', '.java', '.sql']);
@@ -60,24 +64,24 @@ export function scanSourceDirectory(rootDir: string, sourceName: string = 'Local
         findings,
         summary: findings.length === 0 
             ? `Security audit for ${sourceName} completed: No vulnerabilities detected in scanned repository files.`
-            : `Detected ${findings.length} security vulnerability and SQL injection pattern(s) in ${sourceName}.`
+            : `Detected ${findings.length} security vulnerability and SQL injection pattern(s) in ${sourceName}.`,
+        auditMethodology: 'Lexical and syntactic pattern scanning'
     };
 }
 
-export function scanGithubRepository(repoUrl: string): SecurityAuditReport {
-    // Validate repository URL
+export async function scanGithubRepository(repoUrl: string): Promise<SecurityAuditReport> {
+    // Validate repository URL strictly to prevent command injection
     const sanitizedUrl = repoUrl.trim();
-    if (!/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+(?:\.git)?$/i.test(sanitizedUrl)) {
+    if (!/^https:\/\/github\.com\/[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+(?:\.git)?$/i.test(sanitizedUrl)) {
         throw new Error('Invalid GitHub repository URL. Expected format: https://github.com/owner/repository');
     }
 
     // Create unique temporary clone directory
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dbms-git-'));
     try {
-        // Shallow clone 1 commit to optimize speed and bandwidth
-        execSync(`git clone --depth 1 "${sanitizedUrl}" "${tempDir}"`, {
-            stdio: 'pipe',
-            timeout: 60000 // 60s timeout
+        // Asynchronous shallow clone without invoking a system shell (execFile)
+        await execFileAsync('git', ['clone', '--depth', '1', sanitizedUrl, tempDir], {
+            timeout: 30000 // 30s timeout
         });
 
         // Scan cloned files
@@ -95,7 +99,7 @@ export function scanGithubRepository(repoUrl: string): SecurityAuditReport {
 
 export function scanCodeSnippet(code: string, fileName: string = 'snippet.ts'): SecurityFinding[] {
     const findings: SecurityFinding[] = [];
-    const lines = code.split('\n');
+    const lines = (code || '').split('\n');
     scanLines(lines, fileName, findings);
     return findings;
 }

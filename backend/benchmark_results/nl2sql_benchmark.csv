@@ -1,0 +1,21 @@
+id,difficulty,prompt,expectedTables,baselineTables,baselineTableCorrect,schemaAwareTables,schemaAwareTableCorrect,expectedIntent,baselineIntent,schemaAwareIntent,joinsResolved,baselineLatencyMs,schemaAwareLatencyMs
+NL-01,SIMPLE,Show all users,users,users,true,users,true,SELECT,SELECT,SELECT,0,0.2657,4.1005
+NL-02,SIMPLE,Count the total number of orders,orders,orders,true,orders,true,AGGREGATE,AGGREGATE,AGGREGATE,0,0.014,0.7761
+NL-03,SIMPLE,Get the first 5 reviews,reviews,reviews,true,reviews,true,SELECT,SELECT,SELECT,0,0.0162,0.4279
+NL-04,SIMPLE,Show all order items sorted by price descending,order_items,,false,orders,false,SELECT,SELECT,SELECT,0,0.0101,1.1387
+NL-05,MEDIUM,List users with their corresponding orders,"orders,users","orders,users",true,"orders,users",true,SELECT,SELECT,SELECT,1,0.0115,0.3813
+NL-06,MEDIUM,Find orders and the items purchased in each order,"order_items,orders",orders,false,orders,false,SELECT,SELECT,SELECT,0,0.0101,0.7425
+NL-07,MEDIUM,Show users who wrote reviews,"reviews,users","reviews,users",true,"reviews,users",true,SELECT,SELECT,SELECT,1,0.0112,0.2446
+NL-08,MEDIUM,Retrieve users where email ends with example.com,users,users,true,users,true,SELECT,SELECT,SELECT,0,0.0128,0.3398
+NL-09,MEDIUM,Calculate the total revenue from orders,orders,orders,true,orders,true,AGGREGATE,SELECT,AGGREGATE,0,0.0247,0.237
+NL-10,MEDIUM,Calculate the average rating across all reviews,reviews,reviews,true,reviews,true,AGGREGATE,AGGREGATE,AGGREGATE,0,0.0133,0.5485
+NL-11,COMPLEX,Count the number of orders per user,"orders,users",orders,false,"orders,users",true,AGGREGATE,AGGREGATE,AGGREGATE,1,0.0131,0.5015
+NL-12,COMPLEX,Find top 3 users with the highest order volume,"orders,users",users,false,"orders,users",true,SELECT,SELECT,SELECT,1,0.009,0.4281
+NL-13,COMPLEX,Display average product price per order item,order_items,,false,orders,false,AGGREGATE,AGGREGATE,AGGREGATE,0,0.0052,0.3584
+NL-14,MEDIUM,List orders with total amounts exceeding 500 dollars,orders,orders,true,orders,true,SELECT,SELECT,AGGREGATE,0,0.0057,0.2958
+NL-15,COMPLEX,Find users with pending orders,"orders,users","orders,users",true,"orders,users",true,SELECT,SELECT,SELECT,1,0.0041,0.1771
+NL-16,MEDIUM,List reviews with 5 star ratings sorted by creation date,reviews,reviews,true,reviews,true,SELECT,SELECT,SELECT,0,0.005,0.5222
+NL-17,COMPLEX,Count distinct users who made at least one purchase,"orders,users",users,false,users,false,AGGREGATE,AGGREGATE,AGGREGATE,0,0.0057,0.2606
+NL-18,MEDIUM,Find maximum order amount in the orders database,orders,orders,true,orders,true,AGGREGATE,AGGREGATE,AGGREGATE,0,0.0055,0.2033
+NL-19,SIMPLE,Show users registered recently ordered by id desc limit 10,users,users,true,"orders,users",false,SELECT,SELECT,SELECT,1,0.004,0.4155
+NL-20,COMPLEX,List users who gave 1 star reviews with their comments,"reviews,users","reviews,users",true,"reviews,users",true,SELECT,SELECT,SELECT,1,0.0075,0.4068

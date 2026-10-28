@@ -1,0 +1,11 @@
+id,description,syntaxValid,tablesAccessed,hasAggregate,isDestructive,concernsCount,concerns,medianLatencyMs
+OPT-01,Unindexed Wildcard SELECT on users table,true,users,false,false,0,,1.7909
+OPT-02,Two-table inner join without explicit projection,true,"orders, users",false,false,0,,0.8698
+OPT-03,Aggregation with GROUP BY and HAVING without index order,true,orders,true,false,0,,1.3842
+OPT-04,Unbounded delete query (critical safety concern),true,session_logs,false,true,1,CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.,0.3
+OPT-05,Query with unindexed ORDER BY filesort pattern,true,orders,false,false,0,,1.0402
+OPT-06,Three-table join with selective filtering,true,"users, orders, order_items",false,false,0,,1.4108
+OPT-07,SELECT wildcard with subquery in FROM clause,true,,false,false,0,,0.6745
+OPT-08,Unbounded UPDATE statement without WHERE clause,true,,false,true,1,CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.,0.3489
+OPT-09,Specific projection with indexable primary key range scan,true,users,false,false,0,,0.9338
+OPT-10,Paginated query with explicit LIMIT and OFFSET boundary,true,users,false,false,0,,0.6343
