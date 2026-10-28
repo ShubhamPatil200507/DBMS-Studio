@@ -92,7 +92,7 @@ export const analyzePerformance = async (req: Request, res: Response): Promise<v
 
         score = Math.max(15, Math.min(100, score));
 
-        // Note: Preserving original query unless a provably equivalent rewrite is verified
+        // Note: Preserving original query as a safe fallback when no proven equivalent rewrite is available
         const optimized_query = sql;
 
         res.json({
@@ -101,7 +101,9 @@ export const analyzePerformance = async (req: Request, res: Response): Promise<v
             detected_issues,
             recommendations,
             optimized_query,
-            rewriteEquivalenceVerified: true,
+            query_rewritten: false,
+            optimization_status: 'UNCHANGED_SAFE_FALLBACK',
+            rewriteEquivalenceVerified: null, // Honest status: no rewrite occurred
             real_explain: realExplain || [],
             astAnalysis
         });

@@ -1,51 +1,51 @@
 id,description,expectedVulnerable,predictedVulnerable,correct,findingsCount,findingsRules,latencyMs
-SEC-POS-01,Direct string concatenation of req.body into SQL WHERE,true,true,true,1,SEC-SQLI-001,0.872
-SEC-POS-02,Direct concatenation of numeric req.query parameter,true,true,true,1,SEC-SQLI-001,1.0162
-SEC-POS-03,Template literal interpolation with req.params,true,true,true,1,SEC-SQLI-001,0.0282
-SEC-POS-04,Template literal inside db.query call,true,true,true,2,SEC-SQLI-001; SEC-SQLI-002,0.0201
-SEC-POS-05,execute() call with template variable interpolation,true,true,true,2,SEC-SQLI-001; SEC-SQLI-002,0.0492
-SEC-POS-06,raw() database query with raw interpolation,true,true,true,1,SEC-SQLI-002,0.6017
-SEC-POS-07,DELETE FROM without WHERE clause,true,true,true,1,SEC-DATA-003,0.1356
-SEC-POS-08,UPDATE without WHERE clause,true,true,true,1,SEC-DATA-003,0.0166
-SEC-POS-09,Hardcoded database password literal,true,true,true,1,SEC-CRED-004,0.178
-SEC-POS-10,Hardcoded API secret token,true,true,true,1,SEC-CRED-004,0.066
-SEC-POS-11,Hardcoded personal access token,true,true,true,1,SEC-CRED-004,0.0151
+SEC-POS-01,Direct string concatenation of req.body into SQL WHERE,true,true,true,1,SEC-SQLI-001,0.9246
+SEC-POS-02,Direct concatenation of numeric req.query parameter,true,true,true,1,SEC-SQLI-001,0.4046
+SEC-POS-03,Template literal interpolation with req.params,true,true,true,1,SEC-SQLI-001,0.0225
+SEC-POS-04,Template literal inside db.query call,true,true,true,2,SEC-SQLI-001; SEC-SQLI-002,0.019
+SEC-POS-05,execute() call with template variable interpolation,true,true,true,2,SEC-SQLI-001; SEC-SQLI-002,0.0357
+SEC-POS-06,raw() database query with raw interpolation,true,true,true,1,SEC-SQLI-002,0.0713
+SEC-POS-07,DELETE FROM without WHERE clause,true,true,true,1,SEC-DATA-003,0.0561
+SEC-POS-08,UPDATE without WHERE clause,true,true,true,1,SEC-DATA-003,0.0131
+SEC-POS-09,Hardcoded database password literal,true,true,true,1,SEC-CRED-004,0.188
+SEC-POS-10,Hardcoded API secret token,true,true,true,1,SEC-CRED-004,0.0828
+SEC-POS-11,Hardcoded personal access token,true,true,true,1,SEC-CRED-004,0.0179
 SEC-POS-12,Querying plaintext password column,true,true,true,1,SEC-AUTH-005,0.0733
-SEC-POS-13,Inserting unhashed password attribute,true,true,true,1,SEC-AUTH-005,0.0382
-SEC-POS-14,Django-style request.GET concatenation,true,true,true,1,SEC-SQLI-001,0.0114
-SEC-POS-15,Django/PHP request.POST concatenation,true,true,true,1,SEC-SQLI-001,0.0079
+SEC-POS-13,Inserting unhashed password attribute,true,true,true,1,SEC-AUTH-005,0.013
+SEC-POS-14,Django-style request.GET concatenation,true,true,true,1,SEC-SQLI-001,0.01
+SEC-POS-15,Django/PHP request.POST concatenation,true,true,true,1,SEC-SQLI-001,0.0083
 SEC-POS-16,Python style %s string formatting injection,true,true,true,1,SEC-SQLI-001,0.005
-SEC-POS-17,Python style str.format() injection,true,true,true,1,SEC-SQLI-001,0.0053
-SEC-POS-18,Direct body attribute in template query call,true,true,true,2,SEC-SQLI-001; SEC-SQLI-002,0.0076
-SEC-POS-19,Destructive DELETE without WHERE constraint,true,true,true,1,SEC-DATA-003,0.0054
-SEC-POS-20,Hardcoded production secret,true,true,true,1,SEC-CRED-004,0.0098
-SEC-POS-21,Direct concatenation of params object property,true,true,true,1,SEC-SQLI-001,0.005
-SEC-POS-22,execute() with req.query interpolation,true,true,true,2,SEC-SQLI-001; SEC-SQLI-002,0.0049
-SEC-POS-23,Unbounded UPDATE statement without WHERE,true,true,true,1,SEC-DATA-003,0.0111
-SEC-POS-24,Hardcoded admin password variable,true,true,true,1,SEC-CRED-004,0.0201
-SEC-POS-25,Concatenating raw input into UPDATE statement,true,true,true,3,SEC-SQLI-001; SEC-DATA-003; SEC-AUTH-005,0.0117
-SEC-NEG-01,Properly parameterized query with placeholder,false,false,true,0,,0.0088
-SEC-NEG-02,Parameterized prepared statement with multiple bindings,false,false,true,0,,0.0057
-SEC-NEG-03,Parameterized DELETE query with WHERE clause,false,false,true,0,,0.0067
-SEC-NEG-04,Safe UPDATE with explicit WHERE placeholders,false,false,true,0,,0.0065
-SEC-NEG-05,Database credentials read from environment variables,false,false,true,0,,0.0066
-SEC-NEG-06,Secret key accessed via process.env,false,false,true,0,,0.0049
-SEC-NEG-07,Token read from process.env with default fallback,false,false,true,0,,0.0046
-SEC-NEG-08,Password properly hashed using bcrypt,false,false,true,0,,0.0099
-SEC-NEG-09,Selecting hashed password with parameterized binding,false,false,true,0,,0.0093
-SEC-NEG-10,Standard arithmetic addition,false,false,true,0,,0.0097
-SEC-NEG-11,Harmless string template literal without SQL keywords,false,false,true,0,,0.0043
-SEC-NEG-12,String concatenation without SQL sinks,false,false,true,0,,0.0031
-SEC-NEG-13,Static query without user variables,false,false,true,0,,0.003
-SEC-NEG-14,Example documentation placeholder,false,false,true,0,,0.0039
+SEC-POS-17,Python style str.format() injection,true,true,true,1,SEC-SQLI-001,0.0055
+SEC-POS-18,Direct body attribute in template query call,true,true,true,2,SEC-SQLI-001; SEC-SQLI-002,0.0075
+SEC-POS-19,Destructive DELETE without WHERE constraint,true,true,true,1,SEC-DATA-003,0.0051
+SEC-POS-20,Hardcoded production secret,true,true,true,1,SEC-CRED-004,0.0092
+SEC-POS-21,Direct concatenation of params object property,true,true,true,1,SEC-SQLI-001,0.0049
+SEC-POS-22,execute() with req.query interpolation,true,true,true,2,SEC-SQLI-001; SEC-SQLI-002,0.0047
+SEC-POS-23,Unbounded UPDATE statement without WHERE,true,true,true,1,SEC-DATA-003,0.0055
+SEC-POS-24,Hardcoded admin password variable,true,true,true,1,SEC-CRED-004,0.0349
+SEC-POS-25,Concatenating raw input into UPDATE statement,true,true,true,3,SEC-SQLI-001; SEC-DATA-003; SEC-AUTH-005,0.0092
+SEC-NEG-01,Properly parameterized query with placeholder,false,false,true,0,,0.0062
+SEC-NEG-02,Parameterized prepared statement with multiple bindings,false,false,true,0,,0.0039
+SEC-NEG-03,Parameterized DELETE query with WHERE clause,false,false,true,0,,0.005
+SEC-NEG-04,Safe UPDATE with explicit WHERE placeholders,false,false,true,0,,0.0035
+SEC-NEG-05,Database credentials read from environment variables,false,false,true,0,,0.0041
+SEC-NEG-06,Secret key accessed via process.env,false,false,true,0,,0.0032
+SEC-NEG-07,Token read from process.env with default fallback,false,false,true,0,,0.0029
+SEC-NEG-08,Password properly hashed using bcrypt,false,false,true,0,,0.0036
+SEC-NEG-09,Selecting hashed password with parameterized binding,false,false,true,0,,0.0039
+SEC-NEG-10,Standard arithmetic addition,false,false,true,0,,0.0081
+SEC-NEG-11,Harmless string template literal without SQL keywords,false,false,true,0,,0.003
+SEC-NEG-12,String concatenation without SQL sinks,false,false,true,0,,0.0029
+SEC-NEG-13,Static query without user variables,false,false,true,0,,0.0031
+SEC-NEG-14,Example documentation placeholder,false,false,true,0,,0.0037
 SEC-NEG-15,Standard template placeholder string,false,false,true,0,,0.0027
-SEC-NEG-16,Safe static administrative read query,false,false,true,0,,0.0026
-SEC-NEG-17,Reading schema file from local disk,false,false,true,0,,0.0029
-SEC-NEG-18,Static healthcheck query,false,false,true,0,,0.0031
-SEC-NEG-19,In-memory JavaScript array filter,false,false,true,0,,0.0027
-SEC-NEG-20,Parameterized INSERT with audit log values,false,false,true,0,,0.0034
-SEC-NEG-21,Argon2 cryptographic password verification,false,false,true,0,,0.0031
-SEC-NEG-22,Standard HTTP response serialization,false,false,true,0,,0.0028
-SEC-NEG-23,Regex identifier validation guard,false,false,true,0,,0.0026
-SEC-NEG-24,Numeric port parsing from environment,false,false,true,0,,0.0027
-SEC-NEG-25,Parameterized aggregate query with session user id,false,false,true,0,,0.003
+SEC-NEG-16,Safe static administrative read query,false,false,true,0,,0.0025
+SEC-NEG-17,Reading schema file from local disk,false,false,true,0,,0.0076
+SEC-NEG-18,Static healthcheck query,false,false,true,0,,0.0051
+SEC-NEG-19,In-memory JavaScript array filter,false,false,true,0,,0.0032
+SEC-NEG-20,Parameterized INSERT with audit log values,false,false,true,0,,0.0035
+SEC-NEG-21,Argon2 cryptographic password verification,false,false,true,0,,0.0033
+SEC-NEG-22,Standard HTTP response serialization,false,false,true,0,,0.003
+SEC-NEG-23,Regex identifier validation guard,false,false,true,0,,0.0025
+SEC-NEG-24,Numeric port parsing from environment,false,false,true,0,,0.0028
+SEC-NEG-25,Parameterized aggregate query with session user id,false,false,true,0,,0.0033

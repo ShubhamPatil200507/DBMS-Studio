@@ -1,9 +1,13 @@
 import { Request, Response } from 'express';
 import { query } from '../database/connection';
 
-// User context resolver (defaults to authenticated session/token user, fallback 1)
+// User context resolver: requires verified authenticated user identity, NO hardcoded fallback
 export const getRequestUserId = (req: Request): number => {
-    return (req as any).user?.id || 1;
+    const user = (req as any).user;
+    if (!user || typeof user.id !== 'number') {
+        throw new Error('UNAUTHORIZED: Authenticated user context required');
+    }
+    return user.id;
 };
 
 export const logActivity = async (projectId: number, activityType: string, description: string) => {
@@ -19,7 +23,11 @@ export const getProjects = async (req: Request, res: Response): Promise<void> =>
         const userId = getRequestUserId(req);
         const projects = await query('SELECT * FROM projects WHERE user_id = ? ORDER BY updated_at DESC', [userId]);
         res.json(projects);
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message?.includes('UNAUTHORIZED')) {
+            res.status(401).json({ error: error.message });
+            return;
+        }
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch projects' });
     }
@@ -32,11 +40,11 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
         const [project]: any = await query('SELECT * FROM projects WHERE id = ? AND user_id = ?', [id, userId]);
         
         if (!project) {
-            res.status(404).json({ error: 'Project not found' });
+            res.status(404).json({ error: 'Project not found or unauthorized' });
             return;
         }
 
-        // Fetch associated data
+        // Fetch associated data strictly belonging to this owned project
         const schemas = await query('SELECT * FROM database_schemas WHERE project_id = ? ORDER BY created_at DESC LIMIT 1', [id]);
         const schema_versions = await query('SELECT * FROM schema_versions WHERE project_id = ? ORDER BY version_number DESC', [id]);
         const queries = await query('SELECT * FROM sql_queries WHERE project_id = ? ORDER BY created_at DESC', [id]);
@@ -53,7 +61,11 @@ export const getProjectById = async (req: Request, res: Response): Promise<void>
             performance_reports: performance,
             activity
         });
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message?.includes('UNAUTHORIZED')) {
+            res.status(401).json({ error: error.message });
+            return;
+        }
         console.error(error);
         res.status(500).json({ error: 'Failed to fetch project details' });
     }
@@ -78,7 +90,11 @@ export const createProject = async (req: Request, res: Response): Promise<void> 
         await logActivity(result.insertId, 'PROJECT_CREATED', `Project created with ${platform} platform.`);
         
         res.status(201).json({ id: result.insertId, project_name: project_name.trim(), description, database_platform: platform });
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message?.includes('UNAUTHORIZED')) {
+            res.status(401).json({ error: error.message });
+            return;
+        }
         console.error(error);
         res.status(500).json({ error: 'Failed to create project' });
     }
@@ -101,7 +117,11 @@ export const updateProject = async (req: Request, res: Response): Promise<void> 
         }
 
         res.json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message?.includes('UNAUTHORIZED')) {
+            res.status(401).json({ error: error.message });
+            return;
+        }
         console.error(error);
         res.status(500).json({ error: 'Failed to update project' });
     }
@@ -119,7 +139,11 @@ export const deleteProject = async (req: Request, res: Response): Promise<void> 
         }
 
         res.json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
+        if (error.message?.includes('UNAUTHORIZED')) {
+            res.status(401).json({ error: error.message });
+            return;
+        }
         console.error(error);
         res.status(500).json({ error: 'Failed to delete project' });
     }
@@ -133,7 +157,7 @@ export const saveSchema = async (req: Request, res: Response): Promise<void> => 
          const userId = getRequestUserId(req);
          const { schema_json, mysql_schema } = req.body;
 
-         // Verify project exists and belongs to requesting user
+         // Verify project exists and belongs to requesting authenticated user
          const [project]: any = await query('SELECT id FROM projects WHERE id = ? AND user_id = ?', [id, userId]);
          if (!project) {
              res.status(404).json({ error: 'Project not found or unauthorized' });
@@ -163,9 +187,13 @@ export const saveSchema = async (req: Request, res: Response): Promise<void> => 
          await query('UPDATE projects SET updated_at = CURRENT_TIMESTAMP WHERE id = ?', [id]);
          
          res.json({ success: true, version: newVersion });
-     } catch(e) {
+     } catch(e: any) {
+         if (e.message?.includes('UNAUTHORIZED')) {
+             res.status(401).json({ error: e.message });
+             return;
+         }
          console.error('Save schema error', e);
-         res.status(500).json({error: 'Failed to save schema'});
+         res.status(500).json({ error: 'Failed to save schema' });
      }
 };
 
@@ -175,7 +203,7 @@ export const saveQuery = async (req: Request, res: Response): Promise<void> => {
         const userId = getRequestUserId(req);
         const { natural_language_request, generated_sql, explanation, execution_time, execution_status } = req.body;
 
-        // Verify project exists and belongs to requesting user
+        // Verify project exists and belongs to requesting authenticated user
         const [project]: any = await query('SELECT id FROM projects WHERE id = ? AND user_id = ?', [id, userId]);
         if (!project) {
             res.status(404).json({ error: 'Project not found or unauthorized' });
@@ -193,8 +221,12 @@ export const saveQuery = async (req: Request, res: Response): Promise<void> => {
         await query('UPDATE projects SET updated_at = CURRENT_TIMESTAMP WHERE id = ?', [id]);
         
         res.json({ success: true });
-    } catch(e) {
+    } catch(e: any) {
+        if (e.message?.includes('UNAUTHORIZED')) {
+            res.status(401).json({ error: e.message });
+            return;
+        }
         console.error('Save query error', e);
-        res.status(500).json({error: 'Failed to save query'});
+        res.status(500).json({ error: 'Failed to save query' });
     }
 };

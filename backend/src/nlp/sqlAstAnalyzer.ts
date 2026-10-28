@@ -80,13 +80,16 @@ export function parseAndExplainSql(sql: string, databaseDialect: string = 'MySQL
                     if (col.expr?.type === 'aggr_func') {
                         hasAggregate = true;
                         selectDetails.push(`Aggregation: ${col.expr.name}(${col.expr.args?.expr?.column || '*'}) AS ${col.as || 'unnamed'}`);
+                    } else if (col.expr?.column === '*' || col.expr?.type === 'star') {
+                        // Correctly detect wildcard projections (SELECT * and SELECT table.*)
+                        const wildcardTarget = col.expr.table ? `${col.expr.table}.*` : '*';
+                        columnsReferenced.push(wildcardTarget);
+                        selectDetails.push(`Wildcard projection: ${wildcardTarget} (Retrieves all columns)`);
+                        concerns.push(`PERFORMANCE: Wildcard projection (${wildcardTarget}) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.`);
                     } else if (col.expr?.column) {
                         const colName = col.expr.table ? `${col.expr.table}.${col.expr.column}` : col.expr.column;
                         columnsReferenced.push(colName);
                         selectDetails.push(`Projection: ${colName}${col.as ? ` AS ${col.as}` : ''}`);
-                    } else if (col.expr?.type === 'star') {
-                        selectDetails.push(`Wildcard projection: * (Retrieves all columns)`);
-                        concerns.push('PERFORMANCE: SELECT * retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.');
                     } else {
                         selectDetails.push(`Expression: ${col.as || 'calculated field'}`);
                     }

@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp": "2026-10-28T20:19:51.902Z",
+    "timestamp": "2026-10-28T20:46:03.331Z",
     "nodeVersion": "v24.19.0",
     "platform": "win32",
     "release": "10.0.26300",
@@ -8,7 +8,7 @@
     "cpuModel": "AMD Ryzen 7 7435HS                             ",
     "cpuCores": 16,
     "totalMemoryMB": 24261,
-    "freeMemoryMB": 13285
+    "freeMemoryMB": 12637
   },
   "benchmarks": {
     "security": {
@@ -24,8 +24,8 @@
         "precision": 100,
         "recall": 100,
         "f1Score": 100,
-        "meanLatencyMs": 0.0667,
-        "medianLatencyMs": 0.0067
+        "meanLatencyMs": 0.0426,
+        "medianLatencyMs": 0.0051
       },
       "results": [
         {
@@ -36,7 +36,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.872
+          "latencyMs": 0.9246
         },
         {
           "id": "SEC-POS-02",
@@ -46,7 +46,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 1.0162
+          "latencyMs": 0.4046
         },
         {
           "id": "SEC-POS-03",
@@ -56,7 +56,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.0282
+          "latencyMs": 0.0225
         },
         {
           "id": "SEC-POS-04",
@@ -66,7 +66,7 @@
           "correct": true,
           "findingsCount": 2,
           "findingsRules": "SEC-SQLI-001; SEC-SQLI-002",
-          "latencyMs": 0.0201
+          "latencyMs": 0.019
         },
         {
           "id": "SEC-POS-05",
@@ -76,7 +76,7 @@
           "correct": true,
           "findingsCount": 2,
           "findingsRules": "SEC-SQLI-001; SEC-SQLI-002",
-          "latencyMs": 0.0492
+          "latencyMs": 0.0357
         },
         {
           "id": "SEC-POS-06",
@@ -86,7 +86,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-002",
-          "latencyMs": 0.6017
+          "latencyMs": 0.0713
         },
         {
           "id": "SEC-POS-07",
@@ -96,7 +96,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-DATA-003",
-          "latencyMs": 0.1356
+          "latencyMs": 0.0561
         },
         {
           "id": "SEC-POS-08",
@@ -106,7 +106,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-DATA-003",
-          "latencyMs": 0.0166
+          "latencyMs": 0.0131
         },
         {
           "id": "SEC-POS-09",
@@ -116,7 +116,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-CRED-004",
-          "latencyMs": 0.178
+          "latencyMs": 0.188
         },
         {
           "id": "SEC-POS-10",
@@ -126,7 +126,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-CRED-004",
-          "latencyMs": 0.066
+          "latencyMs": 0.0828
         },
         {
           "id": "SEC-POS-11",
@@ -136,7 +136,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-CRED-004",
-          "latencyMs": 0.0151
+          "latencyMs": 0.0179
         },
         {
           "id": "SEC-POS-12",
@@ -156,7 +156,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-AUTH-005",
-          "latencyMs": 0.0382
+          "latencyMs": 0.013
         },
         {
           "id": "SEC-POS-14",
@@ -166,7 +166,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.0114
+          "latencyMs": 0.01
         },
         {
           "id": "SEC-POS-15",
@@ -176,7 +176,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.0079
+          "latencyMs": 0.0083
         },
         {
           "id": "SEC-POS-16",
@@ -196,7 +196,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.0053
+          "latencyMs": 0.0055
         },
         {
           "id": "SEC-POS-18",
@@ -206,7 +206,7 @@
           "correct": true,
           "findingsCount": 2,
           "findingsRules": "SEC-SQLI-001; SEC-SQLI-002",
-          "latencyMs": 0.0076
+          "latencyMs": 0.0075
         },
         {
           "id": "SEC-POS-19",
@@ -216,7 +216,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-DATA-003",
-          "latencyMs": 0.0054
+          "latencyMs": 0.0051
         },
         {
           "id": "SEC-POS-20",
@@ -226,7 +226,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-CRED-004",
-          "latencyMs": 0.0098
+          "latencyMs": 0.0092
         },
         {
           "id": "SEC-POS-21",
@@ -236,7 +236,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.005
+          "latencyMs": 0.0049
         },
         {
           "id": "SEC-POS-22",
@@ -246,7 +246,7 @@
           "correct": true,
           "findingsCount": 2,
           "findingsRules": "SEC-SQLI-001; SEC-SQLI-002",
-          "latencyMs": 0.0049
+          "latencyMs": 0.0047
         },
         {
           "id": "SEC-POS-23",
@@ -256,7 +256,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-DATA-003",
-          "latencyMs": 0.0111
+          "latencyMs": 0.0055
         },
         {
           "id": "SEC-POS-24",
@@ -266,7 +266,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-CRED-004",
-          "latencyMs": 0.0201
+          "latencyMs": 0.0349
         },
         {
           "id": "SEC-POS-25",
@@ -276,7 +276,7 @@
           "correct": true,
           "findingsCount": 3,
           "findingsRules": "SEC-SQLI-001; SEC-DATA-003; SEC-AUTH-005",
-          "latencyMs": 0.0117
+          "latencyMs": 0.0092
         },
         {
           "id": "SEC-NEG-01",
@@ -286,7 +286,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0088
+          "latencyMs": 0.0062
         },
         {
           "id": "SEC-NEG-02",
@@ -296,7 +296,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0057
+          "latencyMs": 0.0039
         },
         {
           "id": "SEC-NEG-03",
@@ -306,7 +306,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0067
+          "latencyMs": 0.005
         },
         {
           "id": "SEC-NEG-04",
@@ -316,7 +316,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0065
+          "latencyMs": 0.0035
         },
         {
           "id": "SEC-NEG-05",
@@ -326,7 +326,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0066
+          "latencyMs": 0.0041
         },
         {
           "id": "SEC-NEG-06",
@@ -336,7 +336,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0049
+          "latencyMs": 0.0032
         },
         {
           "id": "SEC-NEG-07",
@@ -346,7 +346,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0046
+          "latencyMs": 0.0029
         },
         {
           "id": "SEC-NEG-08",
@@ -356,7 +356,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0099
+          "latencyMs": 0.0036
         },
         {
           "id": "SEC-NEG-09",
@@ -366,7 +366,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0093
+          "latencyMs": 0.0039
         },
         {
           "id": "SEC-NEG-10",
@@ -376,7 +376,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0097
+          "latencyMs": 0.0081
         },
         {
           "id": "SEC-NEG-11",
@@ -386,7 +386,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0043
+          "latencyMs": 0.003
         },
         {
           "id": "SEC-NEG-12",
@@ -396,7 +396,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0031
+          "latencyMs": 0.0029
         },
         {
           "id": "SEC-NEG-13",
@@ -406,7 +406,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.003
+          "latencyMs": 0.0031
         },
         {
           "id": "SEC-NEG-14",
@@ -416,7 +416,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0039
+          "latencyMs": 0.0037
         },
         {
           "id": "SEC-NEG-15",
@@ -436,7 +436,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0026
+          "latencyMs": 0.0025
         },
         {
           "id": "SEC-NEG-17",
@@ -446,7 +446,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0029
+          "latencyMs": 0.0076
         },
         {
           "id": "SEC-NEG-18",
@@ -456,7 +456,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0031
+          "latencyMs": 0.0051
         },
         {
           "id": "SEC-NEG-19",
@@ -466,7 +466,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0027
+          "latencyMs": 0.0032
         },
         {
           "id": "SEC-NEG-20",
@@ -476,7 +476,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0034
+          "latencyMs": 0.0035
         },
         {
           "id": "SEC-NEG-21",
@@ -486,7 +486,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0031
+          "latencyMs": 0.0033
         },
         {
           "id": "SEC-NEG-22",
@@ -496,7 +496,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0028
+          "latencyMs": 0.003
         },
         {
           "id": "SEC-NEG-23",
@@ -506,7 +506,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0026
+          "latencyMs": 0.0025
         },
         {
           "id": "SEC-NEG-24",
@@ -516,7 +516,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0027
+          "latencyMs": 0.0028
         },
         {
           "id": "SEC-NEG-25",
@@ -526,7 +526,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.003
+          "latencyMs": 0.0033
         }
       ]
     },
@@ -537,8 +537,8 @@
         "candidateKeyAccuracy": 100,
         "normalFormExactMatches": 15,
         "normalFormAccuracy": 100,
-        "meanLatencyMs": 0.1526,
-        "medianLatencyMs": 0.0576
+        "meanLatencyMs": 0.15,
+        "medianLatencyMs": 0.0721
       },
       "results": [
         {
@@ -550,7 +550,7 @@
           "expectedForm": "1NF",
           "computedForm": "1NF",
           "normalFormMatch": true,
-          "latencyMs": 1.061
+          "latencyMs": 1.1707
         },
         {
           "id": "NORM-02",
@@ -561,7 +561,7 @@
           "expectedForm": "1NF",
           "computedForm": "1NF",
           "normalFormMatch": true,
-          "latencyMs": 0.1051
+          "latencyMs": 0.0884
         },
         {
           "id": "NORM-03",
@@ -572,7 +572,7 @@
           "expectedForm": "1NF",
           "computedForm": "1NF",
           "normalFormMatch": true,
-          "latencyMs": 0.0576
+          "latencyMs": 0.0555
         },
         {
           "id": "NORM-04",
@@ -583,7 +583,7 @@
           "expectedForm": "1NF",
           "computedForm": "1NF",
           "normalFormMatch": true,
-          "latencyMs": 0.1003
+          "latencyMs": 0.0964
         },
         {
           "id": "NORM-05",
@@ -594,7 +594,7 @@
           "expectedForm": "2NF",
           "computedForm": "2NF",
           "normalFormMatch": true,
-          "latencyMs": 0.0557
+          "latencyMs": 0.0566
         },
         {
           "id": "NORM-06",
@@ -605,7 +605,7 @@
           "expectedForm": "2NF",
           "computedForm": "2NF",
           "normalFormMatch": true,
-          "latencyMs": 0.036
+          "latencyMs": 0.0355
         },
         {
           "id": "NORM-07",
@@ -616,7 +616,7 @@
           "expectedForm": "2NF",
           "computedForm": "2NF",
           "normalFormMatch": true,
-          "latencyMs": 0.0333
+          "latencyMs": 0.0312
         },
         {
           "id": "NORM-08",
@@ -627,7 +627,7 @@
           "expectedForm": "2NF",
           "computedForm": "2NF",
           "normalFormMatch": true,
-          "latencyMs": 0.0452
+          "latencyMs": 0.0923
         },
         {
           "id": "NORM-09",
@@ -638,7 +638,7 @@
           "expectedForm": "3NF",
           "computedForm": "3NF",
           "normalFormMatch": true,
-          "latencyMs": 0.4938
+          "latencyMs": 0.2613
         },
         {
           "id": "NORM-10",
@@ -649,7 +649,7 @@
           "expectedForm": "3NF",
           "computedForm": "3NF",
           "normalFormMatch": true,
-          "latencyMs": 0.0938
+          "latencyMs": 0.1047
         },
         {
           "id": "NORM-11",
@@ -660,7 +660,7 @@
           "expectedForm": "3NF",
           "computedForm": "3NF",
           "normalFormMatch": true,
-          "latencyMs": 0.0926
+          "latencyMs": 0.1294
         },
         {
           "id": "NORM-12",
@@ -671,7 +671,7 @@
           "expectedForm": "BCNF",
           "computedForm": "BCNF",
           "normalFormMatch": true,
-          "latencyMs": 0.0255
+          "latencyMs": 0.0291
         },
         {
           "id": "NORM-13",
@@ -682,7 +682,7 @@
           "expectedForm": "BCNF",
           "computedForm": "BCNF",
           "normalFormMatch": true,
-          "latencyMs": 0.0614
+          "latencyMs": 0.0721
         },
         {
           "id": "NORM-14",
@@ -693,7 +693,7 @@
           "expectedForm": "BCNF",
           "computedForm": "BCNF",
           "normalFormMatch": true,
-          "latencyMs": 0.0112
+          "latencyMs": 0.0111
         },
         {
           "id": "NORM-15",
@@ -704,24 +704,734 @@
           "expectedForm": "BCNF",
           "computedForm": "BCNF",
           "normalFormMatch": true,
-          "latencyMs": 0.0171
+          "latencyMs": 0.0156
         }
       ]
     },
     "nl2sql": {
       "summary": {
-        "totalQueriesTested": 20,
-        "baselineTableAccuracy": 70,
-        "schemaAwareTableAccuracy": 75,
-        "baselineIntentAccuracy": 95,
-        "schemaAwareIntentAccuracy": 95,
-        "schemaAwareJoinPathResolutionRate": 75,
-        "baselineMedianLatencyMs": 0.0101,
-        "schemaAwareMedianLatencyMs": 0.4155
+        "preservedCorpus_tableAccuracy": 100,
+        "preservedCorpus_baselineTableAccuracy": 70,
+        "unseenCorpus_tableAccuracy": 80,
+        "unseenCorpus_baselineTableAccuracy": 35,
+        "combinedTotalQueries": 40,
+        "combinedTableAccuracy": 90,
+        "combinedIntentAccuracy": 95,
+        "combinedJoinResolutionRate": 100,
+        "schemaAwareMedianLatencyMs": 0.2392
+      },
+      "preservedCorpus": {
+        "summary": {
+          "totalQueriesTested": 20,
+          "baselineTableAccuracy": 70,
+          "schemaAwareTableAccuracy": 100,
+          "baselineIntentAccuracy": 95,
+          "schemaAwareIntentAccuracy": 95,
+          "schemaAwareJoinPathResolutionRate": 100,
+          "baselineMedianLatencyMs": 0.0115,
+          "schemaAwareMedianLatencyMs": 0.4456
+        },
+        "detailedResults": [
+          {
+            "id": "NL-01",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "SIMPLE",
+            "prompt": "Show all users",
+            "expectedTables": "users",
+            "baselineTables": "users",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.1226,
+            "schemaAwareLatencyMs": 4.8175
+          },
+          {
+            "id": "NL-02",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "SIMPLE",
+            "prompt": "Count the total number of orders",
+            "expectedTables": "orders",
+            "baselineTables": "orders",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "orders",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0126,
+            "schemaAwareLatencyMs": 1.17
+          },
+          {
+            "id": "NL-03",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "SIMPLE",
+            "prompt": "Get the first 5 reviews",
+            "expectedTables": "reviews",
+            "baselineTables": "reviews",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "reviews",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0177,
+            "schemaAwareLatencyMs": 0.6721
+          },
+          {
+            "id": "NL-04",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "SIMPLE",
+            "prompt": "Show all order items sorted by price descending",
+            "expectedTables": "order_items",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "order_items",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0146,
+            "schemaAwareLatencyMs": 1.074
+          },
+          {
+            "id": "NL-05",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "MEDIUM",
+            "prompt": "List users with their corresponding orders",
+            "expectedTables": "orders,users",
+            "baselineTables": "orders,users",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "orders,users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 1,
+            "baselineLatencyMs": 0.0202,
+            "schemaAwareLatencyMs": 0.4529
+          },
+          {
+            "id": "NL-06",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "MEDIUM",
+            "prompt": "Find orders and the items purchased in each order",
+            "expectedTables": "order_items,orders",
+            "baselineTables": "orders",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "order_items,orders",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 1,
+            "baselineLatencyMs": 0.0115,
+            "schemaAwareLatencyMs": 0.9858
+          },
+          {
+            "id": "NL-07",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "MEDIUM",
+            "prompt": "Show users who wrote reviews",
+            "expectedTables": "reviews,users",
+            "baselineTables": "reviews,users",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "reviews,users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 1,
+            "baselineLatencyMs": 0.0164,
+            "schemaAwareLatencyMs": 0.4456
+          },
+          {
+            "id": "NL-08",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "MEDIUM",
+            "prompt": "Retrieve users where email ends with example.com",
+            "expectedTables": "users",
+            "baselineTables": "users",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0193,
+            "schemaAwareLatencyMs": 0.3263
+          },
+          {
+            "id": "NL-09",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "MEDIUM",
+            "prompt": "Calculate the total revenue from orders",
+            "expectedTables": "orders",
+            "baselineTables": "orders",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "orders",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0264,
+            "schemaAwareLatencyMs": 0.3708
+          },
+          {
+            "id": "NL-10",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "MEDIUM",
+            "prompt": "Calculate the average rating across all reviews",
+            "expectedTables": "reviews",
+            "baselineTables": "reviews",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "reviews",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0486,
+            "schemaAwareLatencyMs": 0.6019
+          },
+          {
+            "id": "NL-11",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "COMPLEX",
+            "prompt": "Count the number of orders per user",
+            "expectedTables": "orders,users",
+            "baselineTables": "orders",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "orders,users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 1,
+            "baselineLatencyMs": 0.0076,
+            "schemaAwareLatencyMs": 0.2482
+          },
+          {
+            "id": "NL-12",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "COMPLEX",
+            "prompt": "Find top 3 users with the highest order volume",
+            "expectedTables": "orders,users",
+            "baselineTables": "users",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "orders,users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 1,
+            "baselineLatencyMs": 0.0057,
+            "schemaAwareLatencyMs": 0.8214
+          },
+          {
+            "id": "NL-13",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "COMPLEX",
+            "prompt": "Display average product price per order item",
+            "expectedTables": "order_items",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "order_items",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0058,
+            "schemaAwareLatencyMs": 0.3509
+          },
+          {
+            "id": "NL-14",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "MEDIUM",
+            "prompt": "List orders with total amounts exceeding 500 dollars",
+            "expectedTables": "orders",
+            "baselineTables": "orders",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "orders",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0059,
+            "schemaAwareLatencyMs": 0.3621
+          },
+          {
+            "id": "NL-15",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "COMPLEX",
+            "prompt": "Find users with pending orders",
+            "expectedTables": "orders,users",
+            "baselineTables": "orders,users",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "orders,users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 1,
+            "baselineLatencyMs": 0.0052,
+            "schemaAwareLatencyMs": 0.1827
+          },
+          {
+            "id": "NL-16",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "MEDIUM",
+            "prompt": "List reviews with 5 star ratings sorted by creation date",
+            "expectedTables": "reviews",
+            "baselineTables": "reviews",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "reviews",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0056,
+            "schemaAwareLatencyMs": 0.6977
+          },
+          {
+            "id": "NL-17",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "COMPLEX",
+            "prompt": "Count distinct users who made at least one purchase",
+            "expectedTables": "orders,users",
+            "baselineTables": "users",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "orders,users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 1,
+            "baselineLatencyMs": 0.0065,
+            "schemaAwareLatencyMs": 0.3442
+          },
+          {
+            "id": "NL-18",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "MEDIUM",
+            "prompt": "Find maximum order amount in the orders database",
+            "expectedTables": "orders",
+            "baselineTables": "orders",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "orders",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0066,
+            "schemaAwareLatencyMs": 0.2591
+          },
+          {
+            "id": "NL-19",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "SIMPLE",
+            "prompt": "Show users registered recently ordered by id desc limit 10",
+            "expectedTables": "users",
+            "baselineTables": "users",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0052,
+            "schemaAwareLatencyMs": 0.3829
+          },
+          {
+            "id": "NL-20",
+            "split": "PRESERVED_ORIGINAL",
+            "difficulty": "COMPLEX",
+            "prompt": "List users who gave 1 star reviews with their comments",
+            "expectedTables": "reviews,users",
+            "baselineTables": "reviews,users",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "reviews,users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 1,
+            "baselineLatencyMs": 0.0058,
+            "schemaAwareLatencyMs": 0.2414
+          }
+        ]
+      },
+      "unseenCorpus": {
+        "summary": {
+          "totalQueriesTested": 20,
+          "baselineTableAccuracy": 35,
+          "schemaAwareTableAccuracy": 80,
+          "baselineIntentAccuracy": 85,
+          "schemaAwareIntentAccuracy": 95,
+          "schemaAwareJoinPathResolutionRate": 100,
+          "baselineMedianLatencyMs": 0.0054,
+          "schemaAwareMedianLatencyMs": 0.3971
+        },
+        "detailedResults": [
+          {
+            "id": "UNSEEN-01",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "SIMPLE",
+            "prompt": "Find all customers who registered this year",
+            "expectedTables": "users",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0057,
+            "schemaAwareLatencyMs": 0.641
+          },
+          {
+            "id": "UNSEEN-02",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "COMPLEX",
+            "prompt": "Show total amount spent by each customer",
+            "expectedTables": "orders,users",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "orders,users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 1,
+            "baselineLatencyMs": 0.0081,
+            "schemaAwareLatencyMs": 0.3813
+          },
+          {
+            "id": "UNSEEN-03",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "SIMPLE",
+            "prompt": "List products with prices higher than 100 dollars in order items",
+            "expectedTables": "order_items",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "order_items",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0095,
+            "schemaAwareLatencyMs": 0.6409
+          },
+          {
+            "id": "UNSEEN-04",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "SIMPLE",
+            "prompt": "Count reviews with rating less than 3",
+            "expectedTables": "reviews",
+            "baselineTables": "reviews",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "reviews",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0038,
+            "schemaAwareLatencyMs": 0.3971
+          },
+          {
+            "id": "UNSEEN-05",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "MEDIUM",
+            "prompt": "Show customer names along with their review comments",
+            "expectedTables": "reviews,users",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "reviews,users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 1,
+            "baselineLatencyMs": 0.0108,
+            "schemaAwareLatencyMs": 0.7596
+          },
+          {
+            "id": "UNSEEN-06",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "SIMPLE",
+            "prompt": "Compute the maximum item quantity in any order item",
+            "expectedTables": "order_items",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "order_items",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.007,
+            "schemaAwareLatencyMs": 0.5688
+          },
+          {
+            "id": "UNSEEN-07",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "MEDIUM",
+            "prompt": "Find top 5 highest total orders",
+            "expectedTables": "orders",
+            "baselineTables": "orders",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "orders",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0052,
+            "schemaAwareLatencyMs": 0.2074
+          },
+          {
+            "id": "UNSEEN-08",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "SIMPLE",
+            "prompt": "Retrieve all orders placed with pending status",
+            "expectedTables": "orders",
+            "baselineTables": "orders",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "orders",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0047,
+            "schemaAwareLatencyMs": 0.3756
+          },
+          {
+            "id": "UNSEEN-09",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "MEDIUM",
+            "prompt": "List order items for order 101 sorted by price",
+            "expectedTables": "order_items",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "order_items,orders",
+            "schemaAwareTableCorrect": false,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 1,
+            "baselineLatencyMs": 0.0054,
+            "schemaAwareLatencyMs": 0.2322
+          },
+          {
+            "id": "UNSEEN-10",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "SIMPLE",
+            "prompt": "Count total reviews submitted across all products",
+            "expectedTables": "reviews",
+            "baselineTables": "reviews",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "reviews",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0033,
+            "schemaAwareLatencyMs": 0.3936
+          },
+          {
+            "id": "UNSEEN-11",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "COMPLEX",
+            "prompt": "Show customers with their purchased order items",
+            "expectedTables": "order_items,orders,users",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "order_items,orders,users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 2,
+            "baselineLatencyMs": 0.007,
+            "schemaAwareLatencyMs": 0.4146
+          },
+          {
+            "id": "UNSEEN-12",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "MEDIUM",
+            "prompt": "Find average order total amount across completed transactions",
+            "expectedTables": "orders",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "orders",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0048,
+            "schemaAwareLatencyMs": 0.5503
+          },
+          {
+            "id": "UNSEEN-13",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "SIMPLE",
+            "prompt": "List user accounts created in current year ordered by name",
+            "expectedTables": "users",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0041,
+            "schemaAwareLatencyMs": 0.4937
+          },
+          {
+            "id": "UNSEEN-14",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "MEDIUM",
+            "prompt": "Show all products purchased with quantity above 2 in order items",
+            "expectedTables": "order_items",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "order_items,orders",
+            "schemaAwareTableCorrect": false,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 1,
+            "baselineLatencyMs": 0.0071,
+            "schemaAwareLatencyMs": 0.5444
+          },
+          {
+            "id": "UNSEEN-15",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "SIMPLE",
+            "prompt": "Find minimum rating given in product reviews",
+            "expectedTables": "reviews",
+            "baselineTables": "reviews",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "reviews",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0054,
+            "schemaAwareLatencyMs": 0.4747
+          },
+          {
+            "id": "UNSEEN-16",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "SIMPLE",
+            "prompt": "List reviews with comments ordered by rating desc limit 5",
+            "expectedTables": "reviews",
+            "baselineTables": "reviews",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "reviews",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.007,
+            "schemaAwareLatencyMs": 0.2897
+          },
+          {
+            "id": "UNSEEN-17",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "MEDIUM",
+            "prompt": "Calculate total revenue sum from all customer purchases",
+            "expectedTables": "orders",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "orders,users",
+            "schemaAwareTableCorrect": false,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 1,
+            "baselineLatencyMs": 0.004,
+            "schemaAwareLatencyMs": 0.2985
+          },
+          {
+            "id": "UNSEEN-18",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "SIMPLE",
+            "prompt": "Show top 10 users registered recently ordered by created_at desc",
+            "expectedTables": "users",
+            "baselineTables": "users",
+            "baselineTableCorrect": true,
+            "schemaAwareTables": "orders,reviews,users",
+            "schemaAwareTableCorrect": false,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "SELECT",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 2,
+            "baselineLatencyMs": 0.0053,
+            "schemaAwareLatencyMs": 0.3509
+          },
+          {
+            "id": "UNSEEN-19",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "COMPLEX",
+            "prompt": "Find user accounts with both orders and reviews",
+            "expectedTables": "orders,reviews,users",
+            "baselineTables": "orders,reviews",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "orders,reviews,users",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "SELECT",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "SELECT",
+            "joinsResolved": 2,
+            "baselineLatencyMs": 0.0037,
+            "schemaAwareLatencyMs": 0.1334
+          },
+          {
+            "id": "UNSEEN-20",
+            "split": "UNSEEN_EVALUATION",
+            "difficulty": "SIMPLE",
+            "prompt": "Count distinct products listed in order items",
+            "expectedTables": "order_items",
+            "baselineTables": "",
+            "baselineTableCorrect": false,
+            "schemaAwareTables": "order_items",
+            "schemaAwareTableCorrect": true,
+            "expectedIntent": "AGGREGATE",
+            "baselineIntent": "AGGREGATE",
+            "schemaAwareIntent": "AGGREGATE",
+            "joinsResolved": 0,
+            "baselineLatencyMs": 0.0023,
+            "schemaAwareLatencyMs": 0.1927
+          }
+        ]
       },
       "detailedResults": [
         {
           "id": "NL-01",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "SIMPLE",
           "prompt": "Show all users",
           "expectedTables": "users",
@@ -733,11 +1443,12 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.2657,
-          "schemaAwareLatencyMs": 4.1005
+          "baselineLatencyMs": 0.0043,
+          "schemaAwareLatencyMs": 0.1323
         },
         {
           "id": "NL-02",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "SIMPLE",
           "prompt": "Count the total number of orders",
           "expectedTables": "orders",
@@ -749,11 +1460,12 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.014,
-          "schemaAwareLatencyMs": 0.7761
+          "baselineLatencyMs": 0.0023,
+          "schemaAwareLatencyMs": 0.1627
         },
         {
           "id": "NL-03",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "SIMPLE",
           "prompt": "Get the first 5 reviews",
           "expectedTables": "reviews",
@@ -765,27 +1477,29 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0162,
-          "schemaAwareLatencyMs": 0.4279
+          "baselineLatencyMs": 0.0032,
+          "schemaAwareLatencyMs": 0.1942
         },
         {
           "id": "NL-04",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "SIMPLE",
           "prompt": "Show all order items sorted by price descending",
           "expectedTables": "order_items",
           "baselineTables": "",
           "baselineTableCorrect": false,
-          "schemaAwareTables": "orders",
-          "schemaAwareTableCorrect": false,
+          "schemaAwareTables": "order_items",
+          "schemaAwareTableCorrect": true,
           "expectedIntent": "SELECT",
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0101,
-          "schemaAwareLatencyMs": 1.1387
+          "baselineLatencyMs": 0.0047,
+          "schemaAwareLatencyMs": 0.2701
         },
         {
           "id": "NL-05",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "MEDIUM",
           "prompt": "List users with their corresponding orders",
           "expectedTables": "orders,users",
@@ -797,27 +1511,29 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0115,
-          "schemaAwareLatencyMs": 0.3813
+          "baselineLatencyMs": 0.005,
+          "schemaAwareLatencyMs": 0.1764
         },
         {
           "id": "NL-06",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "MEDIUM",
           "prompt": "Find orders and the items purchased in each order",
           "expectedTables": "order_items,orders",
           "baselineTables": "orders",
           "baselineTableCorrect": false,
-          "schemaAwareTables": "orders",
-          "schemaAwareTableCorrect": false,
+          "schemaAwareTables": "order_items,orders",
+          "schemaAwareTableCorrect": true,
           "expectedIntent": "SELECT",
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
-          "joinsResolved": 0,
-          "baselineLatencyMs": 0.0101,
-          "schemaAwareLatencyMs": 0.7425
+          "joinsResolved": 1,
+          "baselineLatencyMs": 0.0045,
+          "schemaAwareLatencyMs": 0.2405
         },
         {
           "id": "NL-07",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "MEDIUM",
           "prompt": "Show users who wrote reviews",
           "expectedTables": "reviews,users",
@@ -829,11 +1545,12 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0112,
-          "schemaAwareLatencyMs": 0.2446
+          "baselineLatencyMs": 0.0041,
+          "schemaAwareLatencyMs": 0.1384
         },
         {
           "id": "NL-08",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "MEDIUM",
           "prompt": "Retrieve users where email ends with example.com",
           "expectedTables": "users",
@@ -845,11 +1562,12 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0128,
-          "schemaAwareLatencyMs": 0.3398
+          "baselineLatencyMs": 0.0045,
+          "schemaAwareLatencyMs": 0.2392
         },
         {
           "id": "NL-09",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "MEDIUM",
           "prompt": "Calculate the total revenue from orders",
           "expectedTables": "orders",
@@ -858,14 +1576,15 @@
           "schemaAwareTables": "orders",
           "schemaAwareTableCorrect": true,
           "expectedIntent": "AGGREGATE",
-          "baselineIntent": "SELECT",
+          "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0247,
-          "schemaAwareLatencyMs": 0.237
+          "baselineLatencyMs": 0.0038,
+          "schemaAwareLatencyMs": 0.1923
         },
         {
           "id": "NL-10",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "MEDIUM",
           "prompt": "Calculate the average rating across all reviews",
           "expectedTables": "reviews",
@@ -877,11 +1596,12 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0133,
-          "schemaAwareLatencyMs": 0.5485
+          "baselineLatencyMs": 0.0027,
+          "schemaAwareLatencyMs": 0.2205
         },
         {
           "id": "NL-11",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "COMPLEX",
           "prompt": "Count the number of orders per user",
           "expectedTables": "orders,users",
@@ -893,11 +1613,12 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0131,
-          "schemaAwareLatencyMs": 0.5015
+          "baselineLatencyMs": 0.0021,
+          "schemaAwareLatencyMs": 0.1465
         },
         {
           "id": "NL-12",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "COMPLEX",
           "prompt": "Find top 3 users with the highest order volume",
           "expectedTables": "orders,users",
@@ -909,27 +1630,29 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.009,
-          "schemaAwareLatencyMs": 0.4281
+          "baselineLatencyMs": 0.004,
+          "schemaAwareLatencyMs": 0.2326
         },
         {
           "id": "NL-13",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "COMPLEX",
           "prompt": "Display average product price per order item",
           "expectedTables": "order_items",
           "baselineTables": "",
           "baselineTableCorrect": false,
-          "schemaAwareTables": "orders",
-          "schemaAwareTableCorrect": false,
+          "schemaAwareTables": "order_items",
+          "schemaAwareTableCorrect": true,
           "expectedIntent": "AGGREGATE",
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0052,
-          "schemaAwareLatencyMs": 0.3584
+          "baselineLatencyMs": 0.0028,
+          "schemaAwareLatencyMs": 0.2044
         },
         {
           "id": "NL-14",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "MEDIUM",
           "prompt": "List orders with total amounts exceeding 500 dollars",
           "expectedTables": "orders",
@@ -938,14 +1661,15 @@
           "schemaAwareTables": "orders",
           "schemaAwareTableCorrect": true,
           "expectedIntent": "SELECT",
-          "baselineIntent": "SELECT",
+          "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0057,
-          "schemaAwareLatencyMs": 0.2958
+          "baselineLatencyMs": 0.004,
+          "schemaAwareLatencyMs": 0.2564
         },
         {
           "id": "NL-15",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "COMPLEX",
           "prompt": "Find users with pending orders",
           "expectedTables": "orders,users",
@@ -957,11 +1681,12 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0041,
-          "schemaAwareLatencyMs": 0.1771
+          "baselineLatencyMs": 0.0038,
+          "schemaAwareLatencyMs": 0.1864
         },
         {
           "id": "NL-16",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "MEDIUM",
           "prompt": "List reviews with 5 star ratings sorted by creation date",
           "expectedTables": "reviews",
@@ -973,27 +1698,29 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.005,
-          "schemaAwareLatencyMs": 0.5222
+          "baselineLatencyMs": 0.0054,
+          "schemaAwareLatencyMs": 0.7103
         },
         {
           "id": "NL-17",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "COMPLEX",
           "prompt": "Count distinct users who made at least one purchase",
           "expectedTables": "orders,users",
           "baselineTables": "users",
           "baselineTableCorrect": false,
-          "schemaAwareTables": "users",
-          "schemaAwareTableCorrect": false,
+          "schemaAwareTables": "orders,users",
+          "schemaAwareTableCorrect": true,
           "expectedIntent": "AGGREGATE",
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
-          "joinsResolved": 0,
-          "baselineLatencyMs": 0.0057,
-          "schemaAwareLatencyMs": 0.2606
+          "joinsResolved": 1,
+          "baselineLatencyMs": 0.0043,
+          "schemaAwareLatencyMs": 0.2582
         },
         {
           "id": "NL-18",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "MEDIUM",
           "prompt": "Find maximum order amount in the orders database",
           "expectedTables": "orders",
@@ -1005,27 +1732,29 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0055,
-          "schemaAwareLatencyMs": 0.2033
+          "baselineLatencyMs": 0.0043,
+          "schemaAwareLatencyMs": 0.2096
         },
         {
           "id": "NL-19",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "SIMPLE",
           "prompt": "Show users registered recently ordered by id desc limit 10",
           "expectedTables": "users",
           "baselineTables": "users",
           "baselineTableCorrect": true,
-          "schemaAwareTables": "orders,users",
-          "schemaAwareTableCorrect": false,
+          "schemaAwareTables": "users",
+          "schemaAwareTableCorrect": true,
           "expectedIntent": "SELECT",
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
-          "joinsResolved": 1,
-          "baselineLatencyMs": 0.004,
-          "schemaAwareLatencyMs": 0.4155
+          "joinsResolved": 0,
+          "baselineLatencyMs": 0.0043,
+          "schemaAwareLatencyMs": 0.2591
         },
         {
           "id": "NL-20",
+          "split": "PRESERVED_ORIGINAL",
           "difficulty": "COMPLEX",
           "prompt": "List users who gave 1 star reviews with their comments",
           "expectedTables": "reviews,users",
@@ -1037,22 +1766,536 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0075,
-          "schemaAwareLatencyMs": 0.4068
+          "baselineLatencyMs": 0.0049,
+          "schemaAwareLatencyMs": 0.1892
+        },
+        {
+          "id": "UNSEEN-01",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "SIMPLE",
+          "prompt": "Find all customers who registered this year",
+          "expectedTables": "users",
+          "baselineTables": "",
+          "baselineTableCorrect": false,
+          "schemaAwareTables": "users",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "SELECT",
+          "baselineIntent": "SELECT",
+          "schemaAwareIntent": "SELECT",
+          "joinsResolved": 0,
+          "baselineLatencyMs": 0.0037,
+          "schemaAwareLatencyMs": 0.2782
+        },
+        {
+          "id": "UNSEEN-02",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "COMPLEX",
+          "prompt": "Show total amount spent by each customer",
+          "expectedTables": "orders,users",
+          "baselineTables": "",
+          "baselineTableCorrect": false,
+          "schemaAwareTables": "orders,users",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "AGGREGATE",
+          "baselineIntent": "AGGREGATE",
+          "schemaAwareIntent": "AGGREGATE",
+          "joinsResolved": 1,
+          "baselineLatencyMs": 0.004,
+          "schemaAwareLatencyMs": 0.2572
+        },
+        {
+          "id": "UNSEEN-03",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "SIMPLE",
+          "prompt": "List products with prices higher than 100 dollars in order items",
+          "expectedTables": "order_items",
+          "baselineTables": "",
+          "baselineTableCorrect": false,
+          "schemaAwareTables": "order_items",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "SELECT",
+          "baselineIntent": "SELECT",
+          "schemaAwareIntent": "SELECT",
+          "joinsResolved": 0,
+          "baselineLatencyMs": 0.0048,
+          "schemaAwareLatencyMs": 0.4052
+        },
+        {
+          "id": "UNSEEN-04",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "SIMPLE",
+          "prompt": "Count reviews with rating less than 3",
+          "expectedTables": "reviews",
+          "baselineTables": "reviews",
+          "baselineTableCorrect": true,
+          "schemaAwareTables": "reviews",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "AGGREGATE",
+          "baselineIntent": "AGGREGATE",
+          "schemaAwareIntent": "AGGREGATE",
+          "joinsResolved": 0,
+          "baselineLatencyMs": 0.0036,
+          "schemaAwareLatencyMs": 0.2135
+        },
+        {
+          "id": "UNSEEN-05",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "MEDIUM",
+          "prompt": "Show customer names along with their review comments",
+          "expectedTables": "reviews,users",
+          "baselineTables": "",
+          "baselineTableCorrect": false,
+          "schemaAwareTables": "reviews,users",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "SELECT",
+          "baselineIntent": "SELECT",
+          "schemaAwareIntent": "SELECT",
+          "joinsResolved": 1,
+          "baselineLatencyMs": 0.0055,
+          "schemaAwareLatencyMs": 0.2372
+        },
+        {
+          "id": "UNSEEN-06",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "SIMPLE",
+          "prompt": "Compute the maximum item quantity in any order item",
+          "expectedTables": "order_items",
+          "baselineTables": "",
+          "baselineTableCorrect": false,
+          "schemaAwareTables": "order_items",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "AGGREGATE",
+          "baselineIntent": "AGGREGATE",
+          "schemaAwareIntent": "AGGREGATE",
+          "joinsResolved": 0,
+          "baselineLatencyMs": 0.004,
+          "schemaAwareLatencyMs": 0.2233
+        },
+        {
+          "id": "UNSEEN-07",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "MEDIUM",
+          "prompt": "Find top 5 highest total orders",
+          "expectedTables": "orders",
+          "baselineTables": "orders",
+          "baselineTableCorrect": true,
+          "schemaAwareTables": "orders",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "SELECT",
+          "baselineIntent": "AGGREGATE",
+          "schemaAwareIntent": "AGGREGATE",
+          "joinsResolved": 0,
+          "baselineLatencyMs": 0.0041,
+          "schemaAwareLatencyMs": 0.2018
+        },
+        {
+          "id": "UNSEEN-08",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "SIMPLE",
+          "prompt": "Retrieve all orders placed with pending status",
+          "expectedTables": "orders",
+          "baselineTables": "orders",
+          "baselineTableCorrect": true,
+          "schemaAwareTables": "orders",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "SELECT",
+          "baselineIntent": "SELECT",
+          "schemaAwareIntent": "SELECT",
+          "joinsResolved": 0,
+          "baselineLatencyMs": 0.0045,
+          "schemaAwareLatencyMs": 0.296
+        },
+        {
+          "id": "UNSEEN-09",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "MEDIUM",
+          "prompt": "List order items for order 101 sorted by price",
+          "expectedTables": "order_items",
+          "baselineTables": "",
+          "baselineTableCorrect": false,
+          "schemaAwareTables": "order_items,orders",
+          "schemaAwareTableCorrect": false,
+          "expectedIntent": "SELECT",
+          "baselineIntent": "SELECT",
+          "schemaAwareIntent": "SELECT",
+          "joinsResolved": 1,
+          "baselineLatencyMs": 0.0044,
+          "schemaAwareLatencyMs": 0.196
+        },
+        {
+          "id": "UNSEEN-10",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "SIMPLE",
+          "prompt": "Count total reviews submitted across all products",
+          "expectedTables": "reviews",
+          "baselineTables": "reviews",
+          "baselineTableCorrect": true,
+          "schemaAwareTables": "reviews",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "AGGREGATE",
+          "baselineIntent": "AGGREGATE",
+          "schemaAwareIntent": "AGGREGATE",
+          "joinsResolved": 0,
+          "baselineLatencyMs": 0.0041,
+          "schemaAwareLatencyMs": 0.3132
+        },
+        {
+          "id": "UNSEEN-11",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "COMPLEX",
+          "prompt": "Show customers with their purchased order items",
+          "expectedTables": "order_items,orders,users",
+          "baselineTables": "",
+          "baselineTableCorrect": false,
+          "schemaAwareTables": "order_items,orders,users",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "SELECT",
+          "baselineIntent": "SELECT",
+          "schemaAwareIntent": "SELECT",
+          "joinsResolved": 2,
+          "baselineLatencyMs": 0.0101,
+          "schemaAwareLatencyMs": 0.4308
+        },
+        {
+          "id": "UNSEEN-12",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "MEDIUM",
+          "prompt": "Find average order total amount across completed transactions",
+          "expectedTables": "orders",
+          "baselineTables": "",
+          "baselineTableCorrect": false,
+          "schemaAwareTables": "orders",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "AGGREGATE",
+          "baselineIntent": "AGGREGATE",
+          "schemaAwareIntent": "AGGREGATE",
+          "joinsResolved": 0,
+          "baselineLatencyMs": 0.0043,
+          "schemaAwareLatencyMs": 0.2584
+        },
+        {
+          "id": "UNSEEN-13",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "SIMPLE",
+          "prompt": "List user accounts created in current year ordered by name",
+          "expectedTables": "users",
+          "baselineTables": "",
+          "baselineTableCorrect": false,
+          "schemaAwareTables": "users",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "SELECT",
+          "baselineIntent": "AGGREGATE",
+          "schemaAwareIntent": "SELECT",
+          "joinsResolved": 0,
+          "baselineLatencyMs": 0.0029,
+          "schemaAwareLatencyMs": 0.281
+        },
+        {
+          "id": "UNSEEN-14",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "MEDIUM",
+          "prompt": "Show all products purchased with quantity above 2 in order items",
+          "expectedTables": "order_items",
+          "baselineTables": "",
+          "baselineTableCorrect": false,
+          "schemaAwareTables": "order_items,orders",
+          "schemaAwareTableCorrect": false,
+          "expectedIntent": "SELECT",
+          "baselineIntent": "SELECT",
+          "schemaAwareIntent": "SELECT",
+          "joinsResolved": 1,
+          "baselineLatencyMs": 0.0051,
+          "schemaAwareLatencyMs": 0.254
+        },
+        {
+          "id": "UNSEEN-15",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "SIMPLE",
+          "prompt": "Find minimum rating given in product reviews",
+          "expectedTables": "reviews",
+          "baselineTables": "reviews",
+          "baselineTableCorrect": true,
+          "schemaAwareTables": "reviews",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "AGGREGATE",
+          "baselineIntent": "AGGREGATE",
+          "schemaAwareIntent": "AGGREGATE",
+          "joinsResolved": 0,
+          "baselineLatencyMs": 0.0037,
+          "schemaAwareLatencyMs": 0.3025
+        },
+        {
+          "id": "UNSEEN-16",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "SIMPLE",
+          "prompt": "List reviews with comments ordered by rating desc limit 5",
+          "expectedTables": "reviews",
+          "baselineTables": "reviews",
+          "baselineTableCorrect": true,
+          "schemaAwareTables": "reviews",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "SELECT",
+          "baselineIntent": "SELECT",
+          "schemaAwareIntent": "SELECT",
+          "joinsResolved": 0,
+          "baselineLatencyMs": 0.0053,
+          "schemaAwareLatencyMs": 0.2769
+        },
+        {
+          "id": "UNSEEN-17",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "MEDIUM",
+          "prompt": "Calculate total revenue sum from all customer purchases",
+          "expectedTables": "orders",
+          "baselineTables": "",
+          "baselineTableCorrect": false,
+          "schemaAwareTables": "orders,users",
+          "schemaAwareTableCorrect": false,
+          "expectedIntent": "AGGREGATE",
+          "baselineIntent": "AGGREGATE",
+          "schemaAwareIntent": "AGGREGATE",
+          "joinsResolved": 1,
+          "baselineLatencyMs": 0.0032,
+          "schemaAwareLatencyMs": 0.263
+        },
+        {
+          "id": "UNSEEN-18",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "SIMPLE",
+          "prompt": "Show top 10 users registered recently ordered by created_at desc",
+          "expectedTables": "users",
+          "baselineTables": "users",
+          "baselineTableCorrect": true,
+          "schemaAwareTables": "orders,reviews,users",
+          "schemaAwareTableCorrect": false,
+          "expectedIntent": "SELECT",
+          "baselineIntent": "SELECT",
+          "schemaAwareIntent": "SELECT",
+          "joinsResolved": 2,
+          "baselineLatencyMs": 0.0044,
+          "schemaAwareLatencyMs": 0.2636
+        },
+        {
+          "id": "UNSEEN-19",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "COMPLEX",
+          "prompt": "Find user accounts with both orders and reviews",
+          "expectedTables": "orders,reviews,users",
+          "baselineTables": "orders,reviews",
+          "baselineTableCorrect": false,
+          "schemaAwareTables": "orders,reviews,users",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "SELECT",
+          "baselineIntent": "AGGREGATE",
+          "schemaAwareIntent": "SELECT",
+          "joinsResolved": 2,
+          "baselineLatencyMs": 0.0025,
+          "schemaAwareLatencyMs": 0.112
+        },
+        {
+          "id": "UNSEEN-20",
+          "split": "UNSEEN_EVALUATION",
+          "difficulty": "SIMPLE",
+          "prompt": "Count distinct products listed in order items",
+          "expectedTables": "order_items",
+          "baselineTables": "",
+          "baselineTableCorrect": false,
+          "schemaAwareTables": "order_items",
+          "schemaAwareTableCorrect": true,
+          "expectedIntent": "AGGREGATE",
+          "baselineIntent": "AGGREGATE",
+          "schemaAwareIntent": "AGGREGATE",
+          "joinsResolved": 0,
+          "baselineLatencyMs": 0.0022,
+          "schemaAwareLatencyMs": 0.1764
         }
       ]
     },
     "queryOptimization": {
       "summary": {
-        "totalQueriesEvaluated": 10,
-        "runsPerQuery": 5,
-        "totalExecutionRuns": 50,
-        "semanticEquivalenceRate": 100,
-        "safetyDetectionAccuracy": 70,
-        "meanAnalysisLatencyMs": 1.464,
-        "medianAnalysisLatencyMs": 0.9904,
-        "minLatencyMs": 0.2397,
-        "maxLatencyMs": 22.2452
+        "astQueriesEvaluated": 10,
+        "astSafetyDetectionAccuracy": 100,
+        "medianAstAnalysisLatencyMs": 0.9077,
+        "liveDbStatus": "COMPLETED_EMPIRICAL_LIVE_DB",
+        "liveDbTransformationsTested": 3,
+        "liveDbSemanticEquivalenceRate": 100,
+        "runsPerQuery": 5
+      },
+      "astBenchmark": {
+        "summary": {
+          "totalQueriesEvaluated": 10,
+          "runsPerQuery": 5,
+          "totalExecutionRuns": 50,
+          "safetyDetectionAccuracy": 100,
+          "meanAstAnalysisLatencyMs": 1.3814,
+          "medianAstAnalysisLatencyMs": 0.9077,
+          "minAstAnalysisLatencyMs": 0.1705,
+          "maxAstAnalysisLatencyMs": 22.1301,
+          "note": "AST parsing latency measures in-process JavaScript parser execution time, not database execution."
+        },
+        "results": [
+          {
+            "id": "OPT-01",
+            "description": "Unindexed Wildcard SELECT on users table",
+            "syntaxValid": true,
+            "tablesAccessed": "users",
+            "columnsReferenced": "*",
+            "hasAggregate": false,
+            "isDestructive": false,
+            "concernsCount": 1,
+            "concerns": "PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.",
+            "astAnalysisLatencyMs": 0.9328
+          },
+          {
+            "id": "OPT-02",
+            "description": "Two-table inner join without explicit projection",
+            "syntaxValid": true,
+            "tablesAccessed": "orders, users",
+            "columnsReferenced": "*",
+            "hasAggregate": false,
+            "isDestructive": false,
+            "concernsCount": 1,
+            "concerns": "PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.",
+            "astAnalysisLatencyMs": 1.05
+          },
+          {
+            "id": "OPT-03",
+            "description": "Aggregation with GROUP BY and HAVING without index order",
+            "syntaxValid": true,
+            "tablesAccessed": "orders",
+            "columnsReferenced": "user_id",
+            "hasAggregate": true,
+            "isDestructive": false,
+            "concernsCount": 0,
+            "concerns": "",
+            "astAnalysisLatencyMs": 0.9481
+          },
+          {
+            "id": "OPT-04",
+            "description": "Unbounded delete query (critical safety concern)",
+            "syntaxValid": true,
+            "tablesAccessed": "session_logs",
+            "columnsReferenced": "",
+            "hasAggregate": false,
+            "isDestructive": true,
+            "concernsCount": 1,
+            "concerns": "CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.",
+            "astAnalysisLatencyMs": 0.2255
+          },
+          {
+            "id": "OPT-05",
+            "description": "Query with unindexed ORDER BY filesort pattern",
+            "syntaxValid": true,
+            "tablesAccessed": "orders",
+            "columnsReferenced": "id, total_amount, created_at",
+            "hasAggregate": false,
+            "isDestructive": false,
+            "concernsCount": 0,
+            "concerns": "",
+            "astAnalysisLatencyMs": 0.7642
+          },
+          {
+            "id": "OPT-06",
+            "description": "Three-table join with selective filtering",
+            "syntaxValid": true,
+            "tablesAccessed": "users, orders, order_items",
+            "columnsReferenced": "u.name, o.id, oi.product_name",
+            "hasAggregate": false,
+            "isDestructive": false,
+            "concernsCount": 0,
+            "concerns": "",
+            "astAnalysisLatencyMs": 1.2408
+          },
+          {
+            "id": "OPT-07",
+            "description": "SELECT wildcard with subquery in FROM clause",
+            "syntaxValid": true,
+            "tablesAccessed": "",
+            "columnsReferenced": "*",
+            "hasAggregate": false,
+            "isDestructive": false,
+            "concernsCount": 1,
+            "concerns": "PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.",
+            "astAnalysisLatencyMs": 0.9286
+          },
+          {
+            "id": "OPT-08",
+            "description": "Unbounded UPDATE statement without WHERE clause",
+            "syntaxValid": true,
+            "tablesAccessed": "",
+            "columnsReferenced": "",
+            "hasAggregate": false,
+            "isDestructive": true,
+            "concernsCount": 1,
+            "concerns": "CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.",
+            "astAnalysisLatencyMs": 0.404
+          },
+          {
+            "id": "OPT-09",
+            "description": "Specific projection with indexable primary key range scan",
+            "syntaxValid": true,
+            "tablesAccessed": "users",
+            "columnsReferenced": "id, email",
+            "hasAggregate": false,
+            "isDestructive": false,
+            "concernsCount": 0,
+            "concerns": "",
+            "astAnalysisLatencyMs": 0.7842
+          },
+          {
+            "id": "OPT-10",
+            "description": "Paginated query with explicit LIMIT and OFFSET boundary",
+            "syntaxValid": true,
+            "tablesAccessed": "users",
+            "columnsReferenced": "id, name, created_at",
+            "hasAggregate": false,
+            "isDestructive": false,
+            "concernsCount": 0,
+            "concerns": "",
+            "astAnalysisLatencyMs": 0.8566
+          }
+        ]
+      },
+      "liveDbBenchmark": {
+        "summary": {
+          "status": "COMPLETED_EMPIRICAL_LIVE_DB",
+          "totalTransformationsTested": 3,
+          "verifiedSemanticallyEquivalent": 3,
+          "semanticEquivalenceRate": 100,
+          "runsPerTransformation": 5
+        },
+        "results": [
+          {
+            "id": "DB-TRANS-01",
+            "description": "Correlated subquery IN unnested to INNER JOIN with DISTINCT",
+            "transformationType": "Subquery Unnesting",
+            "rowsReturned": 159,
+            "resultsEquivalent": true,
+            "medianOriginalDbLatencyMs": 1.7479,
+            "medianTransformedDbLatencyMs": 2.1098,
+            "speedupFactor": "0.83x"
+          },
+          {
+            "id": "DB-TRANS-02",
+            "description": "Correlated COUNT(*) > 0 subquery transformed to short-circuiting EXISTS predicate",
+            "transformationType": "EXISTS Semi-Join Transformation",
+            "rowsReturned": 200,
+            "resultsEquivalent": true,
+            "medianOriginalDbLatencyMs": 2.4065,
+            "medianTransformedDbLatencyMs": 2.0722,
+            "speedupFactor": "1.16x"
+          },
+          {
+            "id": "DB-TRANS-03",
+            "description": "SARGable predicate transformation eliminating function evaluation on filtered column",
+            "transformationType": "SARGable Predicate Flattening",
+            "rowsReturned": 66,
+            "resultsEquivalent": true,
+            "medianOriginalDbLatencyMs": 1.0937,
+            "medianTransformedDbLatencyMs": 0.974,
+            "speedupFactor": "1.12x"
+          }
+        ]
       },
       "results": [
         {
@@ -1060,110 +2303,120 @@
           "description": "Unindexed Wildcard SELECT on users table",
           "syntaxValid": true,
           "tablesAccessed": "users",
+          "columnsReferenced": "*",
           "hasAggregate": false,
           "isDestructive": false,
-          "concernsCount": 0,
-          "concerns": "",
-          "medianLatencyMs": 1.7909
+          "concernsCount": 1,
+          "concerns": "PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.",
+          "astAnalysisLatencyMs": 0.9328
         },
         {
           "id": "OPT-02",
           "description": "Two-table inner join without explicit projection",
           "syntaxValid": true,
           "tablesAccessed": "orders, users",
+          "columnsReferenced": "*",
           "hasAggregate": false,
           "isDestructive": false,
-          "concernsCount": 0,
-          "concerns": "",
-          "medianLatencyMs": 0.8698
+          "concernsCount": 1,
+          "concerns": "PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.",
+          "astAnalysisLatencyMs": 1.05
         },
         {
           "id": "OPT-03",
           "description": "Aggregation with GROUP BY and HAVING without index order",
           "syntaxValid": true,
           "tablesAccessed": "orders",
+          "columnsReferenced": "user_id",
           "hasAggregate": true,
           "isDestructive": false,
           "concernsCount": 0,
           "concerns": "",
-          "medianLatencyMs": 1.3842
+          "astAnalysisLatencyMs": 0.9481
         },
         {
           "id": "OPT-04",
           "description": "Unbounded delete query (critical safety concern)",
           "syntaxValid": true,
           "tablesAccessed": "session_logs",
+          "columnsReferenced": "",
           "hasAggregate": false,
           "isDestructive": true,
           "concernsCount": 1,
           "concerns": "CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.",
-          "medianLatencyMs": 0.3
+          "astAnalysisLatencyMs": 0.2255
         },
         {
           "id": "OPT-05",
           "description": "Query with unindexed ORDER BY filesort pattern",
           "syntaxValid": true,
           "tablesAccessed": "orders",
+          "columnsReferenced": "id, total_amount, created_at",
           "hasAggregate": false,
           "isDestructive": false,
           "concernsCount": 0,
           "concerns": "",
-          "medianLatencyMs": 1.0402
+          "astAnalysisLatencyMs": 0.7642
         },
         {
           "id": "OPT-06",
           "description": "Three-table join with selective filtering",
           "syntaxValid": true,
           "tablesAccessed": "users, orders, order_items",
+          "columnsReferenced": "u.name, o.id, oi.product_name",
           "hasAggregate": false,
           "isDestructive": false,
           "concernsCount": 0,
           "concerns": "",
-          "medianLatencyMs": 1.4108
+          "astAnalysisLatencyMs": 1.2408
         },
         {
           "id": "OPT-07",
           "description": "SELECT wildcard with subquery in FROM clause",
           "syntaxValid": true,
           "tablesAccessed": "",
+          "columnsReferenced": "*",
           "hasAggregate": false,
           "isDestructive": false,
-          "concernsCount": 0,
-          "concerns": "",
-          "medianLatencyMs": 0.6745
+          "concernsCount": 1,
+          "concerns": "PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.",
+          "astAnalysisLatencyMs": 0.9286
         },
         {
           "id": "OPT-08",
           "description": "Unbounded UPDATE statement without WHERE clause",
           "syntaxValid": true,
           "tablesAccessed": "",
+          "columnsReferenced": "",
           "hasAggregate": false,
           "isDestructive": true,
           "concernsCount": 1,
           "concerns": "CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.",
-          "medianLatencyMs": 0.3489
+          "astAnalysisLatencyMs": 0.404
         },
         {
           "id": "OPT-09",
           "description": "Specific projection with indexable primary key range scan",
           "syntaxValid": true,
           "tablesAccessed": "users",
+          "columnsReferenced": "id, email",
           "hasAggregate": false,
           "isDestructive": false,
           "concernsCount": 0,
           "concerns": "",
-          "medianLatencyMs": 0.9338
+          "astAnalysisLatencyMs": 0.7842
         },
         {
           "id": "OPT-10",
           "description": "Paginated query with explicit LIMIT and OFFSET boundary",
           "syntaxValid": true,
           "tablesAccessed": "users",
+          "columnsReferenced": "id, name, created_at",
           "hasAggregate": false,
           "isDestructive": false,
           "concernsCount": 0,
           "concerns": "",
-          "medianLatencyMs": 0.6343
+          "astAnalysisLatencyMs": 0.8566
         }
       ]
     }

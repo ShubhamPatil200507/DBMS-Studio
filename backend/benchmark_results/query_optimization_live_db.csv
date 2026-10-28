@@ -1,0 +1,4 @@
+id,description,transformationType,rowsReturned,resultsEquivalent,medianOriginalDbLatencyMs,medianTransformedDbLatencyMs,speedupFactor
+DB-TRANS-01,Correlated subquery IN unnested to INNER JOIN with DISTINCT,Subquery Unnesting,159,true,1.7479,2.1098,0.83x
+DB-TRANS-02,Correlated COUNT(*) > 0 subquery transformed to short-circuiting EXISTS predicate,EXISTS Semi-Join Transformation,200,true,2.4065,2.0722,1.16x
+DB-TRANS-03,SARGable predicate transformation eliminating function evaluation on filtered column,SARGable Predicate Flattening,66,true,1.0937,0.974,1.12x

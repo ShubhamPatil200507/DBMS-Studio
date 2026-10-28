@@ -1,4 +1,5 @@
 import { Express } from 'express';
+import authRoutes from './authRoutes';
 import designRoutes from './designRoutes';
 import schemaRoutes from './schemaRoutes';
 import sqlRoutes from './sqlRoutes';
@@ -10,6 +11,7 @@ import securityRoutes from './securityRoutes';
 import agentRoutes from './agentRoutes';
 
 export const setupRoutes = (app: Express) => {
+    app.use('/api/auth', authRoutes);
     app.use('/api/dashboard', dashboardRoutes);
     app.use('/api/design', designRoutes);
     app.use('/api/schema', schemaRoutes);

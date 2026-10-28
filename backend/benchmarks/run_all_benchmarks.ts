@@ -7,7 +7,7 @@ import { runNL2SQLBenchmark } from './benchmark_nl2sql';
 import { runQueryOptimizationBenchmark } from './benchmark_query_optimization';
 
 function toCsv(rows: any[]): string {
-    if (rows.length === 0) return '';
+    if (!Array.isArray(rows) || rows.length === 0) return '';
     const headers = Object.keys(rows[0]);
     const escapeCsv = (val: any) => {
         if (val === null || val === undefined) return '';
@@ -24,7 +24,7 @@ function toCsv(rows: any[]): string {
     return lines.join('\n');
 }
 
-export function executeAllBenchmarks() {
+export async function executeAllBenchmarks() {
     console.log('Starting Intelligent DBMS Studio Empirical Research Benchmarks...\n');
 
     const envMetadata = {
@@ -52,15 +52,28 @@ export function executeAllBenchmarks() {
     const normBenchmark = runNormalizationBenchmark();
     console.table(normBenchmark.summary);
 
-    // 3. NL2SQL Benchmark
-    console.log('\n[3/4] Running NL-to-SQL Intent & Schema Resolution Benchmark (20 queries)...');
+    // 3. NL2SQL Benchmark (Preserved 20 + Unseen 20 = 40 total queries)
+    console.log('\n[3/4] Running NL-to-SQL Intent & Schema Resolution Benchmark (40 queries across preserved and unseen sets)...');
     const nl2sqlBenchmark = runNL2SQLBenchmark();
+    console.log('--- Preserved Original Set (20 queries) ---');
+    console.table(nl2sqlBenchmark.preservedCorpus.summary);
+    console.log('--- Unseen Evaluation Set (20 queries) ---');
+    console.table(nl2sqlBenchmark.unseenCorpus.summary);
+    console.log('--- Combined NL2SQL Summary ---');
     console.table(nl2sqlBenchmark.summary);
 
-    // 4. Query Optimization Benchmark
-    console.log('\n[4/4] Running Query Optimization & AST Analysis Benchmark (10 queries x 5 runs)...');
-    const optBenchmark = runQueryOptimizationBenchmark(5);
-    console.table(optBenchmark.summary);
+    // 4. Query Optimization Benchmark (AST Analysis + Live MySQL Rewrite Equivalence)
+    console.log('\n[4/4] Running Query Optimization & Live MySQL Execution Benchmark...');
+    const optBenchmark = await runQueryOptimizationBenchmark(5);
+    console.log('--- AST Structural Analysis (Local Parser) ---');
+    console.table(optBenchmark.astBenchmark.summary);
+    console.log('--- Empirical Live Database Rewrite & Equivalence (MySQL Engine) ---');
+    if (optBenchmark.liveDbBenchmark.summary.status === 'COMPLETED_EMPIRICAL_LIVE_DB') {
+        console.table(optBenchmark.liveDbBenchmark.summary);
+        console.table(optBenchmark.liveDbBenchmark.results);
+    } else {
+        console.log(`Live DB Benchmark Status: ${optBenchmark.liveDbBenchmark.summary.status}`);
+    }
 
     // Write artifacts to backend/benchmark_results/
     const resultsDir = path.resolve(__dirname, '../benchmark_results');
@@ -87,11 +100,17 @@ export function executeAllBenchmarks() {
     fs.writeFileSync(path.join(resultsDir, 'normalization_benchmark.csv'), toCsv(normBenchmark.results), 'utf8');
     fs.writeFileSync(path.join(resultsDir, 'nl2sql_benchmark.csv'), toCsv(nl2sqlBenchmark.detailedResults), 'utf8');
     fs.writeFileSync(path.join(resultsDir, 'query_optimization_benchmark.csv'), toCsv(optBenchmark.results), 'utf8');
+    if (optBenchmark.liveDbBenchmark.results?.length > 0) {
+        fs.writeFileSync(path.join(resultsDir, 'query_optimization_live_db.csv'), toCsv(optBenchmark.liveDbBenchmark.results), 'utf8');
+    }
 
     console.log(`\nAll benchmarks successfully executed and artifacts saved to: ${resultsDir}`);
     return fullReport;
 }
 
 if (require.main === module) {
-    executeAllBenchmarks();
+    executeAllBenchmarks().catch(err => {
+        console.error('Benchmark execution error:', err);
+        process.exit(1);
+    });
 }

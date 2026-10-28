@@ -4,6 +4,10 @@ import { QueryIR, SchemaTableInfo } from './queryIR';
 const tokenizer = new natural.WordTokenizer();
 const stemmer = natural.PorterStemmer;
 
+function escapeRegExp(string: string): string {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export function parseSchemaContext(schemaDdl?: string): Map<string, SchemaTableInfo> {
     const tableMap = new Map<string, SchemaTableInfo>();
     if (!schemaDdl) return tableMap;
@@ -55,7 +59,7 @@ export function parseSchemaContext(schemaDdl?: string): Map<string, SchemaTableI
 
 export function classifyIntent(tokens: string[]): QueryIR['intent'] {
     const lowerTokens = tokens.map(t => t.toLowerCase());
-    if (lowerTokens.some(t => ['count', 'sum', 'avg', 'average', 'maximum', 'max', 'minimum', 'min', 'total'].includes(t))) {
+    if (lowerTokens.some(t => ['count', 'sum', 'avg', 'average', 'maximum', 'max', 'minimum', 'min', 'total', 'revenue'].includes(t))) {
         return 'AGGREGATE';
     }
     if (lowerTokens.some(t => ['insert', 'add', 'create', 'new'].includes(t))) {
@@ -79,23 +83,76 @@ export function buildQueryIR(naturalQuery: string, schemaMap: Map<string, Schema
     const targetTables: string[] = [];
     const ambiguities: string[] = [];
 
-    // Identify tables mentioned
-    for (const [tableName] of schemaMap.entries()) {
+    // 1. Mask grammatical sorting phrases ("ordered by" / "order by") so they do not falsely trigger table "orders"
+    let cleanQuery = lowerQuery.replace(/\border(?:ed)?\s+by\b/gi, ' __SORT_CLAUSE__ ');
+
+    // 2. Sort tables by length descending so composite tables ("order_items") are checked before sub-parts ("orders")
+    const tableNames = Array.from(schemaMap.keys()).sort((a, b) => b.length - a.length);
+
+    for (const tableName of tableNames) {
+        const spaceVariant = tableName.replace(/_/g, ' ');
+        const singularVariant = spaceVariant.endsWith('s') ? spaceVariant.slice(0, -1) : spaceVariant;
+        const rawSingular = tableName.endsWith('s') ? tableName.slice(0, -1) : tableName;
+
+        const phraseRegex = new RegExp(`\\b(?:${escapeRegExp(spaceVariant)}|${escapeRegExp(singularVariant)}|${escapeRegExp(tableName)}|${escapeRegExp(rawSingular)})\\b`, 'i');
+
+        if (phraseRegex.test(cleanQuery)) {
+            if (!targetTables.includes(tableName)) {
+                targetTables.push(tableName);
+            }
+            // Mask out the matched table phrase so sub-tokens (e.g. "order" inside "order items") do not re-match
+            cleanQuery = cleanQuery.replace(phraseRegex, ` __MATCHED_${tableName.toUpperCase()}__ `);
+        }
+    }
+
+    // 3. Check single-word table stem matches on remaining unmasked tokens
+    const remainingTokens = cleanQuery.split(/[^a-zA-Z0-9_]+/).filter(Boolean);
+    for (const tableName of tableNames) {
+        if (targetTables.includes(tableName)) continue;
+
         const stemmedTable = stemmer.stem(tableName);
         const singularTable = tableName.endsWith('s') ? tableName.slice(0, -1) : tableName;
-        if (lowerTokens.includes(tableName) || lowerTokens.includes(singularTable) || lowerTokens.some(tok => stemmer.stem(tok) === stemmedTable)) {
+
+        if (
+            remainingTokens.includes(tableName) ||
+            remainingTokens.includes(singularTable) ||
+            remainingTokens.some(tok => stemmer.stem(tok) === stemmedTable)
+        ) {
             targetTables.push(tableName);
         }
     }
 
-    // Default target table if none found but tables exist
-    if (targetTables.length === 0 && schemaMap.size > 0) {
-        // Search if any column matches directly
-        for (const [tName, tInfo] of schemaMap.entries()) {
-            for (const col of tInfo.columns) {
-                if (lowerTokens.includes(col.name)) {
-                    if (!targetTables.includes(tName)) targetTables.push(tName);
-                }
+    // 4. Domain entity / business synonyms (e.g. "purchase" -> orders, "items" -> order_items)
+    if (schemaMap.has('orders') && !targetTables.includes('orders')) {
+        if (/\b(?:purchases?|purchased|bought|transactions?)\b/i.test(cleanQuery)) {
+            targetTables.push('orders');
+        }
+    }
+    if (schemaMap.has('order_items') && !targetTables.includes('order_items')) {
+        if (/\b(?:items?|line_items?)\b/i.test(cleanQuery)) {
+            targetTables.push('order_items');
+        }
+    }
+    if (schemaMap.has('users') && !targetTables.includes('users')) {
+        if (/\b(?:customers?|clients?|members?)\b/i.test(cleanQuery)) {
+            targetTables.push('users');
+        }
+    }
+    if (schemaMap.has('reviews') && !targetTables.includes('reviews')) {
+        if (/\b(?:ratings?|feedbacks?|comments?)\b/i.test(cleanQuery)) {
+            targetTables.push('reviews');
+        }
+    }
+
+    // 5. Column-based entity inference if tables are still missing or ambiguous
+    for (const [tName, tInfo] of schemaMap.entries()) {
+        if (targetTables.includes(tName)) continue;
+        for (const col of tInfo.columns) {
+            if (col.name === 'id') continue; // skip generic primary key id
+            const colWords = col.name.replace(/_/g, ' ');
+            if (remainingTokens.includes(col.name) || lowerQuery.includes(colWords)) {
+                targetTables.push(tName);
+                break;
             }
         }
     }
@@ -116,25 +173,25 @@ export function buildQueryIR(naturalQuery: string, schemaMap: Map<string, Schema
     const orderBy: QueryIR['orderBy'] = [];
     if (/order by|sort(?:ed)? by|highest|top|most|cheapest|lowest|latest|newest|oldest/i.test(naturalQuery)) {
         const isDesc = /highest|top|most|latest|newest|desc/i.test(naturalQuery);
-        // Find column
         let matchedCol = '';
         if (targetTables.length > 0) {
-            const table = schemaMap.get(targetTables[0]);
-            if (table) {
+            for (const tName of targetTables) {
+                const table = schemaMap.get(tName);
+                if (!table) continue;
                 for (const col of table.columns) {
                     if (lowerTokens.includes(col.name)) {
                         matchedCol = col.name;
                         break;
                     }
                 }
-                if (!matchedCol) {
-                    // heuristics
-                    if (/price|amount|spent|cost/i.test(naturalQuery)) {
-                        matchedCol = table.columns.find(c => /price|amount|total|cost|spent/i.test(c.name))?.name || '';
-                    } else if (/latest|newest|recent|date|time/i.test(naturalQuery)) {
-                        matchedCol = table.columns.find(c => /created|date|time|timestamp/i.test(c.name))?.name || '';
-                    }
+                if (matchedCol) break;
+                // Heuristics
+                if (/price|amount|spent|cost/i.test(naturalQuery)) {
+                    matchedCol = table.columns.find(c => /price|amount|total|cost|spent/i.test(c.name))?.name || '';
+                } else if (/latest|newest|recent|date|time/i.test(naturalQuery)) {
+                    matchedCol = table.columns.find(c => /created|date|time|timestamp/i.test(c.name))?.name || '';
                 }
+                if (matchedCol) break;
             }
         }
         if (matchedCol) {
@@ -148,7 +205,7 @@ export function buildQueryIR(naturalQuery: string, schemaMap: Map<string, Schema
         selectedMetrics.push({ expression: 'COUNT(*)', alias: 'total_count', func: 'COUNT' });
     } else if (/average|avg/i.test(naturalQuery)) {
         selectedMetrics.push({ expression: 'AVG(*)', alias: 'avg_val', func: 'AVG' });
-    } else if (/sum|total/i.test(naturalQuery)) {
+    } else if (/sum|total|revenue/i.test(naturalQuery)) {
         selectedMetrics.push({ expression: 'SUM(*)', alias: 'total_sum', func: 'SUM' });
     }
 
