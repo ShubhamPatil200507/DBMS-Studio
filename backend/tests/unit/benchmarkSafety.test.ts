@@ -2,7 +2,9 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
     validateBenchmarkDbConfig,
-    validateBenchmarkCleanupBoundary
+    validateBenchmarkCleanupBoundary,
+    generateUniqueBenchmarkDbName,
+    checkDatabasePreExists
 } from '../../src/security/benchmarkDbSafety';
 
 describe('Benchmark Database Safety & Boundary Verification Unit Tests', () => {
@@ -10,7 +12,9 @@ describe('Benchmark Database Safety & Boundary Verification Unit Tests', () => {
         DB_NAME: 'dbms_studio',
         DB_USER: 'app_user',
         DB_PASSWORD: 'secure_password_123',
-        BENCHMARK_DB_NAME: 'dbms_studio_benchmark'
+        BENCHMARK_DB_NAME: 'dbms_studio_benchmark',
+        BENCHMARK_DB_USER: 'dedicated_bench_user',
+        BENCHMARK_DB_PASSWORD: 'dedicated_bench_password_456'
     };
 
     it('rejects execution when BENCHMARK_DB_NAME is completely missing', () => {
@@ -80,31 +84,33 @@ describe('Benchmark Database Safety & Boundary Verification Unit Tests', () => {
         assert.ok(result.error?.includes('must explicitly indicate a disposable benchmark purpose'));
     });
 
-    it('rejects execution when database user is missing (no silent root fallback)', () => {
+    it('requires dedicated benchmark credentials and refuses silent fallback to application user', () => {
         const env = {
-            ...validBaseEnv
+            ...validBaseEnv,
+            DB_USER: 'app_user',
+            DB_PASSWORD: 'app_password'
         };
-        delete env.DB_USER;
         delete env.BENCHMARK_DB_USER;
 
         const result = validateBenchmarkDbConfig(env);
         assert.equal(result.isValid, false);
-        assert.ok(result.error?.includes('silent root fallback is disabled'));
+        assert.ok(result.error?.includes('BENCHMARK_DB_USER environment variable must be explicitly configured'));
     });
 
-    it('rejects execution when database password is unconfigured (no silent empty password fallback)', () => {
+    it('requires dedicated benchmark password and refuses silent fallback to application password', () => {
         const env = {
-            ...validBaseEnv
+            ...validBaseEnv,
+            DB_USER: 'app_user',
+            DB_PASSWORD: 'app_password'
         };
-        delete env.DB_PASSWORD;
         delete env.BENCHMARK_DB_PASSWORD;
 
         const result = validateBenchmarkDbConfig(env);
         assert.equal(result.isValid, false);
-        assert.ok(result.error?.includes('silent empty password fallback is disabled'));
+        assert.ok(result.error?.includes('BENCHMARK_DB_PASSWORD environment variable must be explicitly configured'));
     });
 
-    it('accepts valid configuration and prioritizes dedicated benchmark credentials', () => {
+    it('accepts valid configuration with dedicated benchmark credentials', () => {
         const dedicatedEnv = {
             ...validBaseEnv,
             BENCHMARK_DB_USER: 'bench_runner',
@@ -122,20 +128,64 @@ describe('Benchmark Database Safety & Boundary Verification Unit Tests', () => {
         assert.equal(result.config?.database, 'dbms_studio_benchmark');
     });
 
-    describe('Cleanup Boundary Verification', () => {
-        it('allows cleanup when target database exactly matches validated benchmark database', () => {
-            const boundary = validateBenchmarkCleanupBoundary('dbms_studio_benchmark', 'dbms_studio_benchmark');
+    it('generates unique run-specific benchmark database names', () => {
+        const name1 = generateUniqueBenchmarkDbName('dbms_studio_benchmark');
+        const name2 = generateUniqueBenchmarkDbName('dbms_studio_benchmark');
+
+        assert.notEqual(name1, name2);
+        assert.ok(name1.startsWith('dbms_studio_benchmark_'));
+        assert.ok(name1.length <= 64);
+    });
+
+    it('detects pre-existing database to prevent accidental overwrite or destruction', async () => {
+        const mockConnPreExists = {
+            query: async (sql: string, params: any[]) => {
+                return [[{ Database: 'dbms_studio_benchmark' }]];
+            }
+        };
+
+        const mockConnDoesNotExist = {
+            query: async (sql: string, params: any[]) => {
+                return [[]];
+            }
+        };
+
+        assert.equal(await checkDatabasePreExists(mockConnPreExists, 'dbms_studio_benchmark'), true);
+        assert.equal(await checkDatabasePreExists(mockConnDoesNotExist, 'dbms_studio_benchmark_unique'), false);
+    });
+
+    describe('Cleanup Boundary Verification & Pre-Existing Database Protection', () => {
+        it('allows cleanup only when database was created by this specific run and names match', () => {
+            const boundary = validateBenchmarkCleanupBoundary(
+                'dbms_studio_benchmark_run123',
+                'dbms_studio_benchmark_run123',
+                true
+            );
             assert.equal(boundary.isSafe, true);
         });
 
+        it('strictly blocks cleanup when database was NOT confirmed as created by this run', () => {
+            const boundary = validateBenchmarkCleanupBoundary(
+                'dbms_studio_benchmark',
+                'dbms_studio_benchmark',
+                false
+            );
+            assert.equal(boundary.isSafe, false);
+            assert.ok(boundary.error?.includes('was not confirmed as created by this specific benchmark run'));
+        });
+
         it('strictly blocks cleanup when target database differs from validated database', () => {
-            const boundary = validateBenchmarkCleanupBoundary('dbms_studio', 'dbms_studio_benchmark');
+            const boundary = validateBenchmarkCleanupBoundary(
+                'dbms_studio',
+                'dbms_studio_benchmark',
+                true
+            );
             assert.equal(boundary.isSafe, false);
             assert.ok(boundary.error?.includes('does not match validated benchmark database'));
         });
 
         it('strictly blocks cleanup if target database is a protected system database', () => {
-            const boundary = validateBenchmarkCleanupBoundary('mysql', 'mysql');
+            const boundary = validateBenchmarkCleanupBoundary('mysql', 'mysql', true);
             assert.equal(boundary.isSafe, false);
             assert.ok(boundary.error?.includes('protected MySQL system database'));
         });

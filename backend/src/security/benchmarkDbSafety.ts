@@ -24,7 +24,7 @@ export const SAFE_DB_NAME_REGEX = /^[a-zA-Z0-9_]{3,64}$/;
  * 3. BENCHMARK_DB_NAME must NOT equal the configured application database name (DB_NAME).
  * 4. BENCHMARK_DB_NAME must NOT be a MySQL system database (mysql, sys, performance_schema, information_schema).
  * 5. BENCHMARK_DB_NAME must contain an explicit disposable/benchmark indicator ('benchmark', 'test', or 'synth').
- * 6. Explicit credentials are required: silent root fallback or empty password fallback is prohibited.
+ * 6. Explicit dedicated benchmark credentials required: silent fallback to application credentials or root/empty password is prohibited.
  */
 export function validateBenchmarkDbConfig(env: NodeJS.ProcessEnv = process.env): BenchmarkSafetyValidationResult {
     const rawBenchDbName = env.BENCHMARK_DB_NAME?.trim();
@@ -68,26 +68,25 @@ export function validateBenchmarkDbConfig(env: NodeJS.ProcessEnv = process.env):
     }
 
     // Benchmark database credentials:
-    // Dedicated benchmark credentials take precedence; explicit application DB credentials are used if configured.
-    // SILENT ROOT / EMPTY PASSWORD FALLBACK IS PROHIBITED.
-    const user = env.BENCHMARK_DB_USER?.trim() || env.DB_USER?.trim();
+    // Requires dedicated benchmark credentials by default; silent fallback to application DB credentials is prohibited.
+    const user = env.BENCHMARK_DB_USER?.trim();
     if (!user) {
         return {
             isValid: false,
-            error: 'Safety Exception: Missing database user configuration for benchmark execution. Explicit credentials required; silent root fallback is disabled.'
+            error: 'Safety Exception: Dedicated benchmark credentials required. BENCHMARK_DB_USER environment variable must be explicitly configured; silent fallback to application database credentials is prohibited.'
         };
     }
 
-    const password = env.BENCHMARK_DB_PASSWORD !== undefined ? env.BENCHMARK_DB_PASSWORD : env.DB_PASSWORD;
+    const password = env.BENCHMARK_DB_PASSWORD;
     if (password === undefined) {
         return {
             isValid: false,
-            error: 'Safety Exception: Missing database password configuration for benchmark execution. Explicit credentials required; silent empty password fallback is disabled.'
+            error: 'Safety Exception: Dedicated benchmark credentials required. BENCHMARK_DB_PASSWORD environment variable must be explicitly configured.'
         };
     }
 
-    const host = env.BENCHMARK_DB_HOST?.trim() || env.DB_HOST?.trim() || 'localhost';
-    const port = parseInt(env.BENCHMARK_DB_PORT || env.DB_PORT || '3306', 10);
+    const host = env.BENCHMARK_DB_HOST?.trim() || 'localhost';
+    const port = parseInt(env.BENCHMARK_DB_PORT || '3306', 10);
 
     return {
         isValid: true,
@@ -102,12 +101,45 @@ export function validateBenchmarkDbConfig(env: NodeJS.ProcessEnv = process.env):
 }
 
 /**
- * Validates that a cleanup target DROP DATABASE statement strictly matches the validated disposable benchmark database.
+ * Generates a unique, non-colliding disposable benchmark database name for this specific execution run.
  */
-export function validateBenchmarkCleanupBoundary(targetDb: string, validatedBenchDb: string): { isSafe: boolean; error?: string } {
+export function generateUniqueBenchmarkDbName(baseName: string): string {
+    const timestamp = Date.now().toString(36);
+    const randomSuffix = Math.random().toString(36).substring(2, 6);
+    const candidate = `${baseName}_${timestamp}_${randomSuffix}`;
+    // Clamp to MySQL max identifier length of 64 chars
+    return candidate.substring(0, 64);
+}
+
+/**
+ * Checks whether a database already exists on the database server.
+ */
+export async function checkDatabasePreExists(connection: any, dbName: string): Promise<boolean> {
+    if (!connection || !dbName) return false;
+    const [rows] = await connection.query('SHOW DATABASES LIKE ?', [dbName]);
+    return Array.isArray(rows) && rows.length > 0;
+}
+
+/**
+ * Validates that a cleanup target DROP DATABASE statement strictly matches the validated disposable benchmark database
+ * AND proves that this exact run created it. Pre-existing databases are strictly protected from accidental deletion.
+ */
+export function validateBenchmarkCleanupBoundary(
+    targetDb: string,
+    validatedBenchDb: string,
+    createdByThisRun: boolean = true
+): { isSafe: boolean; error?: string } {
     if (!targetDb || !validatedBenchDb) {
         return { isSafe: false, error: 'Database names cannot be empty during cleanup boundary verification.' };
     }
+
+    if (!createdByThisRun) {
+        return {
+            isSafe: false,
+            error: `Boundary Exception: Cleanup blocked because database '${targetDb}' was not confirmed as created by this specific benchmark run.`
+        };
+    }
+
     const t = targetDb.trim().toLowerCase();
     const v = validatedBenchDb.trim().toLowerCase();
 

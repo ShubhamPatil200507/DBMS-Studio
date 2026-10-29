@@ -28,12 +28,12 @@ An enterprise-grade, autonomous database engineering and optimization studio. Co
   - Multi-user isolation enforces project CRUD ownership via verified JWT tokens (`req.user.id`).
   - Cross-user resource access, modification, and deletion attempts are blocked with 404/403 responses.
   - Administrative capabilities (such as live database audits) require `req.user.role === 'admin'`.
-- **SQL Execution Sandbox Guards**:
-  - Strict read-only enforcement (`SELECT`, `WITH`, `SHOW`, `DESCRIBE`, `EXPLAIN`).
-  - Multi-statement execution blocking (rejects semicolon-chained queries).
-  - Explicit keyword blacklist blocking execution of dangerous database routines (`INTO OUTFILE`, `LOAD_FILE`, `SLEEP`, `BENCHMARK`).
+- **SQL Execution Sandbox & Truthful Cancellation**:
+  - Structural AST policy allowlist: permits safe `SELECT`, `WITH ... SELECT`, `SHOW`, `DESCRIBE`, and `EXPLAIN` statements.
+  - Strictly blocks data-modifying CTEs (`WITH ... UPDATE`, `WITH ... DELETE`), multiple semicolon-separated statements, file export clauses (`INTO OUTFILE`, `INTO DUMPFILE`), and dangerous execution functions (`SLEEP`, `BENCHMARK`, `LOAD_FILE`, lock routines).
   - Query length capped at 5,000 characters; result rows truncated at 500 rows.
-  - 5,000ms query execution timeout race prevents long-running denial of service.
+  - **Truthful Server-Side Query Cancellation**: Leases a dedicated MySQL connection, captures the server `threadId`, and attempts `KILL QUERY <threadId>` upon timeout (5,000ms). Truthfully distinguishes confirmed server cancellations from unconfirmed client socket terminations.
+  - *Account Limitation*: Real server-side cancellation requires the MySQL account to own the connection thread or hold `CONNECTION_ADMIN`/`SYSTEM_USER` privileges. When executed on accounts lacking cancellation privileges, `KILL QUERY` fails and the client destroys the socket, truthfully reporting the cancellation as unconfirmed.
 - **Resource Protection & Rate Limiting**:
   - Global API rate limiter: 300 requests / 15 minutes.
   - Authentication rate limiter (`/login`, `/register`): 20 requests / 15 minutes.
@@ -56,12 +56,13 @@ The repository includes a reproducible automated benchmarking harness (`npm run 
    - Evaluates 40 queries: 20 queries from the preserved original test set and 20 queries from a separate, unseen evaluation corpus.
    - Compares naive baseline keyword matching against schema-aware join path resolution and entity linking.
 4. **Query Optimization & Database Rewrite Benchmark (`benchmark_query_optimization.ts`)**:
-   - **Part A (AST Structural Analysis)**: In-process AST parsing latency measured via Node.js high-resolution timers (`performance.now()`). Measures JavaScript AST traversal time (~0.4–0.8 ms), **not** database execution latency.
-   - **Part B (Live Empirical MySQL Execution)**: Operates strictly within a dedicated, disposable database (`dbms_studio_benchmark`). Generates synthetic datasets (300 customers, 600 orders) with mixed-case attributes to benchmark execution latency and verify SHA-256 result-set equivalence across transformations.
-   - **Collation-Sensitive Safety**: Demonstrates that SARGable predicate rewrites (`LOWER(col) = val` -> `col = val`) preserve result equivalence under case-insensitive collations (`utf8mb4_general_ci`), but drop mixed-case rows under case-sensitive/binary collations (`utf8mb4_bin`), validating the necessity of optimizer safety guards.
+   - **Part A (AST Structural Analysis)**: In-process AST parsing latency measured via Node.js high-resolution timers (`performance.now()`). Evaluates 10 explicitly labeled test cases (5 positive concern queries, 5 negative clean queries), computing true positives, false positives, true negatives, false negatives, precision, recall, and F1 mathematically. Measures local JavaScript parser traversal time (~0.4–0.8 ms), strictly separate from database execution.
+   - **Part B (Live Empirical MySQL Execution)**: Operates strictly within a newly allocated, uniquely named disposable database (`dbms_studio_benchmark_<runId>`). Checks that the database does not pre-exist (refuses to overwrite pre-existing databases), requires explicit dedicated benchmark credentials (`BENCHMARK_DB_USER`, `BENCHMARK_DB_PASSWORD`), executes a 1-query unmeasured warm-up pass, and guarantees cleanup only if this exact run confirmed creation.
+   - **Collation-Sensitive Semantic Divergence**: The collation experiment demonstrates a semantic difference for the tested rewrite and configurations: eliminating `LOWER(status) = 'active'` $\rightarrow$ `status = 'active'` preserves result-set equivalence under case-insensitive collations (`utf8mb4_general_ci`), but produces silent data loss under case-sensitive/binary collations (`utf8mb4_bin`) by dropping mixed-case records (128 vs 42 rows). Note: This experiment demonstrates the semantic risk of naive function flattening in rewriters; the prototype optimizer does not currently implement dynamic schema-collation introspection.
+   - **Dataset Scope & Limitations**: Workload tests run on a small synthetic dataset (300 customers, 600 orders) on MySQL 8.0.46. Latencies reflect in-memory InnoDB buffer pool operations and cannot be generalized to multi-gigabyte disk-bound workloads.
 
 > [!NOTE]
-> The project is currently undergoing active peer audit and empirical validation. Benchmark results represent reproducible local test runs and should not be cited as final publication claims until formal peer review.
+> The project is currently an active empirical research prototype. It is not claimed to be fully secure or publication-ready, and should not be cited as final peer-reviewed findings.
 
 ---
 
@@ -150,6 +151,9 @@ Visit `http://localhost:5000`.
 | `DB_PASSWORD` | MySQL password | No | `""` |
 | `DB_NAME` | MySQL database name | No | `dbms_studio` |
 | `DB_SSL` | Enable TLS (`true`/`false`) | No | `false` |
+| `BENCHMARK_DB_NAME` | Disposable benchmark database base name | **Yes (for benchmarks)** | *None* |
+| `BENCHMARK_DB_USER` | Dedicated benchmark database username | **Yes (for benchmarks)** | *None* |
+| `BENCHMARK_DB_PASSWORD` | Dedicated benchmark database password | **Yes (for benchmarks)** | *None* |
 | `GEMINI_API_KEY` | Google Gemini API key | Optional | - |
 | `VITE_API_BASE_URL` | Base API URL (for split frontend hosting) | No | `""` (relative `/api`) |
 
@@ -167,7 +171,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 # Navigate to backend directory
 cd backend
 
-# Execute all unit, regression, and integration tests (64 tests)
+# Execute all unit, regression, and integration tests (111 tests across 20 suites)
 npm test
 
 # Execute empirical research benchmark suite

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { generateResponse } from '../ai/gemini';
 import { parseSchemaContext, buildQueryIR } from '../nlp/nluParser';
 import { parseAndExplainSql } from '../nlp/sqlAstAnalyzer';
-import { query, executeCancellableQuery } from '../database/connection';
+import { query, executeCancellableQuery, QueryCancellationError } from '../database/connection';
 import { validateSqlExecutionPolicy } from '../security/sqlExecutionPolicy';
 
 const sqlGenerateSchema = {
@@ -211,7 +211,15 @@ export const executeSql = async (req: Request, res: Response): Promise<void> => 
         });
     } catch (error: any) {
         console.error('SQL Execution Error:', error);
-        const isTimeout = error.message?.includes('timed out and was cancelled');
-        res.status(isTimeout ? 408 : 400).json({ error: error.message || 'Failed to execute query' });
+        if (error instanceof QueryCancellationError || error.isConfirmedServerCancellation !== undefined) {
+            res.status(408).json({
+                error: error.message,
+                cancellationConfirmed: Boolean(error.isConfirmedServerCancellation),
+                cancellationStatus: error.isConfirmedServerCancellation ? 'CONFIRMED_SERVER_CANCELLATION' : 'UNCONFIRMED_CLIENT_TERMINATION',
+                threadId: error.threadId
+            });
+            return;
+        }
+        res.status(400).json({ error: error.message || 'Failed to execute query' });
     }
 };

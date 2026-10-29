@@ -3,6 +3,26 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+export class QueryCancellationError extends Error {
+    public readonly isConfirmedServerCancellation: boolean;
+    public readonly threadId: number;
+    public readonly killError?: any;
+
+    constructor(
+        message: string,
+        isConfirmedServerCancellation: boolean,
+        threadId: number,
+        killError?: any
+    ) {
+        super(message);
+        this.name = 'QueryCancellationError';
+        this.isConfirmedServerCancellation = isConfirmedServerCancellation;
+        this.threadId = threadId;
+        this.killError = killError;
+        Object.setPrototypeOf(this, QueryCancellationError.prototype);
+    }
+}
+
 const pool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '3306', 10),
@@ -26,11 +46,19 @@ export const query = async (sql: string, params?: any[]) => {
 };
 
 /**
- * Executes a query on a dedicated leased connection with genuine server-side statement cancellation.
- * If execution exceeds timeoutMs, sends `KILL QUERY <threadId>` to the database server
- * and destroys the socket to guarantee resource release.
+ * Executes a query on a dedicated leased connection with truthful server-side statement cancellation.
+ * If execution exceeds timeoutMs, attempts `KILL QUERY <threadId>` against the database engine.
+ * Truthfully distinguishes confirmed server cancellation from unconfirmed client termination.
+ * 
+ * Note: Real server-side cancellation requires that the connecting user owns the thread or possesses
+ * MySQL CONNECTION_ADMIN or SYSTEM_USER privileges. On accounts without kill privileges, cancellation
+ * cannot be confirmed on the server; the client connection is destroyed to release client-side resources.
  */
-export const executeCancellableQuery = async (sql: string, timeoutMs: number = 5000): Promise<any> => {
+export const executeCancellableQuery = async (
+    sql: string,
+    timeoutMs: number = 5000,
+    customKiller?: (threadId: number) => Promise<void>
+): Promise<any> => {
     const conn = await pool.getConnection();
     const threadId = conn.threadId;
     let timerId: NodeJS.Timeout | null = null;
@@ -44,14 +72,37 @@ export const executeCancellableQuery = async (sql: string, timeoutMs: number = 5
         const timeoutPromise = new Promise((_, reject) => {
             timerId = setTimeout(async () => {
                 timedOut = true;
+                let killConfirmed = false;
+                let killError: any = null;
+
                 try {
-                    // Send real KILL QUERY to MySQL server to interrupt running query
-                    await pool.query(`KILL QUERY ${threadId}`);
-                } catch (killErr) {
-                    // Ignore if thread already terminated
+                    if (customKiller) {
+                        await customKiller(threadId);
+                    } else {
+                        await pool.query(`KILL QUERY ${threadId}`);
+                    }
+                    killConfirmed = true;
+                } catch (err: any) {
+                    killError = err;
                 }
+
+                // Destroy socket connection to prevent connection reuse after timeout
                 conn.destroy();
-                reject(new Error(`Query execution timed out and was cancelled on database server (${timeoutMs}ms limit).`));
+
+                if (killConfirmed) {
+                    reject(new QueryCancellationError(
+                        `Query execution timed out (${timeoutMs}ms limit). Server-side statement cancellation confirmed via KILL QUERY.`,
+                        true,
+                        threadId
+                    ));
+                } else {
+                    reject(new QueryCancellationError(
+                        `Query execution timed out (${timeoutMs}ms limit). Server-side cancellation unconfirmed (KILL QUERY failed: ${killError?.message || 'unknown error'}). Connection destroyed.`,
+                        false,
+                        threadId,
+                        killError
+                    ));
+                }
             }, timeoutMs);
         });
 

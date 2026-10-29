@@ -1,5 +1,5 @@
 id,description,transformationType,collationMode,expectedEquivalence,actualEquivalence,rowsOriginal,rowsTransformed,medianOriginalDbLatencyMs,stdDevOriginalDbLatencyMs,medianTransformedDbLatencyMs,stdDevTransformedDbLatencyMs,speedupFactor
-DB-TRANS-01,Correlated subquery IN unnested to INNER JOIN with DISTINCT,Subquery Unnesting,CASE_INSENSITIVE,true,true,244,244,1.0944,0.2392,1.151,0.3323,0.95x
-DB-TRANS-02,Correlated COUNT(*) > 0 subquery transformed to short-circuiting EXISTS predicate,EXISTS Semi-Join Transformation,CASE_INSENSITIVE,true,true,300,300,1.2196,0.2244,0.9209,0.0503,1.32x
-DB-TRANS-03-CI,SARGable predicate flattening on case-insensitive collation column (utf8mb4_general_ci),SARGable Predicate Flattening (CI),CASE_INSENSITIVE,true,true,128,128,0.565,0.078,0.5192,0.0156,1.09x
-DB-TRANS-03-CS,SARGable predicate rewrite guard check on binary case-sensitive collation column (utf8mb4_bin),Collation-Sensitive Rewrite Guard,CASE_SENSITIVE,false,false,128,42,0.5365,0.1236,0.3569,0.0476,1.5x
+DB-TRANS-01,Correlated subquery IN unnested to INNER JOIN with DISTINCT,Subquery Unnesting,CASE_INSENSITIVE,true,true,244,244,0.99,0.2527,1.0203,0.2748,0.97x
+DB-TRANS-02,Correlated COUNT(*) > 0 subquery transformed to short-circuiting EXISTS predicate,EXISTS Semi-Join Transformation,CASE_INSENSITIVE,true,true,300,300,1.2544,0.2019,0.9041,0.0633,1.39x
+DB-TRANS-03-CI,SARGable predicate flattening on case-insensitive collation column (utf8mb4_general_ci),SARGable Predicate Flattening (CI),CASE_INSENSITIVE,true,true,128,128,0.5265,0.1319,0.8422,0.2113,0.63x
+DB-TRANS-03-CS,SARGable predicate rewrite guard check on binary case-sensitive collation column (utf8mb4_bin),Collation-Sensitive Rewrite Guard,CASE_SENSITIVE,false,false,128,42,0.4398,0.0202,0.348,0.1726,1.26x

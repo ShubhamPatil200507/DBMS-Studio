@@ -1,16 +1,16 @@
 id,description,expectedKeys,computedKeys,candidateKeyMatch,expectedForm,computedForm,normalFormMatch,latencyMs
-NORM-01,Student Grade & Course Name (Partial dependency on CourseID),"CourseID,StudentID","CourseID,StudentID",true,1NF,1NF,true,0.5238
-NORM-02,Employee Project Hours & Project Location,"EmpID,ProjID","EmpID,ProjID",true,1NF,1NF,true,0.0399
-NORM-03,Supplier Parts Shipment with Supplier City,"PartID,SupplierID","PartID,SupplierID",true,1NF,1NF,true,0.0409
-NORM-04,Orders with Product Category and Customer Phone,"OrderID,ProductID","OrderID,ProductID",true,1NF,1NF,true,0.0552
-NORM-05,Employee Department and Department Manager (Transitive DeptID -> DeptManager),EmpID,EmpID,true,2NF,2NF,true,0.03
-NORM-06,Student Major and Department Building,StudentID,StudentID,true,2NF,2NF,true,0.0215
-NORM-07,Order Shipping Zone and Shipping Rate,OrderID,OrderID,true,2NF,2NF,true,0.0175
-NORM-08,Vehicle Registration and State Tax Rate,VIN,VIN,true,2NF,2NF,true,0.0176
-NORM-09,"Student Course Instructor (Instructor -> Course, but Instructor is not superkey)","Course,Student | Instructor,Student","Course,Student | Instructor,Student",true,3NF,3NF,true,0.1157
-NORM-10,Postal Code City Street Address with multiple overlapping candidate keys,"City,Street | PostalCode,Street","City,Street | PostalCode,Street",true,3NF,3NF,true,0.0471
-NORM-11,"Doctor Patient Treatment Clinic (Doctor -> Clinic, Clinic is prime)","Clinic,Patient | Doctor,Patient","Clinic,Patient | Doctor,Patient",true,3NF,3NF,true,0.0516
-NORM-12,User Account Profile (UserID is superkey for all attributes),UserID,UserID,true,BCNF,BCNF,true,0.0122
-NORM-13,Product Catalog Item with multiple unique candidate keys (ID and SKU),ProductID | SKU,ProductID | SKU,true,BCNF,BCNF,true,0.0317
-NORM-14,Binary Relationship Table with Composite Key,"ClubRef,StudentRef","ClubRef,StudentRef",true,BCNF,BCNF,true,0.0065
-NORM-15,Customer Account with Single Key and Independent Attributes,AccountNum,AccountNum,true,BCNF,BCNF,true,0.0082
+NORM-01,Student Grade & Course Name (Partial dependency on CourseID),"CourseID,StudentID","CourseID,StudentID",true,1NF,1NF,true,0.6431
+NORM-02,Employee Project Hours & Project Location,"EmpID,ProjID","EmpID,ProjID",true,1NF,1NF,true,0.0425
+NORM-03,Supplier Parts Shipment with Supplier City,"PartID,SupplierID","PartID,SupplierID",true,1NF,1NF,true,0.0313
+NORM-04,Orders with Product Category and Customer Phone,"OrderID,ProductID","OrderID,ProductID",true,1NF,1NF,true,0.0551
+NORM-05,Employee Department and Department Manager (Transitive DeptID -> DeptManager),EmpID,EmpID,true,2NF,2NF,true,0.0306
+NORM-06,Student Major and Department Building,StudentID,StudentID,true,2NF,2NF,true,0.0195
+NORM-07,Order Shipping Zone and Shipping Rate,OrderID,OrderID,true,2NF,2NF,true,0.017
+NORM-08,Vehicle Registration and State Tax Rate,VIN,VIN,true,2NF,2NF,true,0.0208
+NORM-09,"Student Course Instructor (Instructor -> Course, but Instructor is not superkey)","Course,Student | Instructor,Student","Course,Student | Instructor,Student",true,3NF,3NF,true,0.1159
+NORM-10,Postal Code City Street Address with multiple overlapping candidate keys,"City,Street | PostalCode,Street","City,Street | PostalCode,Street",true,3NF,3NF,true,0.059
+NORM-11,"Doctor Patient Treatment Clinic (Doctor -> Clinic, Clinic is prime)","Clinic,Patient | Doctor,Patient","Clinic,Patient | Doctor,Patient",true,3NF,3NF,true,0.0535
+NORM-12,User Account Profile (UserID is superkey for all attributes),UserID,UserID,true,BCNF,BCNF,true,0.0131
+NORM-13,Product Catalog Item with multiple unique candidate keys (ID and SKU),ProductID | SKU,ProductID | SKU,true,BCNF,BCNF,true,0.0316
+NORM-14,Binary Relationship Table with Composite Key,"ClubRef,StudentRef","ClubRef,StudentRef",true,BCNF,BCNF,true,0.0062
+NORM-15,Customer Account with Single Key and Independent Attributes,AccountNum,AccountNum,true,BCNF,BCNF,true,0.0083

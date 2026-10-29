@@ -1,11 +1,11 @@
-id,description,syntaxValid,tablesAccessed,columnsReferenced,hasAggregate,isDestructive,concernsCount,concerns,astAnalysisLatencyMs
-OPT-01,Unindexed Wildcard SELECT on users table,true,users,*,false,false,1,PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.,0.4793
-OPT-02,Two-table inner join without explicit projection,true,"orders, users",*,false,false,1,PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.,0.5074
-OPT-03,Aggregation with GROUP BY and HAVING without index order,true,orders,user_id,true,false,0,,0.4308
-OPT-04,Unbounded delete query (critical safety concern),true,session_logs,,false,true,1,CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.,0.1025
-OPT-05,Query with unindexed ORDER BY filesort pattern,true,orders,"id, total_amount, created_at",false,false,0,,0.3506
-OPT-06,Three-table join with selective filtering,true,"users, orders, order_items","u.name, o.id, oi.product_name",false,false,0,,0.4843
-OPT-07,SELECT wildcard with subquery in FROM clause,true,,*,false,false,1,PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.,0.4802
-OPT-08,Unbounded UPDATE statement without WHERE clause,true,,,false,true,1,CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.,0.1288
-OPT-09,Specific projection with indexable primary key range scan,true,users,"id, email",false,false,0,,0.3384
-OPT-10,Paginated query with explicit LIMIT and OFFSET boundary,true,users,"id, name, created_at",false,false,0,,0.2873
+id,description,expectedConcern,predictedConcern,correct,syntaxValid,tablesAccessed,columnsReferenced,hasAggregate,isDestructive,concernsCount,concerns,astAnalysisLatencyMs
+OPT-01,Unindexed Wildcard SELECT on users table,true,true,true,true,users,*,false,false,1,PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.,0.4639
+OPT-02,Two-table inner join without explicit projection,true,true,true,true,"orders, users",*,false,false,1,PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.,0.4569
+OPT-03,Aggregation with GROUP BY and HAVING without index order,false,false,true,true,orders,user_id,true,false,0,,0.6549
+OPT-04,Unbounded delete query (critical safety concern),true,true,true,true,session_logs,,false,true,1,CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.,0.1548
+OPT-05,Query with unindexed ORDER BY filesort pattern,false,false,true,true,orders,"id, total_amount, created_at",false,false,0,,0.5308
+OPT-06,Three-table join with selective filtering,false,false,true,true,"users, orders, order_items","u.name, o.id, oi.product_name",false,false,0,,0.5828
+OPT-07,SELECT wildcard with subquery in FROM clause,true,true,true,true,,*,false,false,1,PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.,0.3229
+OPT-08,Unbounded UPDATE statement without WHERE clause,true,true,true,true,,,false,true,1,CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.,0.1382
+OPT-09,Specific projection with indexable primary key range scan,false,false,true,true,users,"id, email",false,false,0,,0.3022
+OPT-10,Paginated query with explicit LIMIT and OFFSET boundary,false,false,true,true,users,"id, name, created_at",false,false,0,,0.2723

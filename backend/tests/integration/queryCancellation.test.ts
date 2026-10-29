@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import express from 'express';
 import { setupRoutes } from '../../src/routes';
 import { signAuthToken } from '../../src/auth/authService';
-import pool, { executeCancellableQuery } from '../../src/database/connection';
+import pool, { executeCancellableQuery, QueryCancellationError } from '../../src/database/connection';
 import http from 'http';
 
 describe('Query Cancellation & Database Resource Release Integration Tests', () => {
@@ -38,8 +38,8 @@ describe('Query Cancellation & Database Resource Release Integration Tests', () 
         }
     });
 
-    describe('Direct Server-Side Query Cancellation (KILL QUERY Mechanism)', () => {
-        it('executes fast read queries promptly within timeout limit', async () => {
+    describe('Direct Server-Side Query Cancellation (Truthful Outcome Reporting)', () => {
+        it('already-finished queries: executes promptly without attempting cancellation when query completes before timeout', async () => {
             const start = performance.now();
             const results = await executeCancellableQuery('SELECT 1 + 1 AS result', 3000);
             const duration = performance.now() - start;
@@ -48,7 +48,7 @@ describe('Query Cancellation & Database Resource Release Integration Tests', () 
             assert.ok(duration < 1000, `Expected fast execution, took ${duration}ms`);
         });
 
-        it('aborts long-running query via real KILL QUERY within timeout window instead of completing', async () => {
+        it('successful cancellation: aborts query via real KILL QUERY and truthfully confirms server-side cancellation', async () => {
             const start = performance.now();
             let caughtError: any = null;
 
@@ -62,9 +62,11 @@ describe('Query Cancellation & Database Resource Release Integration Tests', () 
             const elapsedMs = performance.now() - start;
 
             assert.ok(caughtError !== null, 'Expected query to reject on timeout');
+            assert.ok(caughtError instanceof QueryCancellationError);
+            assert.equal(caughtError.isConfirmedServerCancellation, true);
             assert.ok(
-                caughtError.message.includes('timed out and was cancelled on database server'),
-                `Unexpected error message: ${caughtError.message}`
+                caughtError.message.includes('Server-side statement cancellation confirmed via KILL QUERY'),
+                `Unexpected message: ${caughtError.message}`
             );
             // Must have terminated in ~250-600ms, proving it did NOT run for 3000ms
             assert.ok(
@@ -73,7 +75,37 @@ describe('Query Cancellation & Database Resource Release Integration Tests', () 
             );
         });
 
-        it('proves database connection pool is immediately healthy and not exhausted after cancellation', async () => {
+        it('permission-denied cancellation: truthfully reports unconfirmed cancellation when KILL QUERY fails', async () => {
+            const simulatedAccessDenied = new Error(
+                'ER_SPECIFIC_ACCESS_DENIED_ERROR: Access denied; you need (at least one of) the SUPER, CONNECTION_ADMIN privilege(s) for this operation'
+            );
+
+            let caughtError: any = null;
+            const start = performance.now();
+
+            try {
+                await executeCancellableQuery('SELECT SLEEP(3) AS s', 200, async () => {
+                    // Simulate permission failure during KILL QUERY attempt
+                    throw simulatedAccessDenied;
+                });
+            } catch (err: any) {
+                caughtError = err;
+            }
+
+            const elapsedMs = performance.now() - start;
+
+            assert.ok(caughtError !== null, 'Expected timeout error');
+            assert.ok(caughtError instanceof QueryCancellationError);
+            assert.equal(caughtError.isConfirmedServerCancellation, false);
+            assert.ok(
+                caughtError.message.includes('Server-side cancellation unconfirmed (KILL QUERY failed:'),
+                `Unexpected message: ${caughtError.message}`
+            );
+            assert.ok(caughtError.message.includes('Connection destroyed'));
+            assert.ok(elapsedMs < 1000, 'Socket destruction occurred promptly on timeout');
+        });
+
+        it('connection-pool recovery: proves database connection pool is immediately healthy and recovers after cancellations', async () => {
             // Run successive fast queries through the pool after cancellation
             for (let i = 1; i <= 3; i++) {
                 const res = await executeCancellableQuery(`SELECT ${i} * 10 AS score`, 2000);
