@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 import mysql from 'mysql2/promise';
 import { parseAndExplainSql } from '../src/nlp/sqlAstAnalyzer';
+import { validateBenchmarkDbConfig, validateBenchmarkCleanupBoundary } from '../src/security/benchmarkDbSafety';
 
 export interface OptimizationBenchmarkItem {
     id: string;
@@ -219,20 +220,40 @@ export function runAstAnalysisBenchmark(runsPerQuery = 5) {
  */
 export async function runLiveDbExecutionBenchmark(runsPerQuery = 5): Promise<any> {
     const liveResults: any[] = [];
-    const benchDbName = process.env.BENCHMARK_DB_NAME || 'dbms_studio_benchmark';
+    const validation = validateBenchmarkDbConfig(process.env);
 
-    const dbConfig = {
-        host: process.env.DB_HOST || 'localhost',
-        port: parseInt(process.env.DB_PORT || '3306', 10),
-        user: process.env.DB_USER || 'root',
-        password: process.env.DB_PASSWORD || ''
-    };
+    if (!validation.isValid || !validation.config) {
+        return {
+            summary: {
+                status: 'PENDING_ISOLATED_BENCHMARK_DB_CONFIG_INVALID',
+                reason: validation.error || 'Invalid benchmark database configuration. Application database protected.',
+                totalTransformationsTested: 0,
+                verifiedSemanticallyEquivalent: 0,
+                equivalenceBehaviorRate: 0
+            },
+            results: []
+        };
+    }
+
+    const benchDbConfig = validation.config;
+    const benchDbName = benchDbConfig.database;
 
     let connection: mysql.Connection | null = null;
+    let mysqlVersion = 'Unknown';
 
     try {
-        // Attempt connection to establish isolated database
-        connection = await mysql.createConnection(dbConfig);
+        // Attempt connection using validated explicit benchmark credentials
+        connection = await mysql.createConnection({
+            host: benchDbConfig.host,
+            port: benchDbConfig.port,
+            user: benchDbConfig.user,
+            password: benchDbConfig.password
+        });
+
+        // Retrieve live MySQL engine version
+        const [versionRows] = await connection.query('SELECT VERSION() AS version');
+        mysqlVersion = (versionRows as any)[0]?.version || 'Unknown';
+
         await connection.query(`CREATE DATABASE IF NOT EXISTS \`${benchDbName}\`;`);
         await connection.query(`USE \`${benchDbName}\`;`);
     } catch (err: any) {
@@ -245,7 +266,7 @@ export async function runLiveDbExecutionBenchmark(runsPerQuery = 5): Promise<any
                 reason: `Could not establish isolated benchmark database '${benchDbName}': ${err.message}. Application database protected.`,
                 totalTransformationsTested: 0,
                 verifiedSemanticallyEquivalent: 0,
-                semanticEquivalenceRate: 0
+                equivalenceBehaviorRate: 0
             },
             results: []
         };
@@ -305,6 +326,10 @@ export async function runLiveDbExecutionBenchmark(runsPerQuery = 5): Promise<any
         let verifiedEquivalentCount = 0;
 
         for (const test of LIVE_DB_TRANSFORMATIONS) {
+            // Warm-up procedure: 1 unmeasured execution per query to prime InnoDB buffer pool
+            await connection.query(test.originalSql);
+            await connection.query(test.transformedSql);
+
             const origLatencies: number[] = [];
             const transLatencies: number[] = [];
 
@@ -359,23 +384,33 @@ export async function runLiveDbExecutionBenchmark(runsPerQuery = 5): Promise<any
         const summary = {
             status: 'COMPLETED_EMPIRICAL_LIVE_DB',
             benchmarkDatabase: benchDbName,
+            mysqlVersion,
+            warmupProcedure: '1 unmeasured execution per query to prime InnoDB buffer pool',
+            repetitionsPerTransformation: runsPerQuery,
             datasetCustomers: customerRows,
             datasetOrders: customerRows * 2,
+            collationsTested: ['utf8mb4_general_ci (Case-Insensitive)', 'utf8mb4_bin (Case-Sensitive Binary)'],
+            equivalenceVerificationMethod: 'Deterministic row-by-row sorting and JSON canonicalization comparison',
             totalTransformationsTested: LIVE_DB_TRANSFORMATIONS.length,
             correctEquivalenceBehaviorCount: verifiedEquivalentCount,
             equivalenceBehaviorRate: Number(((verifiedEquivalentCount / LIVE_DB_TRANSFORMATIONS.length) * 100).toFixed(2)),
-            runsPerTransformation: runsPerQuery,
             collationNote: 'Includes mixed-case evaluation on case-insensitive (utf8mb4_general_ci) and binary case-sensitive (utf8mb4_bin) collations.'
         };
 
         return { summary, results: liveResults };
     } finally {
-        // Clean up benchmark-owned schema completely
+        // Clean up benchmark-owned schema completely with strict boundary verification
         if (connection) {
             try {
                 await connection.query('DROP TABLE IF EXISTS bench_synth_orders');
                 await connection.query('DROP TABLE IF EXISTS bench_synth_customers');
-                await connection.query(`DROP DATABASE IF EXISTS \`${benchDbName}\`;`);
+
+                const boundaryCheck = validateBenchmarkCleanupBoundary(benchDbName, benchDbConfig.database);
+                if (boundaryCheck.isSafe) {
+                    await connection.query(`DROP DATABASE IF EXISTS \`${benchDbConfig.database}\`;`);
+                } else {
+                    console.error('Safety Boundary Check Failed on Cleanup:', boundaryCheck.error);
+                }
                 await connection.end();
             } catch (e) {
                 // Ignore cleanup error

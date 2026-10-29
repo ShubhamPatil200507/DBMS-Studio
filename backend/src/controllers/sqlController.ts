@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import { generateResponse } from '../ai/gemini';
 import { parseSchemaContext, buildQueryIR } from '../nlp/nluParser';
 import { parseAndExplainSql } from '../nlp/sqlAstAnalyzer';
-import { query } from '../database/connection';
+import { query, executeCancellableQuery } from '../database/connection';
+import { validateSqlExecutionPolicy } from '../security/sqlExecutionPolicy';
 
 const sqlGenerateSchema = {
     type: 'object',
@@ -178,50 +179,19 @@ export const executeSql = async (req: Request, res: Response): Promise<void> => 
 
         const trimmedSql = sql.trim();
 
-        if (trimmedSql.length > 5000) {
-            res.status(400).json({ error: 'Payload Too Large: SQL statement exceeds the 5,000 character limit.' });
-            return;
-        }
-
-        // Disallow multiple semicolon-delimited statements in sandbox
-        const statements = trimmedSql
-            .split(';')
-            .map((s: string) => s.trim())
-            .filter((s: string) => s.length > 0);
-
-        if (statements.length > 1) {
-            res.status(403).json({ error: 'Security Exception: Multiple semicolon-separated SQL statements are disallowed in the execution sandbox.' });
-            return;
-        }
-
-        const upperSql = trimmedSql.toUpperCase();
-        if (!upperSql.startsWith('SELECT') && !upperSql.startsWith('SHOW') && !upperSql.startsWith('DESCRIBE') && !upperSql.startsWith('EXPLAIN')) {
-            res.status(403).json({ error: 'Security Exception: Only read-only queries (SELECT, SHOW, DESCRIBE, EXPLAIN) are permitted.' });
-            return;
-        }
-
-        // Disallow dangerous administrative keywords even inside read-only statements
-        if (/\b(INTO\s+OUTFILE|INTO\s+DUMPFILE|LOAD_FILE|BENCHMARK|SLEEP)\b/i.test(trimmedSql)) {
-            res.status(403).json({ error: 'Security Exception: Prohibited SQL execution function detected in sandbox.' });
-            return;
-        }
-
-        // Validate AST syntax before sending to database engine
-        const astAnalysis = parseAndExplainSql(trimmedSql);
-        if (!astAnalysis.syntaxValid) {
-            res.status(400).json({ error: `Syntax error: ${astAnalysis.parseError || 'Invalid SQL syntax'}` });
+        // 1. Comprehensive AST & structural policy validation (handles CTEs, read-only enforcement, multiple stmts, exports, dangerous fns)
+        const policy = validateSqlExecutionPolicy(trimmedSql);
+        if (!policy.isAllowed) {
+            const statusCode = policy.isSyntaxError ? 400 : 403;
+            res.status(statusCode).json({ error: policy.reason });
             return;
         }
 
         const maxRows = 500;
         const start = performance.now();
         
-        // Execute with bounded query timeout of 5,000ms
-        const timeoutPromise = new Promise((_, reject) => 
-            setTimeout(() => reject(new Error('Query execution timeout exceeded (5000ms limit).')), 5000)
-        );
-        const queryPromise = query(trimmedSql);
-        const rawResults: any = await Promise.race([queryPromise, timeoutPromise]);
+        // 2. Execute with genuine server-side statement cancellation (KILL QUERY <threadId>) on timeout (5,000ms)
+        const rawResults: any = await executeCancellableQuery(trimmedSql, 5000);
         
         const end = performance.now();
 
@@ -235,10 +205,13 @@ export const executeSql = async (req: Request, res: Response): Promise<void> => 
             rowCount: results.length,
             totalMatchedRows: totalCount,
             isTruncated,
+            statementType: policy.statementType,
+            hasCte: policy.hasCte,
             notice: isTruncated ? `Output truncated to first ${maxRows} records for safety.` : undefined
         });
     } catch (error: any) {
         console.error('SQL Execution Error:', error);
-        res.status(400).json({ error: error.message || 'Failed to execute query' });
+        const isTimeout = error.message?.includes('timed out and was cancelled');
+        res.status(isTimeout ? 408 : 400).json({ error: error.message || 'Failed to execute query' });
     }
 };
