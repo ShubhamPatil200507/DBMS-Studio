@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "timestamp": "2026-10-28T20:46:03.331Z",
+    "timestamp": "2026-10-29T18:53:03.060Z",
     "nodeVersion": "v24.19.0",
     "platform": "win32",
     "release": "10.0.26300",
@@ -8,7 +8,7 @@
     "cpuModel": "AMD Ryzen 7 7435HS                             ",
     "cpuCores": 16,
     "totalMemoryMB": 24261,
-    "freeMemoryMB": 12637
+    "freeMemoryMB": 13892
   },
   "benchmarks": {
     "security": {
@@ -24,8 +24,8 @@
         "precision": 100,
         "recall": 100,
         "f1Score": 100,
-        "meanLatencyMs": 0.0426,
-        "medianLatencyMs": 0.0051
+        "meanLatencyMs": 0.0328,
+        "medianLatencyMs": 0.0046
       },
       "results": [
         {
@@ -36,7 +36,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.9246
+          "latencyMs": 0.711
         },
         {
           "id": "SEC-POS-02",
@@ -46,7 +46,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.4046
+          "latencyMs": 0.3145
         },
         {
           "id": "SEC-POS-03",
@@ -56,7 +56,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.0225
+          "latencyMs": 0.0236
         },
         {
           "id": "SEC-POS-04",
@@ -66,7 +66,7 @@
           "correct": true,
           "findingsCount": 2,
           "findingsRules": "SEC-SQLI-001; SEC-SQLI-002",
-          "latencyMs": 0.019
+          "latencyMs": 0.0197
         },
         {
           "id": "SEC-POS-05",
@@ -76,7 +76,7 @@
           "correct": true,
           "findingsCount": 2,
           "findingsRules": "SEC-SQLI-001; SEC-SQLI-002",
-          "latencyMs": 0.0357
+          "latencyMs": 0.0295
         },
         {
           "id": "SEC-POS-06",
@@ -86,7 +86,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-002",
-          "latencyMs": 0.0713
+          "latencyMs": 0.063
         },
         {
           "id": "SEC-POS-07",
@@ -96,7 +96,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-DATA-003",
-          "latencyMs": 0.0561
+          "latencyMs": 0.0505
         },
         {
           "id": "SEC-POS-08",
@@ -116,7 +116,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-CRED-004",
-          "latencyMs": 0.188
+          "latencyMs": 0.1143
         },
         {
           "id": "SEC-POS-10",
@@ -126,7 +126,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-CRED-004",
-          "latencyMs": 0.0828
+          "latencyMs": 0.0628
         },
         {
           "id": "SEC-POS-11",
@@ -136,7 +136,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-CRED-004",
-          "latencyMs": 0.0179
+          "latencyMs": 0.0155
         },
         {
           "id": "SEC-POS-12",
@@ -146,7 +146,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-AUTH-005",
-          "latencyMs": 0.0733
+          "latencyMs": 0.0546
         },
         {
           "id": "SEC-POS-13",
@@ -156,7 +156,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-AUTH-005",
-          "latencyMs": 0.013
+          "latencyMs": 0.0104
         },
         {
           "id": "SEC-POS-14",
@@ -166,7 +166,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.01
+          "latencyMs": 0.0123
         },
         {
           "id": "SEC-POS-15",
@@ -176,7 +176,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.0083
+          "latencyMs": 0.0085
         },
         {
           "id": "SEC-POS-16",
@@ -186,7 +186,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.005
+          "latencyMs": 0.0046
         },
         {
           "id": "SEC-POS-17",
@@ -196,7 +196,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.0055
+          "latencyMs": 0.0059
         },
         {
           "id": "SEC-POS-18",
@@ -206,7 +206,7 @@
           "correct": true,
           "findingsCount": 2,
           "findingsRules": "SEC-SQLI-001; SEC-SQLI-002",
-          "latencyMs": 0.0075
+          "latencyMs": 0.0079
         },
         {
           "id": "SEC-POS-19",
@@ -216,7 +216,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-DATA-003",
-          "latencyMs": 0.0051
+          "latencyMs": 0.0047
         },
         {
           "id": "SEC-POS-20",
@@ -226,7 +226,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-CRED-004",
-          "latencyMs": 0.0092
+          "latencyMs": 0.0081
         },
         {
           "id": "SEC-POS-21",
@@ -236,7 +236,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-SQLI-001",
-          "latencyMs": 0.0049
+          "latencyMs": 0.0047
         },
         {
           "id": "SEC-POS-22",
@@ -246,7 +246,7 @@
           "correct": true,
           "findingsCount": 2,
           "findingsRules": "SEC-SQLI-001; SEC-SQLI-002",
-          "latencyMs": 0.0047
+          "latencyMs": 0.0045
         },
         {
           "id": "SEC-POS-23",
@@ -266,7 +266,7 @@
           "correct": true,
           "findingsCount": 1,
           "findingsRules": "SEC-CRED-004",
-          "latencyMs": 0.0349
+          "latencyMs": 0.0106
         },
         {
           "id": "SEC-POS-25",
@@ -276,7 +276,7 @@
           "correct": true,
           "findingsCount": 3,
           "findingsRules": "SEC-SQLI-001; SEC-DATA-003; SEC-AUTH-005",
-          "latencyMs": 0.0092
+          "latencyMs": 0.0068
         },
         {
           "id": "SEC-NEG-01",
@@ -286,7 +286,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0062
+          "latencyMs": 0.0051
         },
         {
           "id": "SEC-NEG-02",
@@ -296,7 +296,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0039
+          "latencyMs": 0.0035
         },
         {
           "id": "SEC-NEG-03",
@@ -306,7 +306,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.005
+          "latencyMs": 0.0038
         },
         {
           "id": "SEC-NEG-04",
@@ -316,7 +316,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0035
+          "latencyMs": 0.0044
         },
         {
           "id": "SEC-NEG-05",
@@ -326,7 +326,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0041
+          "latencyMs": 0.0037
         },
         {
           "id": "SEC-NEG-06",
@@ -336,7 +336,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0032
+          "latencyMs": 0.0033
         },
         {
           "id": "SEC-NEG-07",
@@ -346,7 +346,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0029
+          "latencyMs": 0.0025
         },
         {
           "id": "SEC-NEG-08",
@@ -356,7 +356,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0036
+          "latencyMs": 0.003
         },
         {
           "id": "SEC-NEG-09",
@@ -366,7 +366,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0039
+          "latencyMs": 0.0032
         },
         {
           "id": "SEC-NEG-10",
@@ -376,7 +376,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0081
+          "latencyMs": 0.0039
         },
         {
           "id": "SEC-NEG-11",
@@ -386,7 +386,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.003
+          "latencyMs": 0.0023
         },
         {
           "id": "SEC-NEG-12",
@@ -396,7 +396,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0029
+          "latencyMs": 0.0025
         },
         {
           "id": "SEC-NEG-13",
@@ -406,7 +406,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0031
+          "latencyMs": 0.0025
         },
         {
           "id": "SEC-NEG-14",
@@ -416,7 +416,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0037
+          "latencyMs": 0.0031
         },
         {
           "id": "SEC-NEG-15",
@@ -426,7 +426,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0027
+          "latencyMs": 0.0021
         },
         {
           "id": "SEC-NEG-16",
@@ -436,7 +436,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0025
+          "latencyMs": 0.0021
         },
         {
           "id": "SEC-NEG-17",
@@ -446,7 +446,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0076
+          "latencyMs": 0.0024
         },
         {
           "id": "SEC-NEG-18",
@@ -456,7 +456,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0051
+          "latencyMs": 0.0027
         },
         {
           "id": "SEC-NEG-19",
@@ -466,7 +466,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0032
+          "latencyMs": 0.0021
         },
         {
           "id": "SEC-NEG-20",
@@ -476,7 +476,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0035
+          "latencyMs": 0.003
         },
         {
           "id": "SEC-NEG-21",
@@ -486,7 +486,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0033
+          "latencyMs": 0.0031
         },
         {
           "id": "SEC-NEG-22",
@@ -496,7 +496,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.003
+          "latencyMs": 0.0023
         },
         {
           "id": "SEC-NEG-23",
@@ -506,7 +506,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0025
+          "latencyMs": 0.0023
         },
         {
           "id": "SEC-NEG-24",
@@ -516,7 +516,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0028
+          "latencyMs": 0.0022
         },
         {
           "id": "SEC-NEG-25",
@@ -526,7 +526,7 @@
           "correct": true,
           "findingsCount": 0,
           "findingsRules": "",
-          "latencyMs": 0.0033
+          "latencyMs": 0.0024
         }
       ]
     },
@@ -537,8 +537,8 @@
         "candidateKeyAccuracy": 100,
         "normalFormExactMatches": 15,
         "normalFormAccuracy": 100,
-        "meanLatencyMs": 0.15,
-        "medianLatencyMs": 0.0721
+        "meanLatencyMs": 0.1195,
+        "medianLatencyMs": 0.049
       },
       "results": [
         {
@@ -550,7 +550,7 @@
           "expectedForm": "1NF",
           "computedForm": "1NF",
           "normalFormMatch": true,
-          "latencyMs": 1.1707
+          "latencyMs": 1.1103
         },
         {
           "id": "NORM-02",
@@ -561,7 +561,7 @@
           "expectedForm": "1NF",
           "computedForm": "1NF",
           "normalFormMatch": true,
-          "latencyMs": 0.0884
+          "latencyMs": 0.049
         },
         {
           "id": "NORM-03",
@@ -572,7 +572,7 @@
           "expectedForm": "1NF",
           "computedForm": "1NF",
           "normalFormMatch": true,
-          "latencyMs": 0.0555
+          "latencyMs": 0.0611
         },
         {
           "id": "NORM-04",
@@ -583,7 +583,7 @@
           "expectedForm": "1NF",
           "computedForm": "1NF",
           "normalFormMatch": true,
-          "latencyMs": 0.0964
+          "latencyMs": 0.0917
         },
         {
           "id": "NORM-05",
@@ -594,7 +594,7 @@
           "expectedForm": "2NF",
           "computedForm": "2NF",
           "normalFormMatch": true,
-          "latencyMs": 0.0566
+          "latencyMs": 0.0706
         },
         {
           "id": "NORM-06",
@@ -605,7 +605,7 @@
           "expectedForm": "2NF",
           "computedForm": "2NF",
           "normalFormMatch": true,
-          "latencyMs": 0.0355
+          "latencyMs": 0.0338
         },
         {
           "id": "NORM-07",
@@ -616,7 +616,7 @@
           "expectedForm": "2NF",
           "computedForm": "2NF",
           "normalFormMatch": true,
-          "latencyMs": 0.0312
+          "latencyMs": 0.0166
         },
         {
           "id": "NORM-08",
@@ -627,7 +627,7 @@
           "expectedForm": "2NF",
           "computedForm": "2NF",
           "normalFormMatch": true,
-          "latencyMs": 0.0923
+          "latencyMs": 0.0205
         },
         {
           "id": "NORM-09",
@@ -638,7 +638,7 @@
           "expectedForm": "3NF",
           "computedForm": "3NF",
           "normalFormMatch": true,
-          "latencyMs": 0.2613
+          "latencyMs": 0.1244
         },
         {
           "id": "NORM-10",
@@ -649,7 +649,7 @@
           "expectedForm": "3NF",
           "computedForm": "3NF",
           "normalFormMatch": true,
-          "latencyMs": 0.1047
+          "latencyMs": 0.0629
         },
         {
           "id": "NORM-11",
@@ -660,7 +660,7 @@
           "expectedForm": "3NF",
           "computedForm": "3NF",
           "normalFormMatch": true,
-          "latencyMs": 0.1294
+          "latencyMs": 0.0912
         },
         {
           "id": "NORM-12",
@@ -671,7 +671,7 @@
           "expectedForm": "BCNF",
           "computedForm": "BCNF",
           "normalFormMatch": true,
-          "latencyMs": 0.0291
+          "latencyMs": 0.0149
         },
         {
           "id": "NORM-13",
@@ -682,7 +682,7 @@
           "expectedForm": "BCNF",
           "computedForm": "BCNF",
           "normalFormMatch": true,
-          "latencyMs": 0.0721
+          "latencyMs": 0.0326
         },
         {
           "id": "NORM-14",
@@ -693,7 +693,7 @@
           "expectedForm": "BCNF",
           "computedForm": "BCNF",
           "normalFormMatch": true,
-          "latencyMs": 0.0111
+          "latencyMs": 0.0057
         },
         {
           "id": "NORM-15",
@@ -704,7 +704,7 @@
           "expectedForm": "BCNF",
           "computedForm": "BCNF",
           "normalFormMatch": true,
-          "latencyMs": 0.0156
+          "latencyMs": 0.0077
         }
       ]
     },
@@ -718,7 +718,7 @@
         "combinedTableAccuracy": 90,
         "combinedIntentAccuracy": 95,
         "combinedJoinResolutionRate": 100,
-        "schemaAwareMedianLatencyMs": 0.2392
+        "schemaAwareMedianLatencyMs": 0.1333
       },
       "preservedCorpus": {
         "summary": {
@@ -728,8 +728,8 @@
           "baselineIntentAccuracy": 95,
           "schemaAwareIntentAccuracy": 95,
           "schemaAwareJoinPathResolutionRate": 100,
-          "baselineMedianLatencyMs": 0.0115,
-          "schemaAwareMedianLatencyMs": 0.4456
+          "baselineMedianLatencyMs": 0.0059,
+          "schemaAwareMedianLatencyMs": 0.343
         },
         "detailedResults": [
           {
@@ -746,8 +746,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.1226,
-            "schemaAwareLatencyMs": 4.8175
+            "baselineLatencyMs": 0.0777,
+            "schemaAwareLatencyMs": 2.66
           },
           {
             "id": "NL-02",
@@ -763,8 +763,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0126,
-            "schemaAwareLatencyMs": 1.17
+            "baselineLatencyMs": 0.007,
+            "schemaAwareLatencyMs": 0.6347
           },
           {
             "id": "NL-03",
@@ -780,8 +780,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0177,
-            "schemaAwareLatencyMs": 0.6721
+            "baselineLatencyMs": 0.01,
+            "schemaAwareLatencyMs": 0.385
           },
           {
             "id": "NL-04",
@@ -797,8 +797,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0146,
-            "schemaAwareLatencyMs": 1.074
+            "baselineLatencyMs": 0.0065,
+            "schemaAwareLatencyMs": 0.5254
           },
           {
             "id": "NL-05",
@@ -814,8 +814,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 1,
-            "baselineLatencyMs": 0.0202,
-            "schemaAwareLatencyMs": 0.4529
+            "baselineLatencyMs": 0.0066,
+            "schemaAwareLatencyMs": 0.2325
           },
           {
             "id": "NL-06",
@@ -831,8 +831,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 1,
-            "baselineLatencyMs": 0.0115,
-            "schemaAwareLatencyMs": 0.9858
+            "baselineLatencyMs": 0.0057,
+            "schemaAwareLatencyMs": 0.357
           },
           {
             "id": "NL-07",
@@ -848,8 +848,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 1,
-            "baselineLatencyMs": 0.0164,
-            "schemaAwareLatencyMs": 0.4456
+            "baselineLatencyMs": 0.0059,
+            "schemaAwareLatencyMs": 0.179
           },
           {
             "id": "NL-08",
@@ -865,8 +865,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0193,
-            "schemaAwareLatencyMs": 0.3263
+            "baselineLatencyMs": 0.0078,
+            "schemaAwareLatencyMs": 0.4271
           },
           {
             "id": "NL-09",
@@ -882,8 +882,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0264,
-            "schemaAwareLatencyMs": 0.3708
+            "baselineLatencyMs": 0.0506,
+            "schemaAwareLatencyMs": 0.343
           },
           {
             "id": "NL-10",
@@ -899,8 +899,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0486,
-            "schemaAwareLatencyMs": 0.6019
+            "baselineLatencyMs": 0.019,
+            "schemaAwareLatencyMs": 0.4784
           },
           {
             "id": "NL-11",
@@ -916,8 +916,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 1,
-            "baselineLatencyMs": 0.0076,
-            "schemaAwareLatencyMs": 0.2482
+            "baselineLatencyMs": 0.0059,
+            "schemaAwareLatencyMs": 0.2847
           },
           {
             "id": "NL-12",
@@ -933,8 +933,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 1,
-            "baselineLatencyMs": 0.0057,
-            "schemaAwareLatencyMs": 0.8214
+            "baselineLatencyMs": 0.0051,
+            "schemaAwareLatencyMs": 0.5447
           },
           {
             "id": "NL-13",
@@ -950,8 +950,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0058,
-            "schemaAwareLatencyMs": 0.3509
+            "baselineLatencyMs": 0.0042,
+            "schemaAwareLatencyMs": 0.279
           },
           {
             "id": "NL-14",
@@ -968,7 +968,7 @@
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 0,
             "baselineLatencyMs": 0.0059,
-            "schemaAwareLatencyMs": 0.3621
+            "schemaAwareLatencyMs": 0.2784
           },
           {
             "id": "NL-15",
@@ -984,8 +984,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 1,
-            "baselineLatencyMs": 0.0052,
-            "schemaAwareLatencyMs": 0.1827
+            "baselineLatencyMs": 0.0042,
+            "schemaAwareLatencyMs": 0.256
           },
           {
             "id": "NL-16",
@@ -1001,8 +1001,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0056,
-            "schemaAwareLatencyMs": 0.6977
+            "baselineLatencyMs": 0.0057,
+            "schemaAwareLatencyMs": 0.3473
           },
           {
             "id": "NL-17",
@@ -1018,8 +1018,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 1,
-            "baselineLatencyMs": 0.0065,
-            "schemaAwareLatencyMs": 0.3442
+            "baselineLatencyMs": 0.0031,
+            "schemaAwareLatencyMs": 0.1749
           },
           {
             "id": "NL-18",
@@ -1035,8 +1035,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0066,
-            "schemaAwareLatencyMs": 0.2591
+            "baselineLatencyMs": 0.004,
+            "schemaAwareLatencyMs": 0.1401
           },
           {
             "id": "NL-19",
@@ -1052,8 +1052,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0052,
-            "schemaAwareLatencyMs": 0.3829
+            "baselineLatencyMs": 0.003,
+            "schemaAwareLatencyMs": 0.1991
           },
           {
             "id": "NL-20",
@@ -1069,8 +1069,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 1,
-            "baselineLatencyMs": 0.0058,
-            "schemaAwareLatencyMs": 0.2414
+            "baselineLatencyMs": 0.0032,
+            "schemaAwareLatencyMs": 0.2593
           }
         ]
       },
@@ -1082,8 +1082,8 @@
           "baselineIntentAccuracy": 85,
           "schemaAwareIntentAccuracy": 95,
           "schemaAwareJoinPathResolutionRate": 100,
-          "baselineMedianLatencyMs": 0.0054,
-          "schemaAwareMedianLatencyMs": 0.3971
+          "baselineMedianLatencyMs": 0.0027,
+          "schemaAwareMedianLatencyMs": 0.1918
         },
         "detailedResults": [
           {
@@ -1100,8 +1100,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0057,
-            "schemaAwareLatencyMs": 0.641
+            "baselineLatencyMs": 0.0038,
+            "schemaAwareLatencyMs": 0.2812
           },
           {
             "id": "UNSEEN-02",
@@ -1117,8 +1117,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 1,
-            "baselineLatencyMs": 0.0081,
-            "schemaAwareLatencyMs": 0.3813
+            "baselineLatencyMs": 0.0031,
+            "schemaAwareLatencyMs": 0.2106
           },
           {
             "id": "UNSEEN-03",
@@ -1134,8 +1134,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0095,
-            "schemaAwareLatencyMs": 0.6409
+            "baselineLatencyMs": 0.0033,
+            "schemaAwareLatencyMs": 0.1918
           },
           {
             "id": "UNSEEN-04",
@@ -1151,8 +1151,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0038,
-            "schemaAwareLatencyMs": 0.3971
+            "baselineLatencyMs": 0.0014,
+            "schemaAwareLatencyMs": 0.3201
           },
           {
             "id": "UNSEEN-05",
@@ -1168,8 +1168,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 1,
-            "baselineLatencyMs": 0.0108,
-            "schemaAwareLatencyMs": 0.7596
+            "baselineLatencyMs": 0.0048,
+            "schemaAwareLatencyMs": 0.3776
           },
           {
             "id": "UNSEEN-06",
@@ -1185,8 +1185,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.007,
-            "schemaAwareLatencyMs": 0.5688
+            "baselineLatencyMs": 0.0028,
+            "schemaAwareLatencyMs": 0.2068
           },
           {
             "id": "UNSEEN-07",
@@ -1202,8 +1202,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0052,
-            "schemaAwareLatencyMs": 0.2074
+            "baselineLatencyMs": 0.0025,
+            "schemaAwareLatencyMs": 0.2053
           },
           {
             "id": "UNSEEN-08",
@@ -1219,8 +1219,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0047,
-            "schemaAwareLatencyMs": 0.3756
+            "baselineLatencyMs": 0.0032,
+            "schemaAwareLatencyMs": 0.216
           },
           {
             "id": "UNSEEN-09",
@@ -1236,8 +1236,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 1,
-            "baselineLatencyMs": 0.0054,
-            "schemaAwareLatencyMs": 0.2322
+            "baselineLatencyMs": 0.0029,
+            "schemaAwareLatencyMs": 0.1292
           },
           {
             "id": "UNSEEN-10",
@@ -1253,8 +1253,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0033,
-            "schemaAwareLatencyMs": 0.3936
+            "baselineLatencyMs": 0.0018,
+            "schemaAwareLatencyMs": 0.1886
           },
           {
             "id": "UNSEEN-11",
@@ -1270,8 +1270,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 2,
-            "baselineLatencyMs": 0.007,
-            "schemaAwareLatencyMs": 0.4146
+            "baselineLatencyMs": 0.003,
+            "schemaAwareLatencyMs": 0.1334
           },
           {
             "id": "UNSEEN-12",
@@ -1287,8 +1287,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0048,
-            "schemaAwareLatencyMs": 0.5503
+            "baselineLatencyMs": 0.0018,
+            "schemaAwareLatencyMs": 0.2123
           },
           {
             "id": "UNSEEN-13",
@@ -1304,8 +1304,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0041,
-            "schemaAwareLatencyMs": 0.4937
+            "baselineLatencyMs": 0.002,
+            "schemaAwareLatencyMs": 0.1602
           },
           {
             "id": "UNSEEN-14",
@@ -1321,8 +1321,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 1,
-            "baselineLatencyMs": 0.0071,
-            "schemaAwareLatencyMs": 0.5444
+            "baselineLatencyMs": 0.0026,
+            "schemaAwareLatencyMs": 0.1844
           },
           {
             "id": "UNSEEN-15",
@@ -1338,8 +1338,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0054,
-            "schemaAwareLatencyMs": 0.4747
+            "baselineLatencyMs": 0.0021,
+            "schemaAwareLatencyMs": 0.2024
           },
           {
             "id": "UNSEEN-16",
@@ -1355,8 +1355,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.007,
-            "schemaAwareLatencyMs": 0.2897
+            "baselineLatencyMs": 0.0032,
+            "schemaAwareLatencyMs": 0.1475
           },
           {
             "id": "UNSEEN-17",
@@ -1372,8 +1372,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 1,
-            "baselineLatencyMs": 0.004,
-            "schemaAwareLatencyMs": 0.2985
+            "baselineLatencyMs": 0.0022,
+            "schemaAwareLatencyMs": 0.1656
           },
           {
             "id": "UNSEEN-18",
@@ -1389,8 +1389,8 @@
             "baselineIntent": "SELECT",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 2,
-            "baselineLatencyMs": 0.0053,
-            "schemaAwareLatencyMs": 0.3509
+            "baselineLatencyMs": 0.0027,
+            "schemaAwareLatencyMs": 0.1582
           },
           {
             "id": "UNSEEN-19",
@@ -1406,8 +1406,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "SELECT",
             "joinsResolved": 2,
-            "baselineLatencyMs": 0.0037,
-            "schemaAwareLatencyMs": 0.1334
+            "baselineLatencyMs": 0.0014,
+            "schemaAwareLatencyMs": 0.0968
           },
           {
             "id": "UNSEEN-20",
@@ -1423,8 +1423,8 @@
             "baselineIntent": "AGGREGATE",
             "schemaAwareIntent": "AGGREGATE",
             "joinsResolved": 0,
-            "baselineLatencyMs": 0.0023,
-            "schemaAwareLatencyMs": 0.1927
+            "baselineLatencyMs": 0.0018,
+            "schemaAwareLatencyMs": 0.1159
           }
         ]
       },
@@ -1443,8 +1443,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0043,
-          "schemaAwareLatencyMs": 0.1323
+          "baselineLatencyMs": 0.0022,
+          "schemaAwareLatencyMs": 0.0748
         },
         {
           "id": "NL-02",
@@ -1460,8 +1460,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0023,
-          "schemaAwareLatencyMs": 0.1627
+          "baselineLatencyMs": 0.0035,
+          "schemaAwareLatencyMs": 0.1343
         },
         {
           "id": "NL-03",
@@ -1477,8 +1477,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0032,
-          "schemaAwareLatencyMs": 0.1942
+          "baselineLatencyMs": 0.0027,
+          "schemaAwareLatencyMs": 0.1163
         },
         {
           "id": "NL-04",
@@ -1494,8 +1494,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0047,
-          "schemaAwareLatencyMs": 0.2701
+          "baselineLatencyMs": 0.0029,
+          "schemaAwareLatencyMs": 0.1643
         },
         {
           "id": "NL-05",
@@ -1511,8 +1511,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.005,
-          "schemaAwareLatencyMs": 0.1764
+          "baselineLatencyMs": 0.003,
+          "schemaAwareLatencyMs": 0.0977
         },
         {
           "id": "NL-06",
@@ -1528,8 +1528,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0045,
-          "schemaAwareLatencyMs": 0.2405
+          "baselineLatencyMs": 0.0026,
+          "schemaAwareLatencyMs": 0.1292
         },
         {
           "id": "NL-07",
@@ -1545,8 +1545,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0041,
-          "schemaAwareLatencyMs": 0.1384
+          "baselineLatencyMs": 0.0023,
+          "schemaAwareLatencyMs": 0.0838
         },
         {
           "id": "NL-08",
@@ -1562,8 +1562,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0045,
-          "schemaAwareLatencyMs": 0.2392
+          "baselineLatencyMs": 0.0024,
+          "schemaAwareLatencyMs": 0.1235
         },
         {
           "id": "NL-09",
@@ -1579,8 +1579,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0038,
-          "schemaAwareLatencyMs": 0.1923
+          "baselineLatencyMs": 0.002,
+          "schemaAwareLatencyMs": 0.1013
         },
         {
           "id": "NL-10",
@@ -1596,8 +1596,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0027,
-          "schemaAwareLatencyMs": 0.2205
+          "baselineLatencyMs": 0.0016,
+          "schemaAwareLatencyMs": 0.1321
         },
         {
           "id": "NL-11",
@@ -1613,8 +1613,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0021,
-          "schemaAwareLatencyMs": 0.1465
+          "baselineLatencyMs": 0.0015,
+          "schemaAwareLatencyMs": 0.118
         },
         {
           "id": "NL-12",
@@ -1630,8 +1630,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.004,
-          "schemaAwareLatencyMs": 0.2326
+          "baselineLatencyMs": 0.003,
+          "schemaAwareLatencyMs": 0.1482
         },
         {
           "id": "NL-13",
@@ -1647,8 +1647,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0028,
-          "schemaAwareLatencyMs": 0.2044
+          "baselineLatencyMs": 0.0018,
+          "schemaAwareLatencyMs": 0.1138
         },
         {
           "id": "NL-14",
@@ -1664,8 +1664,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.004,
-          "schemaAwareLatencyMs": 0.2564
+          "baselineLatencyMs": 0.0023,
+          "schemaAwareLatencyMs": 0.1374
         },
         {
           "id": "NL-15",
@@ -1681,8 +1681,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0038,
-          "schemaAwareLatencyMs": 0.1864
+          "baselineLatencyMs": 0.0019,
+          "schemaAwareLatencyMs": 0.1465
         },
         {
           "id": "NL-16",
@@ -1698,8 +1698,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0054,
-          "schemaAwareLatencyMs": 0.7103
+          "baselineLatencyMs": 0.0046,
+          "schemaAwareLatencyMs": 0.3358
         },
         {
           "id": "NL-17",
@@ -1715,8 +1715,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0043,
-          "schemaAwareLatencyMs": 0.2582
+          "baselineLatencyMs": 0.0019,
+          "schemaAwareLatencyMs": 0.132
         },
         {
           "id": "NL-18",
@@ -1732,8 +1732,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0043,
-          "schemaAwareLatencyMs": 0.2096
+          "baselineLatencyMs": 0.0021,
+          "schemaAwareLatencyMs": 0.1154
         },
         {
           "id": "NL-19",
@@ -1749,8 +1749,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0043,
-          "schemaAwareLatencyMs": 0.2591
+          "baselineLatencyMs": 0.0027,
+          "schemaAwareLatencyMs": 0.1347
         },
         {
           "id": "NL-20",
@@ -1766,8 +1766,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0049,
-          "schemaAwareLatencyMs": 0.1892
+          "baselineLatencyMs": 0.0028,
+          "schemaAwareLatencyMs": 0.1038
         },
         {
           "id": "UNSEEN-01",
@@ -1783,8 +1783,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0037,
-          "schemaAwareLatencyMs": 0.2782
+          "baselineLatencyMs": 0.0023,
+          "schemaAwareLatencyMs": 0.1797
         },
         {
           "id": "UNSEEN-02",
@@ -1800,8 +1800,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.004,
-          "schemaAwareLatencyMs": 0.2572
+          "baselineLatencyMs": 0.0025,
+          "schemaAwareLatencyMs": 0.1595
         },
         {
           "id": "UNSEEN-03",
@@ -1817,8 +1817,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0048,
-          "schemaAwareLatencyMs": 0.4052
+          "baselineLatencyMs": 0.0031,
+          "schemaAwareLatencyMs": 0.1465
         },
         {
           "id": "UNSEEN-04",
@@ -1834,8 +1834,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0036,
-          "schemaAwareLatencyMs": 0.2135
+          "baselineLatencyMs": 0.0014,
+          "schemaAwareLatencyMs": 0.1135
         },
         {
           "id": "UNSEEN-05",
@@ -1851,8 +1851,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0055,
-          "schemaAwareLatencyMs": 0.2372
+          "baselineLatencyMs": 0.0024,
+          "schemaAwareLatencyMs": 0.1316
         },
         {
           "id": "UNSEEN-06",
@@ -1868,8 +1868,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.004,
-          "schemaAwareLatencyMs": 0.2233
+          "baselineLatencyMs": 0.0017,
+          "schemaAwareLatencyMs": 0.1182
         },
         {
           "id": "UNSEEN-07",
@@ -1885,8 +1885,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0041,
-          "schemaAwareLatencyMs": 0.2018
+          "baselineLatencyMs": 0.0019,
+          "schemaAwareLatencyMs": 0.0959
         },
         {
           "id": "UNSEEN-08",
@@ -1902,8 +1902,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0045,
-          "schemaAwareLatencyMs": 0.296
+          "baselineLatencyMs": 0.0022,
+          "schemaAwareLatencyMs": 0.1426
         },
         {
           "id": "UNSEEN-09",
@@ -1919,8 +1919,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0044,
-          "schemaAwareLatencyMs": 0.196
+          "baselineLatencyMs": 0.0022,
+          "schemaAwareLatencyMs": 0.1393
         },
         {
           "id": "UNSEEN-10",
@@ -1936,8 +1936,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0041,
-          "schemaAwareLatencyMs": 0.3132
+          "baselineLatencyMs": 0.0035,
+          "schemaAwareLatencyMs": 0.2589
         },
         {
           "id": "UNSEEN-11",
@@ -1953,8 +1953,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 2,
-          "baselineLatencyMs": 0.0101,
-          "schemaAwareLatencyMs": 0.4308
+          "baselineLatencyMs": 0.0049,
+          "schemaAwareLatencyMs": 0.2057
         },
         {
           "id": "UNSEEN-12",
@@ -1970,8 +1970,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0043,
-          "schemaAwareLatencyMs": 0.2584
+          "baselineLatencyMs": 0.0022,
+          "schemaAwareLatencyMs": 0.1381
         },
         {
           "id": "UNSEEN-13",
@@ -1987,8 +1987,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0029,
-          "schemaAwareLatencyMs": 0.281
+          "baselineLatencyMs": 0.0015,
+          "schemaAwareLatencyMs": 0.1402
         },
         {
           "id": "UNSEEN-14",
@@ -2004,8 +2004,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0051,
-          "schemaAwareLatencyMs": 0.254
+          "baselineLatencyMs": 0.0027,
+          "schemaAwareLatencyMs": 0.1533
         },
         {
           "id": "UNSEEN-15",
@@ -2021,8 +2021,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0037,
-          "schemaAwareLatencyMs": 0.3025
+          "baselineLatencyMs": 0.0022,
+          "schemaAwareLatencyMs": 0.1167
         },
         {
           "id": "UNSEEN-16",
@@ -2038,8 +2038,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0053,
-          "schemaAwareLatencyMs": 0.2769
+          "baselineLatencyMs": 0.0025,
+          "schemaAwareLatencyMs": 0.1333
         },
         {
           "id": "UNSEEN-17",
@@ -2055,8 +2055,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 1,
-          "baselineLatencyMs": 0.0032,
-          "schemaAwareLatencyMs": 0.263
+          "baselineLatencyMs": 0.0018,
+          "schemaAwareLatencyMs": 0.1453
         },
         {
           "id": "UNSEEN-18",
@@ -2072,8 +2072,8 @@
           "baselineIntent": "SELECT",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 2,
-          "baselineLatencyMs": 0.0044,
-          "schemaAwareLatencyMs": 0.2636
+          "baselineLatencyMs": 0.0025,
+          "schemaAwareLatencyMs": 0.1508
         },
         {
           "id": "UNSEEN-19",
@@ -2089,8 +2089,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "SELECT",
           "joinsResolved": 2,
-          "baselineLatencyMs": 0.0025,
-          "schemaAwareLatencyMs": 0.112
+          "baselineLatencyMs": 0.0015,
+          "schemaAwareLatencyMs": 0.0655
         },
         {
           "id": "UNSEEN-20",
@@ -2106,8 +2106,8 @@
           "baselineIntent": "AGGREGATE",
           "schemaAwareIntent": "AGGREGATE",
           "joinsResolved": 0,
-          "baselineLatencyMs": 0.0022,
-          "schemaAwareLatencyMs": 0.1764
+          "baselineLatencyMs": 0.0012,
+          "schemaAwareLatencyMs": 0.1012
         }
       ]
     },
@@ -2115,10 +2115,10 @@
       "summary": {
         "astQueriesEvaluated": 10,
         "astSafetyDetectionAccuracy": 100,
-        "medianAstAnalysisLatencyMs": 0.9077,
+        "medianAstAnalysisLatencyMs": 0.4941,
         "liveDbStatus": "COMPLETED_EMPIRICAL_LIVE_DB",
-        "liveDbTransformationsTested": 3,
-        "liveDbSemanticEquivalenceRate": 100,
+        "liveDbTransformationsTested": 4,
+        "liveDbEquivalenceRate": 100,
         "runsPerQuery": 5
       },
       "astBenchmark": {
@@ -2127,10 +2127,11 @@
           "runsPerQuery": 5,
           "totalExecutionRuns": 50,
           "safetyDetectionAccuracy": 100,
-          "meanAstAnalysisLatencyMs": 1.3814,
-          "medianAstAnalysisLatencyMs": 0.9077,
-          "minAstAnalysisLatencyMs": 0.1705,
-          "maxAstAnalysisLatencyMs": 22.1301,
+          "meanAstAnalysisLatencyMs": 0.7942,
+          "medianAstAnalysisLatencyMs": 0.4941,
+          "minAstAnalysisLatencyMs": 0.1315,
+          "maxAstAnalysisLatencyMs": 12.4643,
+          "stdDevAstAnalysisLatencyMs": 1.7314,
           "note": "AST parsing latency measures in-process JavaScript parser execution time, not database execution."
         },
         "results": [
@@ -2144,7 +2145,7 @@
             "isDestructive": false,
             "concernsCount": 1,
             "concerns": "PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.",
-            "astAnalysisLatencyMs": 0.9328
+            "astAnalysisLatencyMs": 0.5077
           },
           {
             "id": "OPT-02",
@@ -2156,7 +2157,7 @@
             "isDestructive": false,
             "concernsCount": 1,
             "concerns": "PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.",
-            "astAnalysisLatencyMs": 1.05
+            "astAnalysisLatencyMs": 0.5631
           },
           {
             "id": "OPT-03",
@@ -2168,7 +2169,7 @@
             "isDestructive": false,
             "concernsCount": 0,
             "concerns": "",
-            "astAnalysisLatencyMs": 0.9481
+            "astAnalysisLatencyMs": 0.8263
           },
           {
             "id": "OPT-04",
@@ -2180,7 +2181,7 @@
             "isDestructive": true,
             "concernsCount": 1,
             "concerns": "CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.",
-            "astAnalysisLatencyMs": 0.2255
+            "astAnalysisLatencyMs": 0.1422
           },
           {
             "id": "OPT-05",
@@ -2192,7 +2193,7 @@
             "isDestructive": false,
             "concernsCount": 0,
             "concerns": "",
-            "astAnalysisLatencyMs": 0.7642
+            "astAnalysisLatencyMs": 0.6291
           },
           {
             "id": "OPT-06",
@@ -2204,7 +2205,7 @@
             "isDestructive": false,
             "concernsCount": 0,
             "concerns": "",
-            "astAnalysisLatencyMs": 1.2408
+            "astAnalysisLatencyMs": 0.5608
           },
           {
             "id": "OPT-07",
@@ -2216,7 +2217,7 @@
             "isDestructive": false,
             "concernsCount": 1,
             "concerns": "PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.",
-            "astAnalysisLatencyMs": 0.9286
+            "astAnalysisLatencyMs": 0.3714
           },
           {
             "id": "OPT-08",
@@ -2228,7 +2229,7 @@
             "isDestructive": true,
             "concernsCount": 1,
             "concerns": "CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.",
-            "astAnalysisLatencyMs": 0.404
+            "astAnalysisLatencyMs": 0.1937
           },
           {
             "id": "OPT-09",
@@ -2240,7 +2241,7 @@
             "isDestructive": false,
             "concernsCount": 0,
             "concerns": "",
-            "astAnalysisLatencyMs": 0.7842
+            "astAnalysisLatencyMs": 0.5311
           },
           {
             "id": "OPT-10",
@@ -2252,48 +2253,82 @@
             "isDestructive": false,
             "concernsCount": 0,
             "concerns": "",
-            "astAnalysisLatencyMs": 0.8566
+            "astAnalysisLatencyMs": 0.3395
           }
         ]
       },
       "liveDbBenchmark": {
         "summary": {
           "status": "COMPLETED_EMPIRICAL_LIVE_DB",
-          "totalTransformationsTested": 3,
-          "verifiedSemanticallyEquivalent": 3,
-          "semanticEquivalenceRate": 100,
-          "runsPerTransformation": 5
+          "benchmarkDatabase": "dbms_studio_benchmark",
+          "datasetCustomers": 300,
+          "datasetOrders": 600,
+          "totalTransformationsTested": 4,
+          "correctEquivalenceBehaviorCount": 4,
+          "equivalenceBehaviorRate": 100,
+          "runsPerTransformation": 5,
+          "collationNote": "Includes mixed-case evaluation on case-insensitive (utf8mb4_general_ci) and binary case-sensitive (utf8mb4_bin) collations."
         },
         "results": [
           {
             "id": "DB-TRANS-01",
             "description": "Correlated subquery IN unnested to INNER JOIN with DISTINCT",
             "transformationType": "Subquery Unnesting",
-            "rowsReturned": 159,
-            "resultsEquivalent": true,
-            "medianOriginalDbLatencyMs": 1.7479,
-            "medianTransformedDbLatencyMs": 2.1098,
-            "speedupFactor": "0.83x"
+            "collationMode": "CASE_INSENSITIVE",
+            "expectedEquivalence": true,
+            "actualEquivalence": true,
+            "rowsOriginal": 244,
+            "rowsTransformed": 244,
+            "medianOriginalDbLatencyMs": 1.5067,
+            "stdDevOriginalDbLatencyMs": 0.9337,
+            "medianTransformedDbLatencyMs": 1.3615,
+            "stdDevTransformedDbLatencyMs": 0.4737,
+            "speedupFactor": "1.11x"
           },
           {
             "id": "DB-TRANS-02",
             "description": "Correlated COUNT(*) > 0 subquery transformed to short-circuiting EXISTS predicate",
             "transformationType": "EXISTS Semi-Join Transformation",
-            "rowsReturned": 200,
-            "resultsEquivalent": true,
-            "medianOriginalDbLatencyMs": 2.4065,
-            "medianTransformedDbLatencyMs": 2.0722,
-            "speedupFactor": "1.16x"
+            "collationMode": "CASE_INSENSITIVE",
+            "expectedEquivalence": true,
+            "actualEquivalence": true,
+            "rowsOriginal": 300,
+            "rowsTransformed": 300,
+            "medianOriginalDbLatencyMs": 1.239,
+            "stdDevOriginalDbLatencyMs": 0.2711,
+            "medianTransformedDbLatencyMs": 0.8865,
+            "stdDevTransformedDbLatencyMs": 0.3542,
+            "speedupFactor": "1.4x"
           },
           {
-            "id": "DB-TRANS-03",
-            "description": "SARGable predicate transformation eliminating function evaluation on filtered column",
-            "transformationType": "SARGable Predicate Flattening",
-            "rowsReturned": 66,
-            "resultsEquivalent": true,
-            "medianOriginalDbLatencyMs": 1.0937,
-            "medianTransformedDbLatencyMs": 0.974,
-            "speedupFactor": "1.12x"
+            "id": "DB-TRANS-03-CI",
+            "description": "SARGable predicate flattening on case-insensitive collation column (utf8mb4_general_ci)",
+            "transformationType": "SARGable Predicate Flattening (CI)",
+            "collationMode": "CASE_INSENSITIVE",
+            "expectedEquivalence": true,
+            "actualEquivalence": true,
+            "rowsOriginal": 128,
+            "rowsTransformed": 128,
+            "medianOriginalDbLatencyMs": 0.4521,
+            "stdDevOriginalDbLatencyMs": 0.2051,
+            "medianTransformedDbLatencyMs": 0.4897,
+            "stdDevTransformedDbLatencyMs": 0.0288,
+            "speedupFactor": "0.92x"
+          },
+          {
+            "id": "DB-TRANS-03-CS",
+            "description": "SARGable predicate rewrite guard check on binary case-sensitive collation column (utf8mb4_bin)",
+            "transformationType": "Collation-Sensitive Rewrite Guard",
+            "collationMode": "CASE_SENSITIVE",
+            "expectedEquivalence": false,
+            "actualEquivalence": false,
+            "rowsOriginal": 128,
+            "rowsTransformed": 42,
+            "medianOriginalDbLatencyMs": 0.4913,
+            "stdDevOriginalDbLatencyMs": 0.1344,
+            "medianTransformedDbLatencyMs": 0.4301,
+            "stdDevTransformedDbLatencyMs": 0.0811,
+            "speedupFactor": "1.14x"
           }
         ]
       },
@@ -2308,7 +2343,7 @@
           "isDestructive": false,
           "concernsCount": 1,
           "concerns": "PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.",
-          "astAnalysisLatencyMs": 0.9328
+          "astAnalysisLatencyMs": 0.5077
         },
         {
           "id": "OPT-02",
@@ -2320,7 +2355,7 @@
           "isDestructive": false,
           "concernsCount": 1,
           "concerns": "PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.",
-          "astAnalysisLatencyMs": 1.05
+          "astAnalysisLatencyMs": 0.5631
         },
         {
           "id": "OPT-03",
@@ -2332,7 +2367,7 @@
           "isDestructive": false,
           "concernsCount": 0,
           "concerns": "",
-          "astAnalysisLatencyMs": 0.9481
+          "astAnalysisLatencyMs": 0.8263
         },
         {
           "id": "OPT-04",
@@ -2344,7 +2379,7 @@
           "isDestructive": true,
           "concernsCount": 1,
           "concerns": "CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.",
-          "astAnalysisLatencyMs": 0.2255
+          "astAnalysisLatencyMs": 0.1422
         },
         {
           "id": "OPT-05",
@@ -2356,7 +2391,7 @@
           "isDestructive": false,
           "concernsCount": 0,
           "concerns": "",
-          "astAnalysisLatencyMs": 0.7642
+          "astAnalysisLatencyMs": 0.6291
         },
         {
           "id": "OPT-06",
@@ -2368,7 +2403,7 @@
           "isDestructive": false,
           "concernsCount": 0,
           "concerns": "",
-          "astAnalysisLatencyMs": 1.2408
+          "astAnalysisLatencyMs": 0.5608
         },
         {
           "id": "OPT-07",
@@ -2380,7 +2415,7 @@
           "isDestructive": false,
           "concernsCount": 1,
           "concerns": "PERFORMANCE: Wildcard projection (*) retrieves all columns across matching records; explicit column projection is recommended for high-throughput queries.",
-          "astAnalysisLatencyMs": 0.9286
+          "astAnalysisLatencyMs": 0.3714
         },
         {
           "id": "OPT-08",
@@ -2392,7 +2427,7 @@
           "isDestructive": true,
           "concernsCount": 1,
           "concerns": "CRITICAL: Modifying statement without WHERE clause will affect ALL rows in the table.",
-          "astAnalysisLatencyMs": 0.404
+          "astAnalysisLatencyMs": 0.1937
         },
         {
           "id": "OPT-09",
@@ -2404,7 +2439,7 @@
           "isDestructive": false,
           "concernsCount": 0,
           "concerns": "",
-          "astAnalysisLatencyMs": 0.7842
+          "astAnalysisLatencyMs": 0.5311
         },
         {
           "id": "OPT-10",
@@ -2416,7 +2451,7 @@
           "isDestructive": false,
           "concernsCount": 0,
           "concerns": "",
-          "astAnalysisLatencyMs": 0.8566
+          "astAnalysisLatencyMs": 0.3395
         }
       ]
     }

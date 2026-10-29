@@ -12,16 +12,63 @@ An enterprise-grade, autonomous database engineering and optimization studio. Co
 - **AI SQL Assistant**: Context-aware SQL generation, natural language translation, and sandboxed query execution.
 - **Query Performance & EXPLAIN Analyzer**: Visual query plan inspection, index usage diagnostics, and cost scoring.
 - **Live Security & Audit Suite**:
-  - **SQL Injection AST Taint Analyzer**: Detects raw string concatenations and AST taint patterns.
-  - **Live GitHub Repository Auditor**: Shallow-clones public GitHub repositories on-demand to perform full-codebase static AST security scans.
-  - **Dynamic Database Hardening Auditor**: Connects live to user-provided MySQL instances (custom host, port, credentials) to audit TLS encryption, administrative wildcards, and user privilege postures.
+  - **Lexical and Syntactic Security Scanner**: Detects raw string concatenations, unescaped template string interpolations, unconstrained DELETE operations, and hardcoded database credentials using deterministic regular-expression pattern scanning across code snippets and repositories. *(Note: The scanner uses high-throughput lexical pattern recognition; full-program static AST taint and inter-procedural dataflow analysis are not currently implemented).*
+  - **Live GitHub Repository Auditor**: Shallow-clones public GitHub repositories on-demand to run multi-file lexical security audits with automated temporary directory cleanup.
+  - **Administrative Database Hardening Auditor**: Connects securely to user-provided MySQL instances (strictly enforcing loopback/private host allowlists and valid database port ranges to prevent SSRF) to audit TLS encryption, administrative wildcards, and user privilege postures. Restricted exclusively to administrative users.
+
+---
+
+## 🛡️ Security Architecture & Resource Controls
+
+- **Cryptographic JWT Authentication**:
+  - Requires `JWT_SECRET` with a minimum length of 32 characters (256 bits).
+  - Fails startup immediately if the secret is missing or insufficient; silent default signing keys are strictly prohibited.
+  - Never prints or leaks secrets in error messages or application logs.
+- **Access Control & Ownership Isolation**:
+  - Multi-user isolation enforces project CRUD ownership via verified JWT tokens (`req.user.id`).
+  - Cross-user resource access, modification, and deletion attempts are blocked with 404/403 responses.
+  - Administrative capabilities (such as live database audits) require `req.user.role === 'admin'`.
+- **SQL Execution Sandbox Guards**:
+  - Strict read-only enforcement (`SELECT`, `WITH`, `SHOW`, `DESCRIBE`, `EXPLAIN`).
+  - Multi-statement execution blocking (rejects semicolon-chained queries).
+  - Explicit keyword blacklist blocking execution of dangerous database routines (`INTO OUTFILE`, `LOAD_FILE`, `SLEEP`, `BENCHMARK`).
+  - Query length capped at 5,000 characters; result rows truncated at 500 rows.
+  - 5,000ms query execution timeout race prevents long-running denial of service.
+- **Resource Protection & Rate Limiting**:
+  - Global API rate limiter: 300 requests / 15 minutes.
+  - Authentication rate limiter (`/login`, `/register`): 20 requests / 15 minutes.
+  - Expensive operations rate limiter (agent optimization, repository scans): 40 requests / 15 minutes.
+  - Request body limit capped at 500 KB; global request timeout set to 30 seconds.
+
+---
+
+## 🔬 Empirical Research Benchmarks & Methodology
+
+The repository includes a reproducible automated benchmarking harness (`npm run benchmark`) producing structured JSON and CSV artifacts in `backend/benchmark_results/`:
+
+1. **Security Detection Benchmark (`benchmark_security.ts`)**:
+   - Evaluates 50 independent, manually curated samples (25 positive vulnerability cases, 25 negative secure cases).
+   - Computes precision, recall, specificity, and F1 score mathematically without hardcoding or synthetic metrics.
+2. **Relational Normalization Benchmark (`benchmark_normalization.ts`)**:
+   - Tests 15 canonical ground-truth relational schemas with functional dependencies.
+   - Evaluates candidate key discovery exact matches and 1NF through BCNF classification accuracy.
+3. **NL-to-SQL Intent & Schema Resolution Benchmark (`benchmark_nl2sql.ts`)**:
+   - Evaluates 40 queries: 20 queries from the preserved original test set and 20 queries from a separate, unseen evaluation corpus.
+   - Compares naive baseline keyword matching against schema-aware join path resolution and entity linking.
+4. **Query Optimization & Database Rewrite Benchmark (`benchmark_query_optimization.ts`)**:
+   - **Part A (AST Structural Analysis)**: In-process AST parsing latency measured via Node.js high-resolution timers (`performance.now()`). Measures JavaScript AST traversal time (~0.4–0.8 ms), **not** database execution latency.
+   - **Part B (Live Empirical MySQL Execution)**: Operates strictly within a dedicated, disposable database (`dbms_studio_benchmark`). Generates synthetic datasets (300 customers, 600 orders) with mixed-case attributes to benchmark execution latency and verify SHA-256 result-set equivalence across transformations.
+   - **Collation-Sensitive Safety**: Demonstrates that SARGable predicate rewrites (`LOWER(col) = val` -> `col = val`) preserve result equivalence under case-insensitive collations (`utf8mb4_general_ci`), but drop mixed-case rows under case-sensitive/binary collations (`utf8mb4_bin`), validating the necessity of optimizer safety guards.
+
+> [!NOTE]
+> The project is currently undergoing active peer audit and empirical validation. Benchmark results represent reproducible local test runs and should not be cited as final publication claims until formal peer review.
 
 ---
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, React Flow, Monaco Editor, Lucide Icons, Axios.
-- **Backend**: Node.js, Express, TypeScript, `node-sql-parser`, `natural` (NLP tokenization & stemming), `mysql2`, `@google/genai`.
+- **Backend**: Node.js (v20+ / v24+), Express 5, TypeScript, `node-sql-parser`, `natural` (NLP tokenization & stemming), `mysql2`, `@google/genai`, `express-rate-limit`, `jsonwebtoken`.
 - **Database**: MySQL 8.0+.
 - **DevOps**: Multi-stage Dockerfile, Docker Compose, Render Blueprint, Vercel SPA configuration.
 
@@ -35,6 +82,7 @@ Run the full application including MySQL with a single command:
 
 1. Create a `.env` file in the root directory (or copy `.env.example`):
    ```env
+   JWT_SECRET=your_secure_random_jwt_secret_at_least_32_characters_long
    GEMINI_API_KEY=your_gemini_api_key_here
    ```
 2. Start the services:
@@ -45,15 +93,14 @@ Run the full application including MySQL with a single command:
 
 ---
 
-### Option 2: 1-Click Free Cloud Deploy on Render (Unified Full-Stack)
+### Option 2: 1-Click Cloud Deploy on Render (Unified Full-Stack)
 
 The backend Express server is configured to serve the production Vite frontend build directly under one port and URL.
 
 1. Push your repository to GitHub:
    ```bash
    git add .
-   git commit -m "Initial commit for Intelligent DBMS Studio"
-   git remote add origin https://github.com/<your-username>/intelligent-dbms-studio.git
+   git commit -m "feat(security): apply audit remediations and benchmark harness"
    git push -u origin main
    ```
 2. In [Render Dashboard](https://dashboard.render.com):
@@ -61,7 +108,8 @@ The backend Express server is configured to serve the production Vite frontend b
    - Select your GitHub repository.
    - Render will detect `render.yaml` and configure the Web Service automatically.
 3. Add your Environment Variables:
-   - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (e.g. from Aiven, Railway, or AWS RDS MySQL).
+   - `JWT_SECRET` (generate with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`).
+   - `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` (MySQL 8.0+ instance).
    - `GEMINI_API_KEY`.
 4. Deploy! Render will build the frontend and backend, serving both on your assigned `*.onrender.com` domain.
 
@@ -89,38 +137,42 @@ Visit `http://localhost:5000`.
 
 ---
 
-### Option 4: Split Hosting (Vercel Frontend + Render/Railway Backend)
+## ⚙️ Environment Variables Reference
 
-If you prefer hosting the frontend on Vercel and the backend on Render/Railway:
+| Variable | Description | Required | Default |
+|---|---|---|---|
+| `PORT` | HTTP port for Express server | No | `5000` |
+| `JWT_SECRET` | Cryptographic secret for signing JWTs (minimum 32 characters / 256 bits) | **Yes** | *None (Server fails startup if missing)* |
+| `JWT_EXPIRES_IN` | JWT token expiration lifespan | No | `24h` |
+| `DB_HOST` | MySQL hostname | No | `localhost` |
+| `DB_PORT` | MySQL port | No | `3306` |
+| `DB_USER` | MySQL username | No | `root` |
+| `DB_PASSWORD` | MySQL password | No | `""` |
+| `DB_NAME` | MySQL database name | No | `dbms_studio` |
+| `DB_SSL` | Enable TLS (`true`/`false`) | No | `false` |
+| `GEMINI_API_KEY` | Google Gemini API key | Optional | - |
+| `VITE_API_BASE_URL` | Base API URL (for split frontend hosting) | No | `""` (relative `/api`) |
 
-1. **Backend**:
-   - Root directory: `backend`
-   - Build command: `npm install && npm run build`
-   - Start command: `npm start`
-   - Set environment variables (`DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `GEMINI_API_KEY`).
-2. **Frontend**:
-   - Deploy `frontend/` to Vercel.
-   - Set Environment Variable in Vercel:
-     ```env
-     VITE_API_BASE_URL=https://your-backend-api.onrender.com
-     ```
-   - Client-side routes are preconfigured in `frontend/vercel.json`.
+### Generating a Secure JWT Secret
+You can generate a cryptographically strong secret using Node.js:
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
 ---
 
-## ⚙️ Environment Variables Reference
+## 🧪 Running Automated Tests & Benchmarks
 
-| Variable | Description | Default |
-|---|---|---|
-| `PORT` | HTTP port for Express server | `5000` |
-| `DB_HOST` | MySQL hostname | `localhost` |
-| `DB_PORT` | MySQL port | `3306` |
-| `DB_USER` | MySQL username | `root` |
-| `DB_PASSWORD` | MySQL password | `""` |
-| `DB_NAME` | MySQL database name | `dbms_studio` |
-| `DB_SSL` | Enable TLS (`true`/`false`) | `false` |
-| `GEMINI_API_KEY` | Google Gemini API key | - |
-| `VITE_API_BASE_URL` | Base API URL (for split frontend) | `""` (relative `/api`) |
+```bash
+# Navigate to backend directory
+cd backend
+
+# Execute all unit, regression, and integration tests (64 tests)
+npm test
+
+# Execute empirical research benchmark suite
+npm run benchmark
+```
 
 ---
 

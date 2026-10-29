@@ -2,13 +2,20 @@ import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import express from 'express';
 import { setupRoutes } from '../../src/routes';
+import { signAuthToken } from '../../src/auth/authService';
+import pool from '../../src/database/connection';
 import http from 'http';
 
 describe('Express API Route Integration Tests', () => {
     let server: http.Server;
     let baseUrl: string;
+    let authToken: string;
+    let adminToken: string;
 
     before(async () => {
+        authToken = signAuthToken({ id: 991, email: 'route.test@example.com', name: 'Route Tester', role: 'user' });
+        adminToken = signAuthToken({ id: 990, email: 'admin.route@example.com', name: 'Admin Route Tester', role: 'admin' });
+
         const app = express();
         app.use(express.json());
         setupRoutes(app);
@@ -26,12 +33,18 @@ describe('Express API Route Integration Tests', () => {
         await new Promise<void>((resolve) => {
             server.close(() => resolve());
         });
+        try {
+            await pool.end();
+        } catch (err) {}
     });
 
     it('POST /api/sql/validate returns isValid: false for syntax errors', async () => {
         const res = await fetch(`${baseUrl}/api/sql/validate`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
             body: JSON.stringify({ sql: 'SELECT FROM WHERE;' })
         });
         const data = await res.json() as any;
@@ -44,7 +57,10 @@ describe('Express API Route Integration Tests', () => {
     it('POST /api/sql/validate returns isValid: true for standard SQL queries', async () => {
         const res = await fetch(`${baseUrl}/api/sql/validate`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
             body: JSON.stringify({ sql: 'SELECT id, name FROM users WHERE id = 1;' })
         });
         const data = await res.json() as any;
@@ -56,7 +72,10 @@ describe('Express API Route Integration Tests', () => {
     it('POST /api/sql/execute rejects multiple semicolon-separated statements', async () => {
         const res = await fetch(`${baseUrl}/api/sql/execute`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
             body: JSON.stringify({ sql: 'SELECT 1; DROP TABLE users;' })
         });
         const data = await res.json() as any;
@@ -68,7 +87,10 @@ describe('Express API Route Integration Tests', () => {
     it('POST /api/sql/execute rejects destructive statements', async () => {
         const res = await fetch(`${baseUrl}/api/sql/execute`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
             body: JSON.stringify({ sql: 'DROP TABLE users;' })
         });
         const data = await res.json() as any;
@@ -77,10 +99,13 @@ describe('Express API Route Integration Tests', () => {
         assert.ok(data.error.includes('Only read-only queries'));
     });
 
-    it('POST /api/security/database-audit strictly rejects disallowed/SSRF hosts with 403', async () => {
+    it('POST /api/security/database-audit strictly rejects disallowed/SSRF hosts with 403 for admin', async () => {
         const res = await fetch(`${baseUrl}/api/security/database-audit`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${adminToken}`
+            },
             body: JSON.stringify({
                 host: '169.254.169.254',
                 port: 3306,

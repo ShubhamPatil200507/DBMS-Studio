@@ -172,11 +172,16 @@ export const executeSql = async (req: Request, res: Response): Promise<void> => 
         const { sql } = req.body;
         
         if (!sql || typeof sql !== 'string' || !sql.trim()) {
-            res.status(400).json({ error: 'SQL query is required' });
+            res.status(400).json({ error: 'SQL query is required and must be a non-empty string' });
             return;
         }
 
         const trimmedSql = sql.trim();
+
+        if (trimmedSql.length > 5000) {
+            res.status(400).json({ error: 'Payload Too Large: SQL statement exceeds the 5,000 character limit.' });
+            return;
+        }
 
         // Disallow multiple semicolon-delimited statements in sandbox
         const statements = trimmedSql
@@ -195,6 +200,12 @@ export const executeSql = async (req: Request, res: Response): Promise<void> => 
             return;
         }
 
+        // Disallow dangerous administrative keywords even inside read-only statements
+        if (/\b(INTO\s+OUTFILE|INTO\s+DUMPFILE|LOAD_FILE|BENCHMARK|SLEEP)\b/i.test(trimmedSql)) {
+            res.status(403).json({ error: 'Security Exception: Prohibited SQL execution function detected in sandbox.' });
+            return;
+        }
+
         // Validate AST syntax before sending to database engine
         const astAnalysis = parseAndExplainSql(trimmedSql);
         if (!astAnalysis.syntaxValid) {
@@ -202,14 +213,29 @@ export const executeSql = async (req: Request, res: Response): Promise<void> => 
             return;
         }
 
+        const maxRows = 500;
         const start = performance.now();
-        const results = await query(trimmedSql);
+        
+        // Execute with bounded query timeout of 5,000ms
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Query execution timeout exceeded (5000ms limit).')), 5000)
+        );
+        const queryPromise = query(trimmedSql);
+        const rawResults: any = await Promise.race([queryPromise, timeoutPromise]);
+        
         const end = performance.now();
+
+        const totalCount = Array.isArray(rawResults) ? rawResults.length : 0;
+        const results = Array.isArray(rawResults) ? rawResults.slice(0, maxRows) : rawResults;
+        const isTruncated = totalCount > maxRows;
 
         res.json({
             results,
             executionTime: (end - start).toFixed(2),
-            rowCount: Array.isArray(results) ? results.length : 0
+            rowCount: results.length,
+            totalMatchedRows: totalCount,
+            isTruncated,
+            notice: isTruncated ? `Output truncated to first ${maxRows} records for safety.` : undefined
         });
     } catch (error: any) {
         console.error('SQL Execution Error:', error);

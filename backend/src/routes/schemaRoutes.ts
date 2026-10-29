@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { analyzeSchema } from '../controllers/schemaController';
+import { requireAuth } from '../middleware/authMiddleware';
 
 const router = Router();
 
-router.post('/analyze', analyzeSchema);
+// Protect schema structural normalization & analysis
+router.post('/analyze', requireAuth, analyzeSchema);
 
 export default router;

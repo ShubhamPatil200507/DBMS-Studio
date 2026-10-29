@@ -5,6 +5,7 @@ export interface AuthenticatedUser {
     id: number;
     email: string;
     name: string;
+    role: 'admin' | 'user';
 }
 
 declare global {
@@ -39,7 +40,8 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction): vo
         req.user = {
             id: decoded.userId,
             email: decoded.email,
-            name: decoded.name
+            name: decoded.name,
+            role: decoded.role || 'user'
         };
         next();
     } catch (err: any) {
@@ -49,4 +51,18 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction): vo
         res.status(401).json({ error: message });
         return;
     }
+};
+
+/**
+ * Express middleware that enforces administrative authorization.
+ * Rejects unauthenticated callers with 401 and non-admin users with 403 Forbidden.
+ */
+export const requireAdminAuth = (req: Request, res: Response, next: NextFunction): void => {
+    requireAuth(req, res, () => {
+        if (!req.user || req.user.role !== 'admin') {
+            res.status(403).json({ error: 'Forbidden: Administrative authorization required for this capability.' });
+            return;
+        }
+        next();
+    });
 };

@@ -1,5 +1,7 @@
+import dotenv from 'dotenv';
+dotenv.config();
+import mysql from 'mysql2/promise';
 import { parseAndExplainSql } from '../src/nlp/sqlAstAnalyzer';
-import { query } from '../src/database/connection';
 
 export interface OptimizationBenchmarkItem {
     id: string;
@@ -13,6 +15,8 @@ export interface LiveDbTransformationTest {
     id: string;
     description: string;
     transformationType: string;
+    collationMode: 'CASE_INSENSITIVE' | 'CASE_SENSITIVE';
+    expectedSemanticallyEquivalent: boolean;
     originalSql: string;
     transformedSql: string;
 }
@@ -88,6 +92,8 @@ export const LIVE_DB_TRANSFORMATIONS: LiveDbTransformationTest[] = [
         id: 'DB-TRANS-01',
         description: 'Correlated subquery IN unnested to INNER JOIN with DISTINCT',
         transformationType: 'Subquery Unnesting',
+        collationMode: 'CASE_INSENSITIVE',
+        expectedSemanticallyEquivalent: true,
         originalSql: 'SELECT id, name FROM bench_synth_customers WHERE id IN (SELECT customer_id FROM bench_synth_orders WHERE amount > 300) ORDER BY id;',
         transformedSql: 'SELECT DISTINCT c.id, c.name FROM bench_synth_customers c INNER JOIN bench_synth_orders o ON c.id = o.customer_id WHERE o.amount > 300 ORDER BY c.id;'
     },
@@ -95,20 +101,51 @@ export const LIVE_DB_TRANSFORMATIONS: LiveDbTransformationTest[] = [
         id: 'DB-TRANS-02',
         description: 'Correlated COUNT(*) > 0 subquery transformed to short-circuiting EXISTS predicate',
         transformationType: 'EXISTS Semi-Join Transformation',
+        collationMode: 'CASE_INSENSITIVE',
+        expectedSemanticallyEquivalent: true,
         originalSql: 'SELECT id, name FROM bench_synth_customers c WHERE (SELECT COUNT(*) FROM bench_synth_orders o WHERE o.customer_id = c.id) > 0 ORDER BY id;',
         transformedSql: 'SELECT id, name FROM bench_synth_customers c WHERE EXISTS (SELECT 1 FROM bench_synth_orders o WHERE o.customer_id = c.id) ORDER BY id;'
     },
     {
-        id: 'DB-TRANS-03',
-        description: 'SARGable predicate transformation eliminating function evaluation on filtered column',
-        transformationType: 'SARGable Predicate Flattening',
-        originalSql: "SELECT id, name, status FROM bench_synth_customers WHERE LOWER(status) = 'active' ORDER BY id;",
-        transformedSql: "SELECT id, name, status FROM bench_synth_customers WHERE status = 'active' ORDER BY id;"
+        id: 'DB-TRANS-03-CI',
+        description: 'SARGable predicate flattening on case-insensitive collation column (utf8mb4_general_ci)',
+        transformationType: 'SARGable Predicate Flattening (CI)',
+        collationMode: 'CASE_INSENSITIVE',
+        expectedSemanticallyEquivalent: true,
+        originalSql: "SELECT id, name, status_ci FROM bench_synth_customers WHERE LOWER(status_ci) = 'active' ORDER BY id;",
+        transformedSql: "SELECT id, name, status_ci FROM bench_synth_customers WHERE status_ci = 'active' ORDER BY id;"
+    },
+    {
+        id: 'DB-TRANS-03-CS',
+        description: 'SARGable predicate rewrite guard check on binary case-sensitive collation column (utf8mb4_bin)',
+        transformationType: 'Collation-Sensitive Rewrite Guard',
+        collationMode: 'CASE_SENSITIVE',
+        expectedSemanticallyEquivalent: false, // Rewrite is UNTRUE / UNSAFE on mixed-case data under case-sensitive collation!
+        originalSql: "SELECT id, name, status_cs FROM bench_synth_customers WHERE LOWER(status_cs) = 'active' ORDER BY id;",
+        transformedSql: "SELECT id, name, status_cs FROM bench_synth_customers WHERE status_cs = 'active' ORDER BY id;"
     }
 ];
 
 function sortRows(rows: any[]): any[] {
     return [...rows].sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+}
+
+function computeStats(values: number[]) {
+    const sorted = [...values].sort((a, b) => a - b);
+    const n = sorted.length;
+    const median = n % 2 === 0 ? (sorted[n / 2 - 1] + sorted[n / 2]) / 2 : sorted[Math.floor(n / 2)];
+    const mean = sorted.reduce((sum, v) => sum + v, 0) / n;
+    const min = sorted[0];
+    const max = sorted[n - 1];
+    const variance = sorted.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / n;
+    const stdDev = Math.sqrt(variance);
+    return {
+        median: Number(median.toFixed(4)),
+        mean: Number(mean.toFixed(4)),
+        min: Number(min.toFixed(4)),
+        max: Number(max.toFixed(4)),
+        stdDev: Number(stdDev.toFixed(4))
+    };
 }
 
 /**
@@ -156,9 +193,7 @@ export function runAstAnalysisBenchmark(runsPerQuery = 5) {
         });
     }
 
-    latencies.sort((a, b) => a - b);
-    const medianLatencyMs = latencies[Math.floor(latencies.length / 2)];
-    const meanLatencyMs = latencies.reduce((a, b) => a + b, 0) / latencies.length;
+    const stats = computeStats(latencies);
     const total = OPTIMIZATION_BENCHMARK_QUERIES.length;
 
     const summary = {
@@ -166,10 +201,11 @@ export function runAstAnalysisBenchmark(runsPerQuery = 5) {
         runsPerQuery,
         totalExecutionRuns: total * runsPerQuery,
         safetyDetectionAccuracy: Number(((safetyFlagsAccuratelyTriggered / total) * 100).toFixed(2)),
-        meanAstAnalysisLatencyMs: Number(meanLatencyMs.toFixed(4)),
-        medianAstAnalysisLatencyMs: Number(medianLatencyMs.toFixed(4)),
-        minAstAnalysisLatencyMs: Number(latencies[0].toFixed(4)),
-        maxAstAnalysisLatencyMs: Number(latencies[latencies.length - 1].toFixed(4)),
+        meanAstAnalysisLatencyMs: stats.mean,
+        medianAstAnalysisLatencyMs: stats.median,
+        minAstAnalysisLatencyMs: stats.min,
+        maxAstAnalysisLatencyMs: stats.max,
+        stdDevAstAnalysisLatencyMs: stats.stdDev,
         note: 'AST parsing latency measures in-process JavaScript parser execution time, not database execution.'
     };
 
@@ -177,18 +213,36 @@ export function runAstAnalysisBenchmark(runsPerQuery = 5) {
 }
 
 /**
- * Executes Part B: Empirical Database Execution & Equivalence Benchmark on Live MySQL Instance.
+ * Executes Part B: Empirical Database Execution & Equivalence Benchmark.
+ * STRICT SAFETY RULE: Never mutates the application database. Operates exclusively within
+ * an isolated, dedicated disposable benchmark database (e.g. 'dbms_studio_benchmark').
  */
 export async function runLiveDbExecutionBenchmark(runsPerQuery = 5): Promise<any> {
     const liveResults: any[] = [];
+    const benchDbName = process.env.BENCHMARK_DB_NAME || 'dbms_studio_benchmark';
+
+    const dbConfig = {
+        host: process.env.DB_HOST || 'localhost',
+        port: parseInt(process.env.DB_PORT || '3306', 10),
+        user: process.env.DB_USER || 'root',
+        password: process.env.DB_PASSWORD || ''
+    };
+
+    let connection: mysql.Connection | null = null;
 
     try {
-        await query('SELECT 1');
+        // Attempt connection to establish isolated database
+        connection = await mysql.createConnection(dbConfig);
+        await connection.query(`CREATE DATABASE IF NOT EXISTS \`${benchDbName}\`;`);
+        await connection.query(`USE \`${benchDbName}\`;`);
     } catch (err: any) {
+        if (connection) {
+            try { await connection.end(); } catch (e) { /* ignore */ }
+        }
         return {
             summary: {
-                status: 'PENDING_NO_DATABASE_CONNECTION',
-                reason: `Could not connect to live MySQL instance: ${err.message}`,
+                status: 'PENDING_ISOLATED_BENCHMARK_DB_UNAVAILABLE',
+                reason: `Could not establish isolated benchmark database '${benchDbName}': ${err.message}. Application database protected.`,
                 totalTransformationsTested: 0,
                 verifiedSemanticallyEquivalent: 0,
                 semanticEquivalenceRate: 0
@@ -198,44 +252,50 @@ export async function runLiveDbExecutionBenchmark(runsPerQuery = 5): Promise<any
     }
 
     try {
-        // Setup isolated synthetic benchmark dataset
-        await query('DROP TABLE IF EXISTS bench_synth_orders');
-        await query('DROP TABLE IF EXISTS bench_synth_customers');
+        // Clean any existing benchmark-owned tables inside the isolated benchmark schema only
+        await connection.query('DROP TABLE IF EXISTS bench_synth_orders');
+        await connection.query('DROP TABLE IF EXISTS bench_synth_customers');
 
-        await query(`
+        // Create benchmark customers table with BOTH case-insensitive and case-sensitive collations
+        await connection.query(`
             CREATE TABLE bench_synth_customers (
                 id INT PRIMARY KEY,
                 name VARCHAR(100) NOT NULL,
-                status VARCHAR(20) NOT NULL,
+                status_ci VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+                status_cs VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
                 balance DECIMAL(10,2) NOT NULL,
-                INDEX idx_status (status)
-            )
+                INDEX idx_status_ci (status_ci),
+                INDEX idx_status_cs (status_cs)
+            ) ENGINE=InnoDB;
         `);
 
-        await query(`
+        await connection.query(`
             CREATE TABLE bench_synth_orders (
                 id INT PRIMARY KEY,
                 customer_id INT NOT NULL,
                 amount DECIMAL(10,2) NOT NULL,
                 INDEX idx_customer_id (customer_id)
-            )
+            ) ENGINE=InnoDB;
         `);
 
-        // Populate with deterministic synthetic rows
-        for (let i = 1; i <= 200; i++) {
-            const status = i % 3 === 0 ? 'active' : (i % 3 === 1 ? 'inactive' : 'pending');
-            const balance = (i * 17.5).toFixed(2);
-            await query(
-                'INSERT INTO bench_synth_customers (id, name, status, balance) VALUES (?, ?, ?, ?)',
-                [i, `Customer_${i}`, status, balance]
+        // Populate with deterministic synthetic rows with MIXED-CASE status values
+        const mixedStatuses = ['active', 'Active', 'ACTIVE', 'inactive', 'Inactive', 'pending', 'PENDING'];
+        const customerRows = 300;
+
+        for (let i = 1; i <= customerRows; i++) {
+            const rawStatus = mixedStatuses[i % mixedStatuses.length];
+            const balance = (i * 12.75).toFixed(2);
+            await connection.execute(
+                'INSERT INTO bench_synth_customers (id, name, status_ci, status_cs, balance) VALUES (?, ?, ?, ?, ?)',
+                [i, `Customer_${i}`, rawStatus, rawStatus, balance]
             );
 
             // Add 1-3 orders per customer
             const orderCount = (i % 3) + 1;
             for (let o = 1; o <= orderCount; o++) {
                 const orderId = (i * 10) + o;
-                const amount = ((i * o * 13.2) % 1000).toFixed(2);
-                await query(
+                const amount = ((i * o * 19.4) % 1000).toFixed(2);
+                await connection.execute(
                     'INSERT INTO bench_synth_orders (id, customer_id, amount) VALUES (?, ?, ?)',
                     [orderId, i, amount]
                 );
@@ -253,61 +313,73 @@ export async function runLiveDbExecutionBenchmark(runsPerQuery = 5): Promise<any
 
             for (let r = 0; r < runsPerQuery; r++) {
                 const startO = performance.now();
-                origRows = await query(test.originalSql);
+                const [oRows] = await connection.query(test.originalSql);
                 const endO = performance.now();
                 origLatencies.push(endO - startO);
+                origRows = oRows as any[];
 
                 const startT = performance.now();
-                transRows = await query(test.transformedSql);
+                const [tRows] = await connection.query(test.transformedSql);
                 const endT = performance.now();
                 transLatencies.push(endT - startT);
+                transRows = tRows as any[];
             }
 
-            origLatencies.sort((a, b) => a - b);
-            transLatencies.sort((a, b) => a - b);
-
-            const medianOrigMs = origLatencies[Math.floor(origLatencies.length / 2)];
-            const medianTransMs = transLatencies[Math.floor(transLatencies.length / 2)];
+            const origStats = computeStats(origLatencies);
+            const transStats = computeStats(transLatencies);
 
             // Verify complete row-by-row equivalence
             const sortedOrig = sortRows(origRows);
             const sortedTrans = sortRows(transRows);
             const resultsEquivalent = JSON.stringify(sortedOrig) === JSON.stringify(sortedTrans);
 
-            if (resultsEquivalent) {
+            if (resultsEquivalent === test.expectedSemanticallyEquivalent) {
                 verifiedEquivalentCount++;
             }
 
-            const speedup = medianTransMs > 0 ? Number((medianOrigMs / medianTransMs).toFixed(2)) : 1.0;
+            const speedup = transStats.median > 0 ? Number((origStats.median / transStats.median).toFixed(2)) : 1.0;
 
             liveResults.push({
                 id: test.id,
                 description: test.description,
                 transformationType: test.transformationType,
-                rowsReturned: origRows.length,
-                resultsEquivalent,
-                medianOriginalDbLatencyMs: Number(medianOrigMs.toFixed(4)),
-                medianTransformedDbLatencyMs: Number(medianTransMs.toFixed(4)),
+                collationMode: test.collationMode,
+                expectedEquivalence: test.expectedSemanticallyEquivalent,
+                actualEquivalence: resultsEquivalent,
+                rowsOriginal: origRows.length,
+                rowsTransformed: transRows.length,
+                medianOriginalDbLatencyMs: origStats.median,
+                stdDevOriginalDbLatencyMs: origStats.stdDev,
+                medianTransformedDbLatencyMs: transStats.median,
+                stdDevTransformedDbLatencyMs: transStats.stdDev,
                 speedupFactor: `${speedup}x`
             });
         }
 
         const summary = {
             status: 'COMPLETED_EMPIRICAL_LIVE_DB',
+            benchmarkDatabase: benchDbName,
+            datasetCustomers: customerRows,
+            datasetOrders: customerRows * 2,
             totalTransformationsTested: LIVE_DB_TRANSFORMATIONS.length,
-            verifiedSemanticallyEquivalent: verifiedEquivalentCount,
-            semanticEquivalenceRate: Number(((verifiedEquivalentCount / LIVE_DB_TRANSFORMATIONS.length) * 100).toFixed(2)),
-            runsPerTransformation: runsPerQuery
+            correctEquivalenceBehaviorCount: verifiedEquivalentCount,
+            equivalenceBehaviorRate: Number(((verifiedEquivalentCount / LIVE_DB_TRANSFORMATIONS.length) * 100).toFixed(2)),
+            runsPerTransformation: runsPerQuery,
+            collationNote: 'Includes mixed-case evaluation on case-insensitive (utf8mb4_general_ci) and binary case-sensitive (utf8mb4_bin) collations.'
         };
 
         return { summary, results: liveResults };
     } finally {
-        // Clean up synthetic tables
-        try {
-            await query('DROP TABLE IF EXISTS bench_synth_orders');
-            await query('DROP TABLE IF EXISTS bench_synth_customers');
-        } catch (e) {
-            // Ignore cleanup error
+        // Clean up benchmark-owned schema completely
+        if (connection) {
+            try {
+                await connection.query('DROP TABLE IF EXISTS bench_synth_orders');
+                await connection.query('DROP TABLE IF EXISTS bench_synth_customers');
+                await connection.query(`DROP DATABASE IF EXISTS \`${benchDbName}\`;`);
+                await connection.end();
+            } catch (e) {
+                // Ignore cleanup error
+            }
         }
     }
 }
@@ -325,7 +397,7 @@ export async function runQueryOptimizationBenchmark(runsPerQuery = 5) {
         medianAstAnalysisLatencyMs: astBenchmark.summary.medianAstAnalysisLatencyMs,
         liveDbStatus: liveDbBenchmark.summary.status,
         liveDbTransformationsTested: liveDbBenchmark.summary.totalTransformationsTested,
-        liveDbSemanticEquivalenceRate: liveDbBenchmark.summary.semanticEquivalenceRate,
+        liveDbEquivalenceRate: liveDbBenchmark.summary.equivalenceBehaviorRate,
         runsPerQuery
     };
 
@@ -348,7 +420,7 @@ if (require.main === module) {
             console.table(liveDbBenchmark.summary);
             console.table(liveDbBenchmark.results);
         } else {
-            console.log(`Live DB Benchmark Status: ${liveDbBenchmark.summary.status}`);
+            console.log(`Live DB Benchmark Status: ${liveDbBenchmark.summary.status} (${liveDbBenchmark.summary.reason})`);
         }
 
         console.log('\n=== COMBINED QUERY OPTIMIZATION BENCHMARK SUMMARY ===');
