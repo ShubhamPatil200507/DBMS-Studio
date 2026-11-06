@@ -3,6 +3,7 @@
 
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{graphicx}
 \usepackage{textcomp}
@@ -236,18 +237,26 @@ The table was populated with mixed-case status tokens (\texttt{"Active"}, \textt
 \caption{Empirical Live MySQL 8.0.46 Query Transformation and Equivalence Results}
 \label{tab:live_db_results}
 \centering
-\begin{tabularx}{\textwidth}{lp{4.2cm}lccccX}
+\small
+\begin{tabularx}{\textwidth}{l p{4.6cm} l c c c c p{4.5cm}}
 \toprule
 \textbf{ID} & \textbf{Transformation Description} & \textbf{Collation Mode} & \textbf{Original (ms)} & \textbf{Transformed (ms)} & \textbf{Speedup} & \textbf{Equivalent?} & \textbf{Outcome Notes} \\
 \midrule
-DB-TRANS-01 & Subquery unnesting (\texttt{IN} to \texttt{INNER JOIN}) & Case-Insensitive & $0.990 \pm 0.25$ & $1.020 \pm 0.27$ & $0.97\times$ & \textbf{True} & Exact 244 row match preserved. \\
-DB-TRANS-02 & \texttt{COUNT(*) > 0} to \texttt{EXISTS} short-circuit & Case-Insensitive & $1.254 \pm 0.20$ & $0.904 \pm 0.06$ & $\mathbf{1.39\times}$ & \textbf{True} & Exact 300 row match; 28\% latency drop. \\
+DB-TRANS-01 & Subquery unnesting (\texttt{IN} to \texttt{INNER JOIN}) & Case-Insensitive & $0.990 \pm 0.25$ & $1.020 \pm 0.27$ & $0.97\times$ & \textbf{True} & Exact 244-row match preserved. \\
+DB-TRANS-02 & \texttt{COUNT(*) > 0} to \texttt{EXISTS} short-circuit & Case-Insensitive & $1.254 \pm 0.20$ & $0.904 \pm 0.06$ & $\mathbf{1.39\times}$ & \textbf{True} & Exact 300-row match; 28\% latency drop. \\
 DB-TRANS-03-CI & SARGable flattening on \texttt{status\_ci} & Case-Insensitive & $0.526 \pm 0.13$ & $0.842 \pm 0.21$ & $0.63\times$ & \textbf{True} & Both return 128 matching rows. \\
 DB-TRANS-03-CS & SARGable rewrite guard on \texttt{status\_cs} & \textbf{Binary / Case-Sens.} & $0.440 \pm 0.02$ & $0.348 \pm 0.17$ & $1.26\times$ & \textbf{FALSE} & \textbf{Semantic Divergence Detected!} \\
-& & & & & & & Original: 128 rows; Rewrite: 42 rows. \\
+& & & & & & & Original: 128 rows; Rewrite: 42 rows (67.2\% tuple loss). \\
 \bottomrule
 \end{tabularx}
 \end{table*}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/collation_divergence.png}
+\caption{Empirical verification of collation-induced semantic divergence on MySQL 8.0.46. Syntactic SARGable rewrite drops 86 valid records (67.2\% tuple loss) under binary collation (\texttt{utf8mb4\_bin}).}
+\label{fig:divergence}
+\end{figure}
 
 As demonstrated in Table~\ref{tab:live_db_results}, query \texttt{DB-TRANS-03-CS} exhibits severe semantic failure under binary collation. The original query with $\text{LOWER}(\text{status\_cs}) = \text{'active'}$ successfully matches 128 mixed-case records. The naive SARGable rewrite $\text{status\_cs} = \text{'active'}$ matches only 42 records, dropping 86 valid records (a 67.2\% data loss). DBMS-Studio successfully detected this divergence during equivalence gating and suppressed the rewrite, preserving query correctness.
 
@@ -341,6 +350,15 @@ X.~Zhou, C.~Sun, Y.~Li, H.~Guan, and J.~Sun, ``Learned query optimizer: Current 
 
 \bibitem{haley2008security}
 C.~B. Haley, R.~Laney, J.~D. Moffett, and B.~Nuseibeh, ``Security requirements engineering: A framework for representation and analysis,'' \emph{IEEE Transactions on Software Engineering}, vol.~34, no.~1, pp. 133--153, 2008.
+
+\bibitem{graefe1993volcano}
+G.~Graefe and W.~J. McKenna, ``The Volcano optimizer generator: Extensibility and efficient search,'' in \emph{Proceedings of the Ninth International Conference on Data Engineering (ICDE)}, 1993, pp. 209--218.
+
+\bibitem{stonebraker1986design}
+M.~Stonebraker and L.~A. Rowe, ``The design of POSTGRES,'' in \emph{Proceedings of the ACM SIGMOD International Conference on Management of Data}, 1986, pp. 340--355.
+
+\bibitem{iso2023sql}
+ISO/IEC, ``Information technology --- Database languages --- SQL --- Part 2: Foundation (SQL/Foundation),'' \emph{ISO/IEC 9075-2:2023 Standard}, 2023.
 
 \bibitem{mysql80reference}
 Oracle Corporation, ``MySQL 8.0 Reference Manual: Thread Command and Kill Semantics,'' Oracle Documentation, Tech. Rep., 2026.
