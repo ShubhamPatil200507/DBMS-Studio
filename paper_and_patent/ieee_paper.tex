@@ -13,11 +13,7 @@
 \usepackage{url}
 \usepackage{multirow}
 \usepackage{tabularx}
-\usepackage{array}
 \usepackage{microtype}
-
-% Ensure correct column breaking for bibliography without balance package overlapping bugs
-\IEEEtriggeratref{6}
 
 % Listing configuration
 \lstset{
@@ -175,8 +171,8 @@ In web-based SQL interfaces, client-side timeout loops often present an illusion
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.96\columnwidth]{figures/cancellation_architecture.png}
-\caption{Truthful Server-Side Query Cancellation Architecture in DBMS-Studio. The monitor tracks the worker thread identifier and terminates execution over an independent administrative connection.}
+\includegraphics[width=0.92\columnwidth]{figures/cancellation_architecture.png}
+\caption{Truthful Server-Side Query Cancellation Architecture in DBMS-Studio. The watchdog binds the MySQL connection threadId and issues an atomic KILL QUERY over an independent administrative connection upon timeout.}
 \label{fig:cancellation}
 \end{figure}
 
@@ -210,22 +206,23 @@ Automated research benchmarks require disposable database instances. If cleanup 
 \subsection{Testbed and Environmental Setup}
 All experiments were conducted on a dedicated, non-virtualized bare-metal workstation. The hardware and software specifications are cataloged in Table~\ref{tab:hardware_specs}.
 
-\begin{table}[h]
+\begin{table}[t]
 \caption{System Environment and Hardware Specifications}
 \label{tab:hardware_specs}
 \centering
 \footnotesize
-\begin{tabularx}{\columnwidth}{@{} >{\bfseries}p{2.6cm} X @{}}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\columnwidth}{@{} >{\bfseries}p{2.5cm} X @{}}
 \toprule
-Parameter & Specification \\
+Parameter & Target Platform Specification \\
 \midrule
-Host Processor & AMD Ryzen 7 7435HS (16 Logical Threads @ 3.10 GHz) \\
-System Memory & 24,261 MB Physical RAM \\
+Host Processor & AMD Ryzen 7 7435HS (16 threads @ 3.10\,GHz) \\
+Physical Memory & 24,261\,MB DDR5 RAM \\
 Operating System & Windows 11 Enterprise (Build 10.0.26300, x64) \\
 Runtime Engine & Node.js v24.19.0 (V8 12.4.254.21) \\
 Database Engine & MySQL Community Server 8.0.46 \\
-Storage Engine & InnoDB (128 MB buffer pool, ACID compliant) \\
-Compiler & TypeScript 5.8 / \texttt{tsx} test runner \\
+Storage Engine & InnoDB (128\,MB buffer pool, ACID enabled) \\
+Compiler Harness & TypeScript 5.8 / \texttt{tsx} test runner \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -236,29 +233,29 @@ To validate Theorem 1, we instantiated an isolated synthetic database containing
     \item \texttt{status\_ci}: \texttt{VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4\_general\_ci}
     \item \texttt{status\_cs}: \texttt{VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4\_bin}
 \end{itemize}
-The table was populated with mixed-case status tokens (\texttt{"Active"}, \texttt{"active"}, \texttt{"ACTIVE"}, \texttt{"Inactive"}, \texttt{"Pending"}). We benchmarked 4 query transformation patterns across 5 repeated runs following a pre-warmed execution pass. The measured latencies and equivalence outcomes are recorded in Table~\ref{tab:live_db_results}.
+The table was populated with mixed-case status tokens (\texttt{"Active"}, \texttt{"active"}, \texttt{"ACTIVE"}, \texttt{"Inactive"}, \texttt{"Pending"}). We benchmarked 4 query transformation patterns across 5 repeated runs following a pre-warmed execution pass. The measured latencies and equivalence outcomes are recorded right here in Table~\ref{tab:live_db_results} and illustrated in Fig.~\ref{fig:divergence}.
 
-\begin{table*}[t]
-\caption{Empirical MySQL 8.0.46 Query Transformation, Latency, and Semantic Equivalence Outcomes}
+\begin{table}[t]
+\caption{Live MySQL 8.0.46 Query Optimization \& Equivalence}
 \label{tab:live_db_results}
 \centering
 \footnotesize
-\renewcommand{\arraystretch}{1.2}
-\begin{tabularx}{\textwidth}{@{} l p{4.2cm} l c c c c X @{}}
+\renewcommand{\arraystretch}{1.18}
+\begin{tabularx}{\columnwidth}{@{} l c c c X @{}}
 \toprule
-\textbf{Query ID} & \textbf{Transformation Pattern} & \textbf{Collation Target} & \textbf{Orig. Latency} & \textbf{Trans. Latency} & \textbf{Speedup} & \textbf{Equiv.?} & \textbf{Empirical Execution Finding} \\
+\textbf{Pattern ID} & \textbf{Orig.} & \textbf{Trans.} & \textbf{Speedup} & \textbf{Equivalence \& Outcome} \\
 \midrule
-DB-TRANS-01 & Subquery unnesting (\texttt{IN} to \texttt{INNER JOIN}) & \texttt{utf8mb4\_general\_ci} & $0.990 \pm 0.25$\,ms & $1.020 \pm 0.27$\,ms & $0.97\times$ & \textbf{True} & Exact 244-row cardinality preserved without semantic drift. \\
-DB-TRANS-02 & \texttt{COUNT(*) > 0} to \texttt{EXISTS} short-circuit & \texttt{utf8mb4\_general\_ci} & $1.254 \pm 0.20$\,ms & $0.904 \pm 0.06$\,ms & $\mathbf{1.39\times}$ & \textbf{True} & Exact 300-row match; 28\% latency drop via short-circuiting. \\
-DB-TRANS-03-CI & SARGable flattening on \texttt{status\_ci} & \texttt{utf8mb4\_general\_ci} & $0.526 \pm 0.13$\,ms & $0.842 \pm 0.21$\,ms & $0.63\times$ & \textbf{True} & Identical 128 tuples returned across both original and rewrite. \\
-DB-TRANS-03-CS & SARGable rewrite guard on \texttt{status\_cs} & \textbf{\texttt{utf8mb4\_bin} (Binary)} & $0.440 \pm 0.02$\,ms & $0.348 \pm 0.17$\,ms & $1.26\times$ & \textbf{FALSE} & \textbf{Severe Divergence:} 86 records dropped (67.2\% tuple loss; 128 vs. 42 rows). Rewrite blocked. \\
+DB-TRANS-01 & 0.99\,ms & 1.02\,ms & $0.97\times$ & \textbf{Equivalent}: 244 rows matched; subquery unnested to join. \\
+DB-TRANS-02 & 1.25\,ms & 0.90\,ms & $\mathbf{1.39\times}$ & \textbf{Equivalent}: 300 rows; 28\% latency drop via short-circuit. \\
+DB-TRANS-03-CI & 0.53\,ms & 0.84\,ms & $0.63\times$ & \textbf{Equivalent}: 128 rows on \texttt{utf8mb4\_general\_ci}. \\
+DB-TRANS-03-CS & 0.44\,ms & 0.35\,ms & $1.26\times$ & \textbf{DIVERGENT}: 86 rows lost (67.2\% drop on \texttt{utf8mb4\_bin}). Rewrite blocked. \\
 \bottomrule
 \end{tabularx}
-\end{table*}
+\end{table}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.96\columnwidth]{figures/collation_divergence.png}
+\includegraphics[width=0.92\columnwidth]{figures/collation_divergence.png}
 \caption{Empirical verification of collation-induced semantic divergence on MySQL 8.0.46. Syntactic SARGable rewrite drops 86 valid records (67.2\% tuple loss) under binary collation (\texttt{utf8mb4\_bin}).}
 \label{fig:divergence}
 \end{figure}
@@ -268,21 +265,22 @@ As demonstrated in Table~\ref{tab:live_db_results} and Fig.~\ref{fig:divergence}
 \subsection{Static AST Analysis vs. Lexical Overhead}
 We evaluated the latency and classification accuracy of the AST structural analyzer across 10 distinct SQL queries (5 positive patterns containing wildcards or unindexed projections, and 5 negative clean queries), each evaluated across 5 runs (50 total runs). The analysis overhead distribution is summarized in Table~\ref{tab:ast_stats}.
 
-\begin{table}[h]
+\begin{table}[t]
 \caption{AST Structural Analyzer Performance ($N=50$)}
 \label{tab:ast_stats}
 \centering
 \footnotesize
+\renewcommand{\arraystretch}{1.12}
 \begin{tabularx}{\columnwidth}{@{} X c @{}}
 \toprule
-\textbf{Evaluation Metric} & \textbf{Observed Value} \\
+\textbf{Structural Analyzer Metric} & \textbf{Measured Value} \\
 \midrule
 Classification (TP / TN / FP / FN) & 25 / 25 / 0 / 0 \\
 Precision / Recall / F1-Score & 100\% / 100\% / 100\% \\
-Mean Structural Analysis Latency & 0.716\,ms \\
-Median Structural Analysis Latency & 0.431\,ms \\
-Standard Deviation ($\sigma$) & 1.672\,ms \\
-Minimum / Maximum Recorded Latency & 0.123\,ms / 12.164\,ms \\
+Mean Structural Latency & 0.716\,ms \\
+Median Structural Latency & 0.431\,ms \\
+Latency Std. Deviation ($\sigma$) & 1.672\,ms \\
+Minimum / Maximum Latency & 0.123\,ms / 12.164\,ms \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -292,14 +290,15 @@ The AST analysis executes with a median latency of 0.431~ms, introducing negligi
 \subsection{Schema-Aware NL2SQL Resolution}
 We compared the schema-aware relational graph traversal engine against a heuristic baseline keyword-matching parser. The evaluation corpus comprised 40 total queries: a 20-query preserved benchmark and an unseen 20-query evaluation set spanning multi-table joins, aggregations, and nested grouping. Results are presented in Table~\ref{tab:nl2sql_results}.
 
-\begin{table}[h]
+\begin{table}[t]
 \caption{NL2SQL Schema Resolution Benchmark ($N=40$)}
 \label{tab:nl2sql_results}
 \centering
 \footnotesize
-\begin{tabularx}{\columnwidth}{@{} p{2.4cm} l c c c @{}}
+\renewcommand{\arraystretch}{1.12}
+\begin{tabularx}{\columnwidth}{@{} p{2.2cm} l c c c @{}}
 \toprule
-\textbf{Corpus Partition} & \textbf{Metric} & \textbf{Base} & \textbf{Ours} & \textbf{Gain} \\
+\textbf{Corpus Set} & \textbf{Metric} & \textbf{Baseline} & \textbf{Ours} & \textbf{Delta} \\
 \midrule
 \multirow{2}{*}{Preserved ($n=20$)} & Table Acc. & 70.0\% & \textbf{100.0\%} & +30.0\% \\
 & Intent Acc. & 95.0\% & 95.0\% & 0.0\% \\
@@ -307,7 +306,7 @@ We compared the schema-aware relational graph traversal engine against a heurist
 \multirow{2}{*}{Unseen ($n=20$)} & Table Acc. & 35.0\% & \textbf{80.0\%} & \textbf{+45.0\%} \\
 & Intent Acc. & 85.0\% & \textbf{95.0\%} & +10.0\% \\
 \midrule
-\multirow{3}{*}{\textbf{Combined ($N=40$)}} & \textbf{Table Acc.} & \textbf{52.5\%} & \textbf{90.0\%} & \textbf{+37.5\%} \\
+\multirow{3}{*}{\textbf{Total ($N=40$)}} & \textbf{Table Acc.} & \textbf{52.5\%} & \textbf{90.0\%} & \textbf{+37.5\%} \\
 & \textbf{Intent Acc.} & 90.0\% & \textbf{95.0\%} & +5.0\% \\
 & \textbf{Join Res.} & 62.5\% & \textbf{100.0\%} & +37.5\% \\
 \bottomrule
