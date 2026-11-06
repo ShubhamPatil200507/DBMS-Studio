@@ -29,3 +29,5 @@ yarn-error.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+paper_and_patent/
