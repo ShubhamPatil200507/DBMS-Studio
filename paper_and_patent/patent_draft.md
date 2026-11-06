@@ -26,7 +26,7 @@ The following specification particularly describes the invention and the manner 
 ---
 
 ### 4. FIELD OF THE INVENTION
-The present invention relates generally to database management systems (DBMS), relational query optimization, and application security sandboxing. More specifically, the present invention relates to a computer-implemented method and system for:
+The present invention relates generally to database management systems (DBMS), relational query optimization architectures, and application security sandboxing frameworks. More specifically, the present invention relates to a computer-implemented method and system for:
 1. Validating semantic equivalence of search-argumentable (SARGable) relational query rewrites with character-set and column-collation awareness;
 2. Enforcing fail-closed Abstract Syntax Tree (AST) policy sandboxing over recursive Common Table Expressions (CTEs), multi-statement chained commands, and timing side-channel operations;
 3. Executing truthful server-side query cancellation by synchronizing asynchronous application watchdogs with underlying database kernel thread identifiers; and
@@ -46,7 +46,7 @@ thereby allowing the relational storage engine (such as MySQL InnoDB) to utilize
 #### Deficiencies in Prior Art:
 1. **Collation Blindness and Silent Data Loss:** Prior art heuristic transformation layers exist as external middleware detached from physical catalog metadata. When executed against columns defined with binary or case-sensitive collations (e.g., `utf8mb4_bin` or `latin1_general_cs`), the syntactic equality check $c = \text{'active'}$ performs exact byte-level matching. Consequently, tuples possessing mixed-case tokens (e.g., `'Active'`, `'ACTIVE'`) that were returned by the original query are omitted from the result set of the transformed query. This results in silent, unnotified analytical divergence and data corruption.
 2. **Superficial Lexical Sandboxing:** Interactive and educational database platforms frequently expose direct SQL execution sandboxes to end users. Conventionally, security is enforced via regular expression token matching or query prefix checks (e.g., verifying whether a query begins with the string `"SELECT"`). Malicious or unintended operations readily evade such filters through Common Table Expressions (CTEs) executing data mutations (e.g., `WITH cte AS (SELECT 1) UPDATE users SET ...`), chained multiple statements separated by semicolons, or filesystem exfiltration clauses (`INTO OUTFILE`).
-3. **Untruthful Query Cancellation:** Asynchronous database client drivers (e.g., Node.js database pools) frequently implement client-side timeout races. When a execution timer expires, the application drops the socket listener and reports to the client that the query was aborted. In reality, the database server engine continues executing the query (such as a Cartesian product join) indefinitely, consuming database buffer pool and CPU resources, which can lead to server exhaustion and denial of service.
+3. **Untruthful Query Cancellation:** Asynchronous database client drivers (e.g., Node.js database pools) frequently implement client-side timeout races. When an execution timer expires, the application drops the socket listener and reports to the client that the query was aborted. In reality, the database server engine continues executing the query (such as a Cartesian product join) indefinitely, consuming database buffer pool and CPU resources, which can lead to server exhaustion and denial of service.
 4. **Destructive Benchmark Cleanup Hazards:** Automated regression benchmarking systems frequently operate against fixed database schemas or execute unconstrained `DROP DATABASE IF EXISTS` commands upon teardown. In scenarios involving configuration errors or name collisions, automated scripts risk deleting active application or production databases.
 
 Hence, there exists a critical need for an integrated system and method that enforces catalog-aware collation gating, AST-level fail-closed structural sandboxing, truthful server-side thread termination, and strictly verified benchmark isolation.
@@ -80,17 +80,26 @@ According to a primary embodiment of the present invention, there is provided a 
 ### 8. BRIEF DESCRIPTION OF THE ACCOMPANYING DRAWINGS
 The accompanying drawings illustrate embodiments of the invention and together with the description serve to explain the principles of the invention:
 
-* **FIGURE 1** illustrates the overall multi-tier system architecture of DBMS-Studio, showing the interaction between the presentation layer, API controllers, AST policy sandbox, watchdog controller, and the relational database engine.
-* **FIGURE 2** illustrates a block diagram and operational sequence flow of the dual-connection truthful query cancellation watchdog according to an embodiment of the present invention.
-* **FIGURE 3** illustrates a comparative chart demonstrating collation-induced semantic divergence in SARGable rewrites across case-insensitive (`utf8mb4_general_ci`) and binary (`utf8mb4_bin`) collations.
-* **FIGURE 4** illustrates a state transition diagram of the disposable benchmark namespace lifecycle and fail-closed cleanup boundary assertions.
+* **FIGURE 1** illustrates the overall multi-tier system architecture (100) of DBMS-Studio, showing the interaction between the presentation layer (110), application server (120), AST policy sandbox (130), collation engine (140), watchdog controller (150), and relational database engine (160).
+* **FIGURE 2** illustrates a block diagram and operational sequence flow (200) of the dual-connection truthful query cancellation watchdog according to an embodiment of the present invention.
+* **FIGURE 3** illustrates a comparative chart (300) demonstrating collation-induced semantic divergence in SARGable rewrites across case-insensitive (`utf8mb4_general_ci`) and binary (`utf8mb4_bin`) collations.
+* **FIGURE 4** illustrates a state transition diagram (400) of the disposable benchmark namespace lifecycle and fail-closed cleanup boundary assertions.
 
 ---
 
 ### 9. DETAILED DESCRIPTION OF THE PREFERRED EMBODIMENTS
-Referring now to the drawings and specific embodiments, the technical configuration of the present invention is described in detail.
+Referring now to the drawings, detailed descriptions of specific embodiments are provided.
 
-#### 1. Collation-Aware Semantic Rewrite Verification Engine
+#### 1. System Architecture (FIGURE 1)
+Referring to **FIGURE 1**, the system architecture (100) comprises:
+* A client device (110) executing an interactive React 18 user interface;
+* An application server (120) executing an Express.js orchestration layer;
+* An Abstract Syntax Tree (AST) policy sandbox (130);
+* A collation verification engine (140);
+* A truthful watchdog monitor (150); and
+* A relational database storage engine (160), specifically MySQL 8.0.46 maintaining an InnoDB buffer pool and an active kernel process list.
+
+#### 2. Collation-Aware Semantic Rewrite Verification Engine (FIGURE 3)
 In accordance with an embodiment, when an optimization advisor evaluates an expression such as $\text{LOWER}(c) = \text{'val'}$ on table $R$, the system queries the schema catalog:
 ```sql
 SELECT COLLATION_NAME, DATA_TYPE 
@@ -102,9 +111,9 @@ If `COLLATION_NAME` is a binary or case-sensitive collation (e.g., `utf8mb4_bin`
 To empirically prove semantic equivalence on non-binary columns, the verification module executes both $Q_{\text{orig}}$ and $Q_{\text{trans}}$ on a testbed. The resulting row sets $R_{\text{orig}}$ and $R_{\text{trans}}$ are sorted deterministically using a composite string comparator across all projected attributes. The sorted rows are serialized into canonical JSON arrays:
 $$\mathcal{S}_{\text{orig}} = \text{Serialize}(\text{Sort}(R_{\text{orig}}))$$
 $$\mathcal{S}_{\text{trans}} = \text{Serialize}(\text{Sort}(R_{\text{trans}}))$$
-Semantic equivalence is certified if and only if $\mathcal{S}_{\text{orig}} \equiv \mathcal{S}_{\text{trans}}$ and $|R_{\text{orig}}| = |R_{\text{trans}}|$. If a discrepancy is detected (such as the 128 vs 42 tuple divergence observed in empirical tests on `utf8mb4_bin`), the rewrite is marked as non-equivalent, and the system retains the original unflattened query.
+Semantic equivalence is certified if and only if $\mathcal{S}_{\text{orig}} \equiv \mathcal{S}_{\text{trans}}$ and $|R_{\text{orig}}| = |R_{\text{trans}}|$. If a discrepancy is detected (such as the 128 vs 42 tuple divergence observed in empirical tests on `utf8mb4_bin` illustrated in **FIGURE 3**), the rewrite is marked as non-equivalent, and the system retains the original unflattened query.
 
-#### 2. Fail-Closed AST Policy and CTE Sandboxing
+#### 3. Fail-Closed AST Policy and CTE Sandboxing
 In accordance with another embodiment, the SQL sandboxing engine receives an arbitrary query string from an authenticated client. The string is fed into `node-sql-parser` to generate an Abstract Syntax Tree $\mathcal{T}$.
 
 The AST enforcer executes a multi-phase structural inspection:
@@ -119,10 +128,10 @@ The AST enforcer executes a multi-phase structural inspection:
    * The parser scans for file export AST nodes: `into.type == "outfile"` or `into.type == "dumpfile"`.
    * The expression walker traverses all function call nodes. If any function name matches `SLEEP`, `BENCHMARK`, or `LOAD_FILE`, the query is rejected.
 
-#### 3. Dual-Connection Server-Side Query Execution Watchdog
+#### 4. Dual-Connection Server-Side Query Execution Watchdog (FIGURE 2)
 In accordance with another embodiment, referring to **FIGURE 2**, the server-side execution manager handles long-running or malicious queries through a kernel-synchronized termination protocol:
 1. A connection $C_1$ is leased from the MySQL connection pool.
-2. Upon connection acquisition, the internal thread identifier $\tau_1 = C_1.\text{threadId}$ is captured.
+2. Upon connection acquisition, the internal thread identifier $\tau_1 = C_1.\text{threadId}$ is captured from the socket protocol.
 3. The query execution promise is created: $P_{\text{exec}} = C_1.\text{query}(\text{SQL})$.
 4. A concurrent timer promise $P_{\text{timer}}$ is instantiated with timeout duration $\Delta t$ (e.g., 5,000 ms).
 5. If $P_{\text{exec}}$ resolves prior to $\Delta t$, the timer is cleared, connection $C_1$ is released back to the pool, and results are returned.
@@ -134,15 +143,15 @@ In accordance with another embodiment, referring to **FIGURE 2**, the server-sid
    * The watchdog verifies that the error code matches 1317, confirming that the MySQL storage engine interrupted execution.
    * If the administrative connection throws an access-denied or network error during the kill attempt, the system throws a `QueryCancellationError` indicating `cancellationConfirmed: false`, ensuring truthful outcome reporting.
 
-#### 4. Ephemeral Benchmark Isolation and Boundary Verification
+#### 5. Ephemeral Benchmark Isolation and Boundary Verification (FIGURE 4)
 In accordance with yet another embodiment, referring to **FIGURE 4**, automated benchmarking executes within an entropy-isolated environment:
 1. A unique database identifier is generated:
 $$D_{\text{bench}} = \text{"dbms\_studio\_benchmark\_"} \,\|\, \text{Timestamp} \,\|\, \text{RandomToken}$$
-2. The system queries $\text{SHOW DATABASES LIKE } D_{\text{bench}}$. If the database already exists, execution aborts immediately to protect pre-existing schemas.
+2. The system queries $\text{SHOW DATABASES LIKE } D_{\text{bench}}$. If the database already exists, execution aborts immediately (State 450) to protect pre-existing schemas.
 3. A state machine `BenchmarkCleanupSession` is initialized with properties:
 $$\{\text{databaseName}: D_{\text{bench}}, \; \text{createdByThisRun}: \text{false}, \; \text{isCleanedUp}: \text{false}\}$$
-4. Upon successful execution of $\text{CREATE DATABASE } D_{\text{bench}}$, `createdByThisRun` is set to `true`.
-5. In the cleanup phase, the boundary validator enforces:
+4. Upon successful execution of $\text{CREATE DATABASE } D_{\text{bench}}$, `createdByThisRun` is set to `true` (State 430).
+5. In the cleanup phase (State 440), the boundary validator enforces:
    * Target database name must exactly match $D_{\text{bench}}$.
    * Target database name must not match protected system databases (`mysql`, `sys`, `information_schema`, `performance_schema`).
    * `createdByThisRun` must be strictly boolean `true`.
@@ -154,28 +163,24 @@ $$\{\text{databaseName}: D_{\text{bench}}, \; \text{createdByThisRun}: \text{fal
 ### 10. CLAIMS
 I claim:
 
-1. A computer-implemented method for verifying semantic equivalence and enforcing fail-closed execution sandboxing in a relational database management system, comprising the steps of:
-   * receiving, by an application programming interface (API) layer, a candidate relational query $Q_{\text{orig}}$ and a proposed search-argumentable (SARGable) syntactic query rewrite $Q_{\text{trans}}$;
-   * retrieving, from a database schema catalog, collation metadata $\text{Coll}(A)$ associated with a target column $A$ referenced in a predicate expression of said candidate query $Q_{\text{orig}}$;
-   * verifying whether $\text{Coll}(A)$ matches a binary or case-sensitive collation format, and upon determining a match, suppressing issuance of said proposed query rewrite $Q_{\text{trans}}$ and logging a semantic divergence alert;
-   * parsing incoming SQL queries using an Abstract Syntax Tree (AST) processor into a structural statement tree $\mathcal{T}$;
-   * validating that statement tree $\mathcal{T}$ contains exactly one root statement and conforms to a read-only statement whitelist;
-   * inspecting every Common Table Expression (CTE) sub-node within statement tree $\mathcal{T}$ and rejecting the query if any CTE sub-node contains a data-modifying operation; and
-   * transmitting authorized read-only queries to a database server engine under a monitored execution watchdog.
+1. A computer-implemented method for verifying semantic equivalence and enforcing fail-closed execution sandboxing in a relational database management system, comprising:
+   * receiving, by an application programming interface layer of an application server, a candidate relational query $Q_{\text{orig}}$ and a proposed search-argumentable syntactic query rewrite $Q_{\text{trans}}$;
+   * retrieving, from a database schema catalog, column collation metadata $\text{Coll}(A)$ associated with an attribute $A$ referenced in a predicate expression of said candidate query $Q_{\text{orig}}$;
+   * evaluating whether said column collation metadata $\text{Coll}(A)$ matches a binary or case-sensitive collation format, and upon determining a match, suppressing issuance of said proposed query rewrite $Q_{\text{trans}}$ and preserving said candidate query $Q_{\text{orig}}$;
+   * parsing incoming user SQL statements using an Abstract Syntax Tree (AST) processor into a structural statement tree $\mathcal{T}$;
+   * enforcing a cardinality constraint verifying that said statement tree $\mathcal{T}$ contains exactly one root statement, and confirming that said root statement conforms to a predetermined read-only statement whitelist;
+   * traversing Common Table Expression (CTE) sub-nodes within statement tree $\mathcal{T}$ and rejecting execution if any CTE sub-node contains a data-modifying operation; and
+   * transmitting authorized read-only queries to a relational database server engine under a monitored execution watchdog.
 
-2. The method as claimed in claim 1, wherein when collation metadata $\text{Coll}(A)$ indicates a case-insensitive collation, the method further comprises:
+2. The computer-implemented method as claimed in claim 1, wherein when said column collation metadata $\text{Coll}(A)$ indicates a case-insensitive collation, the method further comprises:
    * executing $Q_{\text{orig}}$ and $Q_{\text{trans}}$ against an isolated synthetic relational dataset;
-   * canonicalizing and deterministically sorting resulting row tuples $R_{\text{orig}}$ and $R_{\text{trans}}$;
-   * serializing the sorted row tuples into canonical JSON format; and
-   * certifying semantic equivalence only if the canonical JSON format of $R_{\text{orig}}$ is identical to that of $R_{\text{trans}}$ and the total row counts are equal.
+   * canonically sorting resulting row tuples $R_{\text{orig}}$ and $R_{\text{trans}}$ using a deterministic composite comparator across projected attributes;
+   * serializing the sorted row tuples into canonical JSON strings; and
+   * certifying semantic equivalence only if the canonical JSON strings of $R_{\text{orig}}$ and $R_{\text{trans}}$ match identically and the total row counts $|R_{\text{orig}}|$ and $|R_{\text{trans}}|$ are equal.
 
-3. The method as claimed in claim 1, wherein said AST processor recursively traverses expression nodes to identify and prohibit invocation of timing-based side-channel functions comprising `SLEEP` and `BENCHMARK`, and filesystem exfiltration clauses comprising `INTO OUTFILE` and `INTO DUMPFILE`.
+3. The computer-implemented method as claimed in claim 1, wherein said AST processor recursively inspects expression nodes to identify and prohibit invocation of timing-based side-channel functions comprising `SLEEP` and `BENCHMARK`, and filesystem exfiltration clauses comprising `INTO OUTFILE` and `INTO DUMPFILE`.
 
-4. The method as claimed in claim 1, further comprising executing automated regression benchmarks within an isolated disposable database schema, comprising:
-   * generating a dynamic database name comprising a disposable benchmark prefix, a millisecond timestamp, and an entropy token;
-   * executing a pre-existence query against the database engine and failing closed if a database matching said dynamic database name already exists;
-   * instantiating a session state object tracking whether the database was created by the active run; and
-   * validating cleanup boundaries prior to teardown, wherein a teardown drop command is blocked if session ownership verification is false or if cleanup has already been executed.
+4. The computer-implemented method as claimed in claim 1, wherein said read-only statement whitelist consists of `select`, `show`, `describe`, and `explain` statement types, and wherein any mutation statement comprising `insert`, `update`, `delete`, `drop`, and `alter` triggers an immediate fail-closed rejection.
 
 5. A system for server-side relational query execution and truthful cancellation, comprising:
    * an application server comprising a processor and a memory executing a query management module;
@@ -199,6 +204,12 @@ I claim:
    * decomposing candidate SQL statements into an Abstract Syntax Tree (AST);
    * enforcing a fail-closed execution policy that accepts analytical Common Table Expressions (CTEs) while rejecting data-modifying CTEs, multiple stacked queries, and disk exfiltration commands; and
    * synchronizing asynchronous query timeouts with database engine kernel thread identifiers via dual-connection `KILL QUERY` execution.
+
+10. The non-transitory computer-readable storage medium as claimed in claim 9, wherein the operations further comprise isolating automated regression benchmarks within an ephemeral database schema by:
+   * generating a dynamic database name comprising a disposable benchmark prefix, a millisecond timestamp, and an entropy token;
+   * executing a pre-existence query against the database engine and failing closed if a database matching said dynamic database name already exists;
+   * instantiating a session state object tracking whether the database was created by the active run; and
+   * validating cleanup boundaries prior to teardown, wherein a teardown drop command is blocked if session ownership verification is false or if cleanup has already been executed.
 
 ---
 
