@@ -14,10 +14,12 @@
 \usepackage{multirow}
 \usepackage{tabularx}
 \usepackage{array}
-\usepackage{ragged2e}
-\usepackage{balance}
+\usepackage{microtype}
 
-% Code listing configuration
+% Ensure correct column breaking for bibliography without balance package overlapping bugs
+\IEEEtriggeratref{6}
+
+% Listing configuration
 \lstset{
     basicstyle=\ttfamily\scriptsize,
     breaklines=true,
@@ -53,9 +55,9 @@ Autonomous DBMS, Query Optimization, Semantic Equivalence, SARGable Predicates, 
 
 \section{Introduction}
 
-The rapid evolution of Autonomous Database Management Systems (ADBMS) and AI-augmented developer tooling has shifted query optimization, schema normalization, and security auditing from manual database administrator (DBA) workflows into automated, software-driven pipelines~\cite{chaudhuri1998overview, leis2015good}. Modern intelligent studios frequently combine Natural Language to SQL (NL2SQL) synthesis, rule-based heuristic query transformation, and automated performance advisors to assist developers~\cite{marcus2019neo}. 
+The rapid evolution of Autonomous Database Management Systems (ADBMS) and AI-augmented developer tooling has shifted query optimization, schema normalization, and security auditing from manual database administrator (DBA) workflows into automated, software-driven pipelines~\cite{chaudhuri1998overview, leis2015good}. Modern intelligent studios frequently combine Natural Language to SQL (NL2SQL) synthesis, rule-based heuristic query transformation, and automated performance advisors to assist developers in exploring database schemas and tuning complex query plans~\cite{marcus2019neo}. 
 
-Despite their practical utility, existing platforms suffer from three foundational vulnerabilities:
+Despite their practical utility, existing platforms suffer from three foundational vulnerabilities that jeopardize data integrity and system availability:
 \begin{enumerate}
     \item \textbf{Collation-Insensitive Semantic Drift:} Rule-based optimizers routinely convert non-SARGable predicate filters—such as $\sigma_{\text{LOWER}(c) = v}(R)$—into index-accessible point lookups $\sigma_{c = v}(R)$. While semantically sound in case-insensitive environments, this transformation silently discards data when applied to case-sensitive or binary collation columns (\texttt{utf8mb4\_bin}), producing undetected analytical discrepancies.
     \item \textbf{Superficial Lexical Sandboxing:} Platforms designed for student and developer experimentation typically guard SQL execution via naive keyword blacklists (e.g., scanning for \texttt{"DROP"} or checking if a query begins with \texttt{"SELECT"}). Attackers and inadvertent users readily circumvent these checks via Common Table Expressions (CTEs) executing data mutations (\texttt{WITH cte AS (SELECT 1) UPDATE ...}), multi-statement chained injections, or out-of-band disk writes (\texttt{INTO OUTFILE}).
@@ -77,10 +79,10 @@ The specific contributions of this paper are organized as follows:
 \section{Related Work}
 
 \subsection{Automated and Learned Query Optimization}
-Query optimization historically centers on dynamic programming over System~R cost models~\cite{selinger1979access}. Modern extensions leverage machine learning and learned cost models~\cite{marcus2019neo, zhou2020learned}. Concurrently, heuristic rule engines (e.g., Apache Calcite, CockroachDB) apply relational algebra transformations such as subquery unnesting, predicate pushdown, and projection pruning. However, these systems universally assume that the relational engine's catalog metadata handles physical execution correctly. When heuristic transformation layers operate as intermediary middleware outside the engine, they lack catalog context, making them susceptible to collation divergence.
+Query optimization historically centers on dynamic programming over System~R cost models~\cite{selinger1979access}. Modern extensions leverage machine learning and learned cost models to estimate cardinality and select physical join operators~\cite{marcus2019neo, zhou2020learned}. Concurrently, heuristic rule engines (e.g., Apache Calcite, CockroachDB) apply relational algebra transformations such as subquery unnesting, predicate pushdown, and projection pruning~\cite{graefe1993volcano}. However, these systems universally assume that the relational engine's catalog metadata handles physical execution correctly. When heuristic transformation layers operate as intermediary middleware outside the engine, they lack catalog context, making them susceptible to collation divergence.
 
 \subsection{SQL Static Analysis and Sandboxing}
-Web-based database studios (such as phpMyAdmin, Cloud9, or educational query portals) enforce execution security via regular expression filtering or database user privilege separation. Static application security testing (SAST) tools (e.g., SonarQube, Semgrep) detect classic string concatenation vulnerabilities~\cite{haley2008security}. However, AST-level sandboxing that differentiates read-only recursive CTEs from data-mutating CTEs within high-concurrency Node.js runtime environments remains largely absent in open-source DBMS studios.
+Web-based database studios (such as phpMyAdmin, Cloud9, or educational query portals) enforce execution security via regular expression filtering or database user privilege separation. Static application security testing (SAST) tools detect classic string concatenation vulnerabilities~\cite{haley2008security}. However, AST-level sandboxing that differentiates read-only recursive CTEs from data-mutating CTEs within high-concurrency Node.js runtime environments remains largely absent in open-source DBMS studios.
 
 \subsection{Query Cancellation Semantics}
 In asynchronous database drivers (e.g., \texttt{mysql2}, \texttt{pg}), client-side timeout libraries often implement \texttt{Promise.race()} timeout loops. When the timer triggers, the driver drops or unhooks the client event listener. Unless an explicit termination packet or administrative thread cancellation is issued to the server daemon, the thread remains active in the database process list (\texttt{SHOW PROCESSLIST}) until query exhaustion~\cite{mysql80reference}. DBMS-Studio bridges this gap via verified server-side kill synchronization.
@@ -131,21 +133,21 @@ Since ASCII($\text{'A'}$) = 65 and ASCII($\text{'a'}$) = 97, the condition $t[A]
 proving that syntactic predicate flattening without catalog collation awareness violates semantic equivalence. $\blacksquare$
 
 \begin{algorithm}[t]
-\caption{Collation-Aware Semantic Verification}
+\caption{Collation-Aware Semantic Rewrite Gating}
 \label{alg:equivalence}
 \begin{algorithmic}[1]
-\REQUIRE Relation $R$, Original Query $Q_{\text{orig}}$, Transformed Query $Q_{\text{trans}}$
-\ENSURE $\text{Status} \in \{\text{EQUIVALENT}, \text{DIVERGENT}\}$
-\STATE Fetch $\text{Coll}(A)$ from \texttt{information\_schema.columns}
+\REQUIRE Relation $R$, Candidate Query $Q_{\text{orig}}$, Transformed Query $Q_{\text{trans}}$
+\ENSURE Verification Status $\in \{\text{EQUIVALENT}, \text{DIVERGENT}\}$
+\STATE Query catalog: $\text{Coll}(A) \leftarrow \text{GetCollation}(R, A)$
 \IF{$\text{Coll}(A) \in \text{BINARY\_COLLATIONS}$}
-    \STATE \textbf{abort} rewrite; log warning \texttt{ERR\_COLLATION\_SENSITIVE}
+    \STATE \textbf{abort} rewrite; log \texttt{ERR\_COLLATION\_SENSITIVE}
     \RETURN $\text{DIVERGENT}$
 \ENDIF
 \STATE Execute $R_{\text{orig}} \leftarrow \text{Execute}(Q_{\text{orig}})$
 \STATE Execute $R_{\text{trans}} \leftarrow \text{Execute}(Q_{\text{trans}})$
 \STATE $S_{\text{orig}} \leftarrow \text{SortAndCanonicalize}(R_{\text{orig}})$
 \STATE $S_{\text{trans}} \leftarrow \text{SortAndCanonicalize}(R_{\text{trans}})$
-\IF{$\text{JSON}(S_{\text{orig}}) == \text{JSON}(S_{\text{trans}})$}
+\IF{$\text{JSON}(S_{\text{orig}}) == \text{JSON}(S_{\text{trans}}) \land |R_{\text{orig}}| == |R_{\text{trans}}|$}
     \RETURN $\text{EQUIVALENT}$
 \ELSE
     \RETURN $\text{DIVERGENT}$
@@ -173,7 +175,7 @@ In web-based SQL interfaces, client-side timeout loops often present an illusion
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{figures/cancellation_architecture.png}
+\includegraphics[width=0.96\columnwidth]{figures/cancellation_architecture.png}
 \caption{Truthful Server-Side Query Cancellation Architecture in DBMS-Studio. The monitor tracks the worker thread identifier and terminates execution over an independent administrative connection.}
 \label{fig:cancellation}
 \end{figure}
@@ -212,21 +214,20 @@ All experiments were conducted on a dedicated, non-virtualized bare-metal workst
 \caption{System Environment and Hardware Specifications}
 \label{tab:hardware_specs}
 \centering
-\small
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}ll@{}}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{} >{\bfseries}p{2.6cm} X @{}}
 \toprule
-\textbf{Parameter} & \textbf{Specification} \\
+Parameter & Specification \\
 \midrule
 Host Processor & AMD Ryzen 7 7435HS (16 Logical Threads @ 3.10 GHz) \\
 System Memory & 24,261 MB Physical RAM \\
 Operating System & Windows 11 Enterprise (Build 10.0.26300, x64) \\
-Execution Engine & Node.js v24.19.0 (V8 12.4.254.21) \\
+Runtime Engine & Node.js v24.19.0 (V8 12.4.254.21) \\
 Database Engine & MySQL Community Server 8.0.46 \\
 Storage Engine & InnoDB (128 MB buffer pool, ACID compliant) \\
 Compiler & TypeScript 5.8 / \texttt{tsx} test runner \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
 \subsection{Empirical Collation Divergence Experiment}
@@ -238,54 +239,52 @@ To validate Theorem 1, we instantiated an isolated synthetic database containing
 The table was populated with mixed-case status tokens (\texttt{"Active"}, \texttt{"active"}, \texttt{"ACTIVE"}, \texttt{"Inactive"}, \texttt{"Pending"}). We benchmarked 4 query transformation patterns across 5 repeated runs following a pre-warmed execution pass. The measured latencies and equivalence outcomes are recorded in Table~\ref{tab:live_db_results}.
 
 \begin{table*}[t]
-\caption{Empirical Live MySQL 8.0.46 Query Transformation and Equivalence Results}
+\caption{Empirical MySQL 8.0.46 Query Transformation, Latency, and Semantic Equivalence Outcomes}
 \label{tab:live_db_results}
 \centering
-\small
-\renewcommand{\arraystretch}{1.25}
-\begin{tabularx}{\textwidth}{@{} l >{\RaggedRight\arraybackslash}p{4.4cm} l c c c c >{\RaggedRight\arraybackslash}X @{}}
+\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{@{} l p{4.2cm} l c c c c X @{}}
 \toprule
-\textbf{ID} & \textbf{Transformation Pattern} & \textbf{Target Collation} & \textbf{Orig. (ms)} & \textbf{Trans. (ms)} & \textbf{Speedup} & \textbf{Equiv.?} & \textbf{Empirical Verification Summary} \\
+\textbf{Query ID} & \textbf{Transformation Pattern} & \textbf{Collation Target} & \textbf{Orig. Latency} & \textbf{Trans. Latency} & \textbf{Speedup} & \textbf{Equiv.?} & \textbf{Empirical Execution Finding} \\
 \midrule
-DB-TRANS-01 & Subquery unnesting (\texttt{IN} to \texttt{INNER JOIN}) & Case-Insensitive & $0.990 \pm 0.25$ & $1.020 \pm 0.27$ & $0.97\times$ & \textbf{True} & Exact 244-row match preserved without tuple divergence. \\
-DB-TRANS-02 & \texttt{COUNT(*) > 0} to \texttt{EXISTS} short-circuit & Case-Insensitive & $1.254 \pm 0.20$ & $0.904 \pm 0.06$ & $\mathbf{1.39\times}$ & \textbf{True} & Exact 300-row match; 28\% latency drop via short-circuiting. \\
-DB-TRANS-03-CI & SARGable flattening on \texttt{status\_ci} & Case-Insensitive & $0.526 \pm 0.13$ & $0.842 \pm 0.21$ & $0.63\times$ & \textbf{True} & Consistent 128 matching rows across both executions. \\
-DB-TRANS-03-CS & SARGable rewrite guard on \texttt{status\_cs} & \textbf{Binary / Case-Sens.} & $0.440 \pm 0.02$ & $0.348 \pm 0.17$ & $1.26\times$ & \textbf{FALSE} & \textbf{Divergence Caught:} 86 valid records dropped (67.2\% tuple loss; 128 vs. 42 rows). Rewrite blocked. \\
+DB-TRANS-01 & Subquery unnesting (\texttt{IN} to \texttt{INNER JOIN}) & \texttt{utf8mb4\_general\_ci} & $0.990 \pm 0.25$\,ms & $1.020 \pm 0.27$\,ms & $0.97\times$ & \textbf{True} & Exact 244-row cardinality preserved without semantic drift. \\
+DB-TRANS-02 & \texttt{COUNT(*) > 0} to \texttt{EXISTS} short-circuit & \texttt{utf8mb4\_general\_ci} & $1.254 \pm 0.20$\,ms & $0.904 \pm 0.06$\,ms & $\mathbf{1.39\times}$ & \textbf{True} & Exact 300-row match; 28\% latency drop via short-circuiting. \\
+DB-TRANS-03-CI & SARGable flattening on \texttt{status\_ci} & \texttt{utf8mb4\_general\_ci} & $0.526 \pm 0.13$\,ms & $0.842 \pm 0.21$\,ms & $0.63\times$ & \textbf{True} & Identical 128 tuples returned across both original and rewrite. \\
+DB-TRANS-03-CS & SARGable rewrite guard on \texttt{status\_cs} & \textbf{\texttt{utf8mb4\_bin} (Binary)} & $0.440 \pm 0.02$\,ms & $0.348 \pm 0.17$\,ms & $1.26\times$ & \textbf{FALSE} & \textbf{Severe Divergence:} 86 records dropped (67.2\% tuple loss; 128 vs. 42 rows). Rewrite blocked. \\
 \bottomrule
 \end{tabularx}
 \end{table*}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\columnwidth]{figures/collation_divergence.png}
+\includegraphics[width=0.96\columnwidth]{figures/collation_divergence.png}
 \caption{Empirical verification of collation-induced semantic divergence on MySQL 8.0.46. Syntactic SARGable rewrite drops 86 valid records (67.2\% tuple loss) under binary collation (\texttt{utf8mb4\_bin}).}
 \label{fig:divergence}
 \end{figure}
 
-As demonstrated in Table~\ref{tab:live_db_results}, query \texttt{DB-TRANS-03-CS} exhibits severe semantic failure under binary collation. The original query with $\text{LOWER}(\text{status\_cs}) = \text{'active'}$ successfully matches 128 mixed-case records. The naive SARGable rewrite $\text{status\_cs} = \text{'active'}$ matches only 42 records, dropping 86 valid records (a 67.2\% data loss). DBMS-Studio successfully detected this divergence during equivalence gating and suppressed the rewrite, preserving query correctness.
+As demonstrated in Table~\ref{tab:live_db_results} and Fig.~\ref{fig:divergence}, query \texttt{DB-TRANS-03-CS} exhibits severe semantic failure under binary collation. The original query with $\text{LOWER}(\text{status\_cs}) = \text{'active'}$ successfully matches 128 mixed-case records. The naive SARGable rewrite $\text{status\_cs} = \text{'active'}$ matches only 42 records, dropping 86 valid records (a 67.2\% data loss). DBMS-Studio successfully detected this divergence during equivalence gating and suppressed the rewrite, preserving query correctness.
 
 \subsection{Static AST Analysis vs. Lexical Overhead}
 We evaluated the latency and classification accuracy of the AST structural analyzer across 10 distinct SQL queries (5 positive patterns containing wildcards or unindexed projections, and 5 negative clean queries), each evaluated across 5 runs (50 total runs). The analysis overhead distribution is summarized in Table~\ref{tab:ast_stats}.
 
 \begin{table}[h]
-\caption{AST Structural Analyzer Performance Statistics ($N=50$)}
+\caption{AST Structural Analyzer Performance ($N=50$)}
 \label{tab:ast_stats}
 \centering
-\small
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}lc@{}}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{} X c @{}}
 \toprule
-\textbf{Metric} & \textbf{Observed Value} \\
+\textbf{Evaluation Metric} & \textbf{Observed Value} \\
 \midrule
-True Positives / True Negatives & 25 / 25 \\
-False Positives / False Negatives & 0 / 0 \\
-Accuracy / Precision / Recall & 100\% / 100\% / 100\% \\
-Mean AST Analysis Latency & 0.716 ms \\
-Median AST Analysis Latency & 0.431 ms \\
-Standard Deviation & 1.672 ms \\
-Minimum / Maximum Latency & 0.123 ms / 12.164 ms \\
+Classification (TP / TN / FP / FN) & 25 / 25 / 0 / 0 \\
+Precision / Recall / F1-Score & 100\% / 100\% / 100\% \\
+Mean Structural Analysis Latency & 0.716\,ms \\
+Median Structural Analysis Latency & 0.431\,ms \\
+Standard Deviation ($\sigma$) & 1.672\,ms \\
+Minimum / Maximum Recorded Latency & 0.123\,ms / 12.164\,ms \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
 The AST analysis executes with a median latency of 0.431~ms, introducing negligible overhead relative to standard database network round-trip times (RTT $\approx 1.5 - 5.0$~ms).
@@ -294,26 +293,25 @@ The AST analysis executes with a median latency of 0.431~ms, introducing negligi
 We compared the schema-aware relational graph traversal engine against a heuristic baseline keyword-matching parser. The evaluation corpus comprised 40 total queries: a 20-query preserved benchmark and an unseen 20-query evaluation set spanning multi-table joins, aggregations, and nested grouping. Results are presented in Table~\ref{tab:nl2sql_results}.
 
 \begin{table}[h]
-\caption{NL2SQL Schema Resolution Benchmark ($N=40$ Queries)}
+\caption{NL2SQL Schema Resolution Benchmark ($N=40$)}
 \label{tab:nl2sql_results}
 \centering
-\small
-\renewcommand{\arraystretch}{1.15}
-\begin{tabular}{@{}lcccc@{}}
+\footnotesize
+\begin{tabularx}{\columnwidth}{@{} p{2.4cm} l c c c @{}}
 \toprule
-\textbf{Corpus Partition} & \textbf{Metric} & \textbf{Baseline} & \textbf{DBMS-Studio} & \textbf{Gain} \\
+\textbf{Corpus Partition} & \textbf{Metric} & \textbf{Base} & \textbf{Ours} & \textbf{Gain} \\
 \midrule
-\multirow{2}{*}{Preserved Corpus ($n=20$)} & Table Acc. & 70.0\% & \textbf{100.0\%} & +30.0\% \\
+\multirow{2}{*}{Preserved ($n=20$)} & Table Acc. & 70.0\% & \textbf{100.0\%} & +30.0\% \\
 & Intent Acc. & 95.0\% & 95.0\% & 0.0\% \\
 \midrule
-\multirow{2}{*}{Unseen Corpus ($n=20$)} & Table Acc. & 35.0\% & \textbf{80.0\%} & \textbf{+45.0\%} \\
+\multirow{2}{*}{Unseen ($n=20$)} & Table Acc. & 35.0\% & \textbf{80.0\%} & \textbf{+45.0\%} \\
 & Intent Acc. & 85.0\% & \textbf{95.0\%} & +10.0\% \\
 \midrule
-\multirow{3}{*}{\textbf{Combined Set ($N=40$)}} & \textbf{Table Acc.} & \textbf{52.5\%} & \textbf{90.0\%} & \textbf{+37.5\%} \\
+\multirow{3}{*}{\textbf{Combined ($N=40$)}} & \textbf{Table Acc.} & \textbf{52.5\%} & \textbf{90.0\%} & \textbf{+37.5\%} \\
 & \textbf{Intent Acc.} & 90.0\% & \textbf{95.0\%} & +5.0\% \\
 & \textbf{Join Res.} & 62.5\% & \textbf{100.0\%} & +37.5\% \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
 On the unseen evaluation corpus, baseline table discovery dropped precipitously to 35.0\% due to vocabulary mismatch. DBMS-Studio maintained 80.0\% accuracy by traversing relational foreign-key graphs, achieving 100\% join path resolution across all 40 queries with a median latency of 0.124~ms.
@@ -337,7 +335,6 @@ Similarly, the security auditing engine was tested against 50 vulnerability inje
 In this paper, we addressed critical correctness, isolation, and security vulnerabilities present in modern autonomous database management studios. We demonstrated both theoretically and empirically that SARGable query rewrites without collation awareness cause severe semantic data loss under binary collations. We presented DBMS-Studio, an integrated platform featuring collation-sensitive rewrite gating, fail-closed AST sandboxing for Common Table Expressions, and server-side synchronized query cancellation via MySQL thread-id management. Our empirical evaluation across 114 automated tests and extensive benchmarks confirms that DBMS-Studio delivers reliable, high-performance database management without sacrificing semantic integrity or system security.
 
 % -------------------------------------------------------------
-\balance
 \bibliographystyle{IEEEtran}
 \begin{thebibliography}{10}
 
@@ -356,14 +353,14 @@ P.~G. Selinger, M.~M. Astrahan, D.~D. Chamberlin, R.~A. Lorie, and T.~G. Price, 
 \bibitem{zhou2020learned}
 X.~Zhou, C.~Sun, Y.~Li, H.~Guan, and J.~Sun, ``Learned query optimizer: Current status and future directions,'' \emph{IEEE Transactions on Knowledge and Data Engineering}, vol.~34, no.~12, pp. 5621--5639, 2020.
 
-\bibitem{haley2008security}
-C.~B. Haley, R.~Laney, J.~D. Moffett, and B.~Nuseibeh, ``Security requirements engineering: A framework for representation and analysis,'' \emph{IEEE Transactions on Software Engineering}, vol.~34, no.~1, pp. 133--153, 2008.
-
 \bibitem{graefe1993volcano}
 G.~Graefe and W.~J. McKenna, ``The Volcano optimizer generator: Extensibility and efficient search,'' in \emph{Proceedings of the Ninth International Conference on Data Engineering (ICDE)}, 1993, pp. 209--218.
 
 \bibitem{stonebraker1986design}
 M.~Stonebraker and L.~A. Rowe, ``The design of POSTGRES,'' in \emph{Proceedings of the ACM SIGMOD International Conference on Management of Data}, 1986, pp. 340--355.
+
+\bibitem{haley2008security}
+C.~B. Haley, R.~Laney, J.~D. Moffett, and B.~Nuseibeh, ``Security requirements engineering: A framework for representation and analysis,'' \emph{IEEE Transactions on Software Engineering}, vol.~34, no.~1, pp. 133--153, 2008.
 
 \bibitem{iso2023sql}
 ISO/IEC, ``Information technology --- Database languages --- SQL --- Part 2: Foundation (SQL/Foundation),'' \emph{ISO/IEC 9075-2:2023 Standard}, 2023.
