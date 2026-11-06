@@ -4,7 +4,9 @@ import {
     validateBenchmarkDbConfig,
     validateBenchmarkCleanupBoundary,
     generateUniqueBenchmarkDbName,
-    checkDatabasePreExists
+    checkDatabasePreExists,
+    executeBenchmarkCleanup,
+    BenchmarkCleanupSession
 } from '../../src/security/benchmarkDbSafety';
 
 describe('Benchmark Database Safety & Boundary Verification Unit Tests', () => {
@@ -137,43 +139,132 @@ describe('Benchmark Database Safety & Boundary Verification Unit Tests', () => {
         assert.ok(name1.length <= 64);
     });
 
-    it('detects pre-existing database to prevent accidental overwrite or destruction', async () => {
-        const mockConnPreExists = {
-            query: async (sql: string, params: any[]) => {
-                return [[{ Database: 'dbms_studio_benchmark' }]];
-            }
-        };
-
-        const mockConnDoesNotExist = {
-            query: async (sql: string, params: any[]) => {
-                return [[]];
-            }
-        };
-
-        assert.equal(await checkDatabasePreExists(mockConnPreExists, 'dbms_studio_benchmark'), true);
-        assert.equal(await checkDatabasePreExists(mockConnDoesNotExist, 'dbms_studio_benchmark_unique'), false);
-    });
-
-    describe('Cleanup Boundary Verification & Pre-Existing Database Protection', () => {
-        it('allows cleanup only when database was created by this specific run and names match', () => {
+    describe('Hardened Benchmark Cleanup Regression Suite', () => {
+        // Regression Test 1: createdByThisRun omitted
+        it('regression: blocks cleanup when createdByThisRun is omitted (undefined) - fails closed', () => {
             const boundary = validateBenchmarkCleanupBoundary(
-                'dbms_studio_benchmark_run123',
-                'dbms_studio_benchmark_run123',
-                true
+                'dbms_studio_benchmark_test1',
+                'dbms_studio_benchmark_test1',
+                undefined as any
             );
-            assert.equal(boundary.isSafe, true);
+            assert.equal(boundary.isSafe, false);
+            assert.ok(boundary.error?.includes('ownership verification is missing, false, or invalid'));
         });
 
-        it('strictly blocks cleanup when database was NOT confirmed as created by this run', () => {
+        // Regression Test 2: createdByThisRun = false
+        it('regression: blocks cleanup when createdByThisRun is explicitly false - fails closed', () => {
             const boundary = validateBenchmarkCleanupBoundary(
-                'dbms_studio_benchmark',
-                'dbms_studio_benchmark',
+                'dbms_studio_benchmark_test2',
+                'dbms_studio_benchmark_test2',
                 false
             );
             assert.equal(boundary.isSafe, false);
-            assert.ok(boundary.error?.includes('was not confirmed as created by this specific benchmark run'));
+            assert.ok(boundary.error?.includes('ownership verification is missing, false, or invalid'));
         });
 
+        // Regression Test 3: Pre-existing database
+        it('regression: detects pre-existing database and refuses to overwrite or drop it', async () => {
+            const mockConn = {
+                query: async (sql: string, params: any[]) => {
+                    if (sql.includes('SHOW DATABASES LIKE')) {
+                        return [[{ Database: 'dbms_studio_benchmark_preexisting' }]];
+                    }
+                    throw new Error('Unexpected query execution on pre-existing database');
+                }
+            };
+
+            const preExists = await checkDatabasePreExists(mockConn, 'dbms_studio_benchmark_preexisting');
+            assert.equal(preExists, true);
+
+            // Because database pre-existed, session ownership is false; cleanup must fail closed
+            const boundary = validateBenchmarkCleanupBoundary(
+                'dbms_studio_benchmark_preexisting',
+                'dbms_studio_benchmark_preexisting',
+                false
+            );
+            assert.equal(boundary.isSafe, false);
+            assert.ok(boundary.error?.includes('ownership verification is missing, false, or invalid'));
+        });
+
+        // Regression Test 4: Database creation failure
+        it('regression: blocks cleanup after database creation failure (ownership remains false)', async () => {
+            const session: BenchmarkCleanupSession = {
+                databaseName: 'dbms_studio_benchmark_failed_run',
+                createdByThisRun: false,
+                isCleanedUp: false
+            };
+
+            let dropAttempted = false;
+            const mockConn = {
+                query: async (sql: string) => {
+                    if (sql.includes('DROP DATABASE')) dropAttempted = true;
+                    return [[]];
+                }
+            };
+
+            const result = await executeBenchmarkCleanup(mockConn, session);
+            assert.equal(result.success, false);
+            assert.equal(result.dropped, false);
+            assert.equal(dropAttempted, false, 'DROP DATABASE must not be executed when creation failed');
+            assert.ok(result.error?.includes('ownership verification is missing, false, or invalid'));
+        });
+
+        // Regression Test 5: Successful creation followed by cleanup
+        it('regression: allows cleanup following successful creation and drops target database', async () => {
+            const session: BenchmarkCleanupSession = {
+                databaseName: 'dbms_studio_benchmark_successful_run',
+                createdByThisRun: true,
+                isCleanedUp: false
+            };
+
+            const executedSql: string[] = [];
+            const mockConn = {
+                query: async (sql: string) => {
+                    executedSql.push(sql);
+                    return [[]];
+                }
+            };
+
+            const result = await executeBenchmarkCleanup(mockConn, session);
+            assert.equal(result.success, true);
+            assert.equal(result.dropped, true);
+            assert.equal(session.isCleanedUp, true);
+            assert.ok(executedSql.some(s => s.includes('DROP DATABASE IF EXISTS `dbms_studio_benchmark_successful_run`')));
+        });
+
+        // Regression Test 6: Cleanup called twice
+        it('regression: blocks duplicate drop when cleanup is called twice on the same session', async () => {
+            const session: BenchmarkCleanupSession = {
+                databaseName: 'dbms_studio_benchmark_double_run',
+                createdByThisRun: true,
+                isCleanedUp: false
+            };
+
+            let dropInvocationCount = 0;
+            const mockConn = {
+                query: async (sql: string) => {
+                    if (sql.includes('DROP DATABASE')) dropInvocationCount++;
+                    return [[]];
+                }
+            };
+
+            // First cleanup call: succeeds
+            const res1 = await executeBenchmarkCleanup(mockConn, session);
+            assert.equal(res1.success, true);
+            assert.equal(res1.dropped, true);
+            assert.equal(dropInvocationCount, 1);
+            assert.equal(session.isCleanedUp, true);
+
+            // Second cleanup call: MUST fail closed
+            const res2 = await executeBenchmarkCleanup(mockConn, session);
+            assert.equal(res2.success, false);
+            assert.equal(res2.dropped, false);
+            assert.equal(dropInvocationCount, 1, 'DROP DATABASE must not be called twice');
+            assert.ok(res2.error?.includes('already been executed'));
+        });
+    });
+
+    describe('Cleanup Boundary Verification Target Mismatch & Protection', () => {
         it('strictly blocks cleanup when target database differs from validated database', () => {
             const boundary = validateBenchmarkCleanupBoundary(
                 'dbms_studio',

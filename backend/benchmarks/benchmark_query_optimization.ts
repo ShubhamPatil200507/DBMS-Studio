@@ -6,7 +6,9 @@ import {
     validateBenchmarkDbConfig,
     validateBenchmarkCleanupBoundary,
     generateUniqueBenchmarkDbName,
-    checkDatabasePreExists
+    checkDatabasePreExists,
+    BenchmarkCleanupSession,
+    executeBenchmarkCleanup
 } from '../src/security/benchmarkDbSafety';
 
 export interface OptimizationBenchmarkItem {
@@ -290,9 +292,14 @@ export async function runLiveDbExecutionBenchmark(runsPerQuery = 5): Promise<any
     // Generate a uniquely named benchmark database for this specific run
     const uniqueBenchDbName = generateUniqueBenchmarkDbName(benchDbConfig.database);
 
+    const cleanupSession: BenchmarkCleanupSession = {
+        databaseName: uniqueBenchDbName,
+        createdByThisRun: false,
+        isCleanedUp: false
+    };
+
     let connection: mysql.Connection | null = null;
     let mysqlVersion = 'Unknown';
-    let createdByThisRun = false;
 
     try {
         // Attempt connection using validated explicit dedicated benchmark credentials
@@ -315,10 +322,17 @@ export async function runLiveDbExecutionBenchmark(runsPerQuery = 5): Promise<any
 
         // Create newly allocated disposable database without IF NOT EXISTS, tracking this exact run created it
         await connection.query(`CREATE DATABASE \`${uniqueBenchDbName}\`;`);
-        createdByThisRun = true;
+        cleanupSession.createdByThisRun = true;
         await connection.query(`USE \`${uniqueBenchDbName}\`;`);
     } catch (err: any) {
         if (connection) {
+            if (cleanupSession.createdByThisRun && !cleanupSession.isCleanedUp) {
+                try {
+                    await executeBenchmarkCleanup(connection, cleanupSession);
+                } catch (cleanupErr: any) {
+                    console.error('Safety Boundary Check Notice on Cleanup during setup error:', cleanupErr.message);
+                }
+            }
             try { await connection.end(); } catch (e) { /* ignore */ }
         }
         return {
@@ -462,23 +476,16 @@ export async function runLiveDbExecutionBenchmark(runsPerQuery = 5): Promise<any
         return { summary, results: liveResults };
     } finally {
         // Clean up benchmark-owned schema ONLY if this exact run confirmed creation
-        if (connection && createdByThisRun) {
+        if (connection) {
             try {
-                await connection.query('DROP TABLE IF EXISTS bench_synth_orders');
-                await connection.query('DROP TABLE IF EXISTS bench_synth_customers');
-
-                const boundaryCheck = validateBenchmarkCleanupBoundary(uniqueBenchDbName, uniqueBenchDbName, createdByThisRun);
-                if (boundaryCheck.isSafe) {
-                    await connection.query(`DROP DATABASE IF EXISTS \`${uniqueBenchDbName}\`;`);
-                } else {
-                    console.error('Safety Boundary Check Failed on Cleanup:', boundaryCheck.error);
+                if (cleanupSession.createdByThisRun && !cleanupSession.isCleanedUp) {
+                    await executeBenchmarkCleanup(connection, cleanupSession);
                 }
-                await connection.end();
-            } catch (e) {
-                // Ignore cleanup error
+            } catch (cleanupErr: any) {
+                console.error('Safety Boundary Check Notice on Cleanup:', cleanupErr.message);
+            } finally {
+                try { await connection.end(); } catch (e) {}
             }
-        } else if (connection) {
-            try { await connection.end(); } catch (e) {}
         }
     }
 }

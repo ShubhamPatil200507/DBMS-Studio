@@ -12,6 +12,12 @@ export interface BenchmarkSafetyValidationResult {
     config?: BenchmarkDbConfig;
 }
 
+export interface BenchmarkCleanupSession {
+    readonly databaseName: string;
+    createdByThisRun: boolean;
+    isCleanedUp: boolean;
+}
+
 export const PROTECTED_SYSTEM_DATABASES = new Set(['mysql', 'information_schema', 'performance_schema', 'sys']);
 export const SAFE_DB_NAME_REGEX = /^[a-zA-Z0-9_]{3,64}$/;
 
@@ -122,22 +128,37 @@ export async function checkDatabasePreExists(connection: any, dbName: string): P
 
 /**
  * Validates that a cleanup target DROP DATABASE statement strictly matches the validated disposable benchmark database
- * AND proves that this exact run created it. Pre-existing databases are strictly protected from accidental deletion.
+ * AND proves that this exact run created it.
+ * 
+ * Safety invariants:
+ * 1. Fails closed if createdByThisRun is missing, false, invalid, or inconsistent (no default value permitted).
+ * 2. Fails closed if cleanup has already been executed for this database (prevent duplicate drop).
+ * 3. Fails closed if database name matches system databases or non-disposable patterns.
  */
 export function validateBenchmarkCleanupBoundary(
     targetDb: string,
     validatedBenchDb: string,
-    createdByThisRun: boolean = true
+    createdByThisRun: boolean,
+    alreadyCleanedUp: boolean = false
 ): { isSafe: boolean; error?: string } {
-    if (!targetDb || !validatedBenchDb) {
-        return { isSafe: false, error: 'Database names cannot be empty during cleanup boundary verification.' };
-    }
-
-    if (!createdByThisRun) {
+    // Fail closed if ownership information is missing, false, invalid, or inconsistent
+    if (typeof createdByThisRun !== 'boolean' || createdByThisRun !== true) {
         return {
             isSafe: false,
-            error: `Boundary Exception: Cleanup blocked because database '${targetDb}' was not confirmed as created by this specific benchmark run.`
+            error: `Boundary Exception: Cleanup blocked because database '${targetDb || 'unknown'}' ownership verification is missing, false, or invalid (createdByThisRun must strictly be boolean true).`
         };
+    }
+
+    // Fail closed if cleanup was already executed on this session
+    if (alreadyCleanedUp === true) {
+        return {
+            isSafe: false,
+            error: `Boundary Exception: Cleanup has already been executed for database '${targetDb || 'unknown'}'. Duplicate cleanup calls are blocked.`
+        };
+    }
+
+    if (!targetDb || typeof targetDb !== 'string' || !targetDb.trim() || !validatedBenchDb || typeof validatedBenchDb !== 'string' || !validatedBenchDb.trim()) {
+        return { isSafe: false, error: 'Database names cannot be empty during cleanup boundary verification.' };
     }
 
     const t = targetDb.trim().toLowerCase();
@@ -154,4 +175,50 @@ export function validateBenchmarkCleanupBoundary(
     }
 
     return { isSafe: true };
+}
+
+/**
+ * Executes cleanup of benchmark database resources with strict ownership boundary enforcement.
+ * Ensures DROP DATABASE is only executed once and only if this exact run confirmed creation.
+ */
+export async function executeBenchmarkCleanup(
+    connection: any,
+    session: BenchmarkCleanupSession
+): Promise<{ success: boolean; dropped: boolean; error?: string }> {
+    const boundaryCheck = validateBenchmarkCleanupBoundary(
+        session.databaseName,
+        session.databaseName,
+        session.createdByThisRun,
+        session.isCleanedUp
+    );
+
+    if (!boundaryCheck.isSafe) {
+        return {
+            success: false,
+            dropped: false,
+            error: boundaryCheck.error
+        };
+    }
+
+    if (!connection) {
+        return {
+            success: false,
+            dropped: false,
+            error: 'No active MySQL connection provided for benchmark cleanup.'
+        };
+    }
+
+    try {
+        await connection.query('DROP TABLE IF EXISTS bench_synth_orders');
+        await connection.query('DROP TABLE IF EXISTS bench_synth_customers');
+        await connection.query(`DROP DATABASE IF EXISTS \`${session.databaseName}\`;`);
+        session.isCleanedUp = true;
+        return { success: true, dropped: true };
+    } catch (dbErr: any) {
+        return {
+            success: false,
+            dropped: false,
+            error: `Failed during DROP statements: ${dbErr.message}`
+        };
+    }
 }
