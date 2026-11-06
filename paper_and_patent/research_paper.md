@@ -187,12 +187,12 @@ To validate Theorem 1, we instantiated an isolated synthetic database containing
 The table was populated with mixed-case status tokens (`"Active"`, `"active"`, `"ACTIVE"`, `"Inactive"`, `"Pending"`). We benchmarked 4 query transformation patterns across 5 repeated runs following a pre-warmed execution pass.
 
 #### Table I: Empirical Live MySQL 8.0.46 Query Transformation and Equivalence Results
-| ID | Transformation Description | Collation Mode | Original Latency (ms) | Transformed Latency (ms) | Speedup Factor | Equivalent? | Outcome Notes |
-| :--- | :--- | :--- | :--- | :--- | :--- | :---: | :--- |
-| **DB-TRANS-01** | Subquery unnesting (`IN` to `INNER JOIN`) | Case-Insensitive | $0.990 \pm 0.25$ | $1.020 \pm 0.27$ | $0.97\times$ | **True** | Exact 244 row match preserved. |
-| **DB-TRANS-02** | `COUNT(*) > 0` to `EXISTS` short-circuit | Case-Insensitive | $1.254 \pm 0.20$ | $0.904 \pm 0.06$ | $\mathbf{1.39\times}$ | **True** | Exact 300 row match; 28% latency drop. |
-| **DB-TRANS-03-CI** | SARGable flattening on `status_ci` | Case-Insensitive | $0.526 \pm 0.13$ | $0.842 \pm 0.21$ | $0.63\times$ | **True** | Both return 128 matching rows. |
-| **DB-TRANS-03-CS** | SARGable rewrite guard on `status_cs` | **Binary / Case-Sens.** | $0.440 \pm 0.02$ | $0.348 \pm 0.17$ | $1.26\times$ | **FALSE** | **Semantic Divergence Detected!** Original: 128 rows; Rewrite: 42 rows (67.2% data loss). |
+| ID | Transformation Pattern | Target Collation | Orig. (ms) | Trans. (ms) | Speedup | Equiv.? | Empirical Verification Summary |
+| :--- | :--- | :--- | :--- | :--- | :---: | :---: | :--- |
+| **DB-TRANS-01** | Subquery unnesting (`IN` to `INNER JOIN`) | Case-Insensitive | $0.990 \pm 0.25$ | $1.020 \pm 0.27$ | $0.97\times$ | **True** | Exact 244-row match preserved without tuple divergence. |
+| **DB-TRANS-02** | `COUNT(*) > 0` to `EXISTS` short-circuit | Case-Insensitive | $1.254 \pm 0.20$ | $0.904 \pm 0.06$ | $\mathbf{1.39\times}$ | **True** | Exact 300-row match; 28% latency drop via short-circuiting. |
+| **DB-TRANS-03-CI** | SARGable flattening on `status_ci` | Case-Insensitive | $0.526 \pm 0.13$ | $0.842 \pm 0.21$ | $0.63\times$ | **True** | Consistent 128 matching rows across both executions. |
+| **DB-TRANS-03-CS** | SARGable rewrite guard on `status_cs` | **Binary / Case-Sens.** | $0.440 \pm 0.02$ | $0.348 \pm 0.17$ | $1.26\times$ | **FALSE** | **Divergence Caught:** 86 valid records dropped (67.2% tuple loss; 128 vs. 42 rows). Rewrite blocked. |
 
 As demonstrated in Table I, query `DB-TRANS-03-CS` exhibits severe semantic failure under binary collation. The original query with $\text{LOWER}(\text{status\_cs}) = \text{'active'}$ successfully matches 128 mixed-case records. The naive SARGable rewrite $\text{status\_cs} = \text{'active'}$ matches only 42 records, dropping 86 valid records (a 67.2% data loss). DBMS-Studio successfully detected this divergence during equivalence gating and suppressed the rewrite, preserving query correctness.
 

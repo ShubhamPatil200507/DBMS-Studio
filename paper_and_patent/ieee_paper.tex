@@ -13,6 +13,8 @@
 \usepackage{url}
 \usepackage{multirow}
 \usepackage{tabularx}
+\usepackage{array}
+\usepackage{ragged2e}
 \usepackage{balance}
 
 % Code listing configuration
@@ -210,17 +212,19 @@ All experiments were conducted on a dedicated, non-virtualized bare-metal workst
 \caption{System Environment and Hardware Specifications}
 \label{tab:hardware_specs}
 \centering
-\begin{tabular}{ll}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}ll@{}}
 \toprule
 \textbf{Parameter} & \textbf{Specification} \\
 \midrule
-Processor & AMD Ryzen 7 7435HS (16 Logical Threads @ 3.10 GHz) \\
+Host Processor & AMD Ryzen 7 7435HS (16 Logical Threads @ 3.10 GHz) \\
 System Memory & 24,261 MB Physical RAM \\
 Operating System & Windows 11 Enterprise (Build 10.0.26300, x64) \\
-Runtime Engine & Node.js v24.19.0 (V8 12.4.254.21) \\
+Execution Engine & Node.js v24.19.0 (V8 12.4.254.21) \\
 Database Engine & MySQL Community Server 8.0.46 \\
-Storage Engine & InnoDB (Default buffer pool 128 MB) \\
-Compiler & TypeScript 5.8 / \texttt{tsx} runner \\
+Storage Engine & InnoDB (128 MB buffer pool, ACID compliant) \\
+Compiler & TypeScript 5.8 / \texttt{tsx} test runner \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -238,15 +242,15 @@ The table was populated with mixed-case status tokens (\texttt{"Active"}, \textt
 \label{tab:live_db_results}
 \centering
 \small
-\begin{tabularx}{\textwidth}{l p{4.6cm} l c c c c p{4.5cm}}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{} l >{\RaggedRight\arraybackslash}p{4.4cm} l c c c c >{\RaggedRight\arraybackslash}X @{}}
 \toprule
-\textbf{ID} & \textbf{Transformation Description} & \textbf{Collation Mode} & \textbf{Original (ms)} & \textbf{Transformed (ms)} & \textbf{Speedup} & \textbf{Equivalent?} & \textbf{Outcome Notes} \\
+\textbf{ID} & \textbf{Transformation Pattern} & \textbf{Target Collation} & \textbf{Orig. (ms)} & \textbf{Trans. (ms)} & \textbf{Speedup} & \textbf{Equiv.?} & \textbf{Empirical Verification Summary} \\
 \midrule
-DB-TRANS-01 & Subquery unnesting (\texttt{IN} to \texttt{INNER JOIN}) & Case-Insensitive & $0.990 \pm 0.25$ & $1.020 \pm 0.27$ & $0.97\times$ & \textbf{True} & Exact 244-row match preserved. \\
-DB-TRANS-02 & \texttt{COUNT(*) > 0} to \texttt{EXISTS} short-circuit & Case-Insensitive & $1.254 \pm 0.20$ & $0.904 \pm 0.06$ & $\mathbf{1.39\times}$ & \textbf{True} & Exact 300-row match; 28\% latency drop. \\
-DB-TRANS-03-CI & SARGable flattening on \texttt{status\_ci} & Case-Insensitive & $0.526 \pm 0.13$ & $0.842 \pm 0.21$ & $0.63\times$ & \textbf{True} & Both return 128 matching rows. \\
-DB-TRANS-03-CS & SARGable rewrite guard on \texttt{status\_cs} & \textbf{Binary / Case-Sens.} & $0.440 \pm 0.02$ & $0.348 \pm 0.17$ & $1.26\times$ & \textbf{FALSE} & \textbf{Semantic Divergence Detected!} \\
-& & & & & & & Original: 128 rows; Rewrite: 42 rows (67.2\% tuple loss). \\
+DB-TRANS-01 & Subquery unnesting (\texttt{IN} to \texttt{INNER JOIN}) & Case-Insensitive & $0.990 \pm 0.25$ & $1.020 \pm 0.27$ & $0.97\times$ & \textbf{True} & Exact 244-row match preserved without tuple divergence. \\
+DB-TRANS-02 & \texttt{COUNT(*) > 0} to \texttt{EXISTS} short-circuit & Case-Insensitive & $1.254 \pm 0.20$ & $0.904 \pm 0.06$ & $\mathbf{1.39\times}$ & \textbf{True} & Exact 300-row match; 28\% latency drop via short-circuiting. \\
+DB-TRANS-03-CI & SARGable flattening on \texttt{status\_ci} & Case-Insensitive & $0.526 \pm 0.13$ & $0.842 \pm 0.21$ & $0.63\times$ & \textbf{True} & Consistent 128 matching rows across both executions. \\
+DB-TRANS-03-CS & SARGable rewrite guard on \texttt{status\_cs} & \textbf{Binary / Case-Sens.} & $0.440 \pm 0.02$ & $0.348 \pm 0.17$ & $1.26\times$ & \textbf{FALSE} & \textbf{Divergence Caught:} 86 valid records dropped (67.2\% tuple loss; 128 vs. 42 rows). Rewrite blocked. \\
 \bottomrule
 \end{tabularx}
 \end{table*}
@@ -267,7 +271,9 @@ We evaluated the latency and classification accuracy of the AST structural analy
 \caption{AST Structural Analyzer Performance Statistics ($N=50$)}
 \label{tab:ast_stats}
 \centering
-\begin{tabular}{lc}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lc@{}}
 \toprule
 \textbf{Metric} & \textbf{Observed Value} \\
 \midrule
@@ -291,7 +297,9 @@ We compared the schema-aware relational graph traversal engine against a heurist
 \caption{NL2SQL Schema Resolution Benchmark ($N=40$ Queries)}
 \label{tab:nl2sql_results}
 \centering
-\begin{tabular}{lcccc}
+\small
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lcccc@{}}
 \toprule
 \textbf{Corpus Partition} & \textbf{Metric} & \textbf{Baseline} & \textbf{DBMS-Studio} & \textbf{Gain} \\
 \midrule
